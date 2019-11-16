@@ -10,12 +10,6 @@ services:
   - mysql
 before_install:
  - chmod +x gradlew
- - chmod +x ./GenreApp/gradlew
- - chmod +x ./FilmApp/gradlew
- - chmod +x ./CinemaApp/gradlew
- - chmod +x ./SeanceApp/gradlew
- - chmod +x ./DiscoveryService/gradlew
- - chmod +x ./ApiGatewayApp/gradlew
 
 notifications:
   email: false
