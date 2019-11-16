@@ -15,6 +15,7 @@ matrix:
       -
         before_install:
         - "cd SeanceApp"
+        - "echo PWD"
         - "chmod +x gradlew"
         script: gradlew clean test
         after_script: gradlew clean build
