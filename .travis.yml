@@ -8,31 +8,39 @@ addons:
       - dos2unix
 services:
   - mysql
-before_install:
- - chmod +x gradlew
-
+env:
+  PRO=CinemaStreamMicroservices
 notifications:
   email: false
 matrix:
   include:
-    - script: ./GenreApp/build.gradle
-      before_script: ./GenreApp/gradlew clean test
-      after_script: ./GenreApp/gradlew clean build
-      env: PRO=GenreApp
-    - script: ./SeanceApp/build.gradle
-      before_script: ./SeanceApp/gradlew clean test
-      after_script: ./SeanceApp/gradlew clean build
+    - before_install: cd SeanceApp
+      before_script: chmod +x gradlew
+      script: gradlew clean test
+      after_script: gradlew clean build
       env: PRO=SeanceApp
-    - script: ./CinemaApp/build.gradle
-      before_script: ./CinemaApp/gradlew clean test
-      after_script: ./CinemaApp/gradlew clean build
-      env: PRO=CinemaApp
-    - script: ./FilmApp/build.gradle
-      before_script: ./FilmApp/gradlew clean test
-      after_script: ./FilmApp/gradlew clean build
+    - before_install: cd GenreApp
+      before_script: chmod +x gradlew
+      script: gradlew clean test
+      after_script: gradlew clean build
+      env: PRO=GenreApp
+    - before_install: cd FilmApp
+      before_script: chmod +x gradlew
+      script: gradlew clean test
+      after_script: gradlew clean build
       env: PRO=FilmApp
-    - script: ./DiscoveryService/build.gradle
-      before_script: ./DiscoveryService/gradlew clean test
-      after_script: ./DiscoveryService/gradlew clean build
+    - before_install: cd CinemaApp
+      before_script: chmod +x gradlew
+      script: gradlew clean test
+      after_script: gradlew clean build
+      env: PRO=CinemaApp
+    - before_install: cd DiscoveryService
+      before_script: chmod +x gradlew
+      script: gradlew clean test
+      after_script: gradlew clean build
       env: PRO=DiscoveryService
-env: PRO=CinemaStreamMicroservices
+    - before_install: cd ApiGatewayApp
+      before_script: chmod +x gradlew
+      script: gradlew clean test
+      after_script: gradlew clean build
+      env: PRO=ApiGatewayApp
