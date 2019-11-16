@@ -1,0 +1,48 @@
+sudo: false
+language: java
+jdk:
+  - openjdk12
+addons:
+  apt:
+    packages:
+      - dos2unix
+services:
+  - mysql
+before_install:
+ - chmod +x gradlew
+ - chmod +x ./GenreApp/gradlew
+ - chmod +x ./FilmApp/gradlew
+ - chmod +x ./CinemaApp/gradlew
+ - chmod +x ./SeanceApp/gradlew
+ - chmod +x ./DiscoveryService/gradlew
+ - chmod +x ./ApiGatewayApp/gradlew
+
+notifications:
+  email: false
+matrix:
+  include:
+    - script: ./GenreApp/build.gradle
+      before_script: ./GenreApp/gradlew clean test
+      after_script: ./GenreApp/gradlew clean build
+    env: PRO=GenreApp
+    - script: ./SeanceApp/build.gradle
+      before_script: ./SeanceApp/gradlew clean test
+      after_script: ./SeanceApp/gradlew clean build
+    env: PRO=SeanceApp
+    - script: ./CinemaApp/build.gradle
+      before_script: ./CinemaApp/gradlew clean test
+      after_script: ./CinemaApp/gradlew clean build
+    env: PRO=CinemaApp
+    - script: ./FilmApp/build.gradle
+      before_script: ./FilmApp/gradlew clean test
+      after_script: ./FilmApp/gradlew clean build
+    env: PRO=FilmApp
+    - script: ./DiscoveryService/build.gradle
+      before_script: ./DiscoveryService/gradlew clean test
+      after_script: ./DiscoveryService/gradlew clean build
+    env: PRO=DiscoveryService
+    - script: ./ApiGatewayApp/build.gradle
+      before_script: ./ApiGatewayApp/gradlew clean test
+      after_script: ./ApiGatewayApp/gradlew clean build
+    env: PRO=ApiGatewayApp
+env: PRO=CinemaStreamMicroservices
