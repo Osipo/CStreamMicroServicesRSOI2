@@ -18,10 +18,7 @@ matrix:
         before_install:
         - "cd SeanceApp"
         - "echo $PWD"
-        - "for entry in SeanceApp/*
-            do
-              echo $entry
-            done"
+        - "echo ls -l -d SeanceApp"
         - "chmod +x $TRAVIS_BUILD_DIR/SeanceApp/gradlew"
         script: gradlew clean test
         after_script: gradlew clean build
