@@ -10,37 +10,50 @@ services:
   - mysql
 env:
   PRO=CinemaStreamMicroservices
-notifications:
-  email: false
 matrix:
   include:
-    - before_install: cd SeanceApp
-      before_script: chmod +x gradlew
-      script: gradlew clean test
-      after_script: gradlew clean build
-      env: PRO=SeanceApp
-    - before_install: cd GenreApp
-      before_script: chmod +x gradlew
-      script: gradlew clean test
-      after_script: gradlew clean build
-      env: PRO=GenreApp
-    - before_install: cd FilmApp
-      before_script: chmod +x gradlew
-      script: gradlew clean test
-      after_script: gradlew clean build
-      env: PRO=FilmApp
-    - before_install: cd CinemaApp
-      before_script: chmod +x gradlew
-      script: gradlew clean test
-      after_script: gradlew clean build
-      env: PRO=CinemaApp
-    - before_install: cd DiscoveryService
-      before_script: chmod +x gradlew
-      script: gradlew clean test
-      after_script: gradlew clean build
-      env: PRO=DiscoveryService
-    - before_install: cd ApiGatewayApp
-      before_script: chmod +x gradlew
-      script: gradlew clean test
-      after_script: gradlew clean build
-      env: PRO=ApiGatewayApp
+      -
+        before_script:
+        - "cd SeanceApp"
+        - "chmod +x gradlew"
+        script: gradlew clean test
+        after_script: gradlew clean build
+        env: PRO=SeanceApp
+      -
+        before_script:
+          - "cd GenreApp"
+          - "chmod +x gradlew"
+        script: gradlew clean test
+        after_script: gradlew clean build
+        env: PRO=GenreApp
+      -
+        before_script:
+          - "cd FilmApp"
+          - "chmod +x gradlew"
+        script: gradlew clean test
+        after_script: gradlew clean build
+        env: PRO=FilmApp
+      -
+        before_script:
+          - "cd CinemaApp"
+          - "chmod +x gradlew"
+        script: gradlew clean test
+        after_script: gradlew clean build
+        env: PRO=CinemaApp
+
+      -
+        before_script:
+          - "cd DiscoveryService"
+          - "chmod +x gradlew"
+        script: gradlew clean test
+        after_script: gradlew clean build
+        env: PRO=DiscoveryService
+      -
+        before_script:
+          - "cd ApiGatewayApp"
+          - "chmod +x gradlew"
+        script: gradlew clean test
+        after_script: gradlew clean build
+        env: PRO=ApiGatewayApp
+notifications:
+  email: false
