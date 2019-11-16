@@ -1,0 +1,9 @@
+rootProject.name = 'CinemaStreamMicroservices'
+include 'DiscoveryService'
+include 'GenreApp'
+include 'FilmApp'
+include 'SeanceApp'
+include 'CinemaApp'
+include 'ApiGatewayApp'
+
+

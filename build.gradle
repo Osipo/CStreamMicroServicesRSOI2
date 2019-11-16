@@ -1,0 +1,44 @@
+plugins{
+    id 'java'
+    id 'jacoco'
+}
+subprojects{
+    version '1.0-SHAPSHOT'
+}
+apply plugin: 'jacoco'
+group 'ru'
+version '1.0-SNAPSHOT'
+sourceCompatibility = 1.12
+targetCompatibility = 1.12
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+test{
+    useJUnitPlatform()
+}
+jacoco {
+    toolVersion = "0.8.2"
+}
+jacocoTestReport {
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
+        csv.enabled = true
+    }
+}
+task stage(dependsOn: ['build', 'clean'])
+build.mustRunAfter clean
+
+task copyToLib(type: Copy) {
+    into "$buildDir/libs"
+    from(configurations.compile)
+}
+
+stage.dependsOn(copyToLib)
+
+test.finalizedBy jacocoTestReport

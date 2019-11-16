@@ -1,0 +1,17 @@
+.idea
+*.iml
+.gradle
+out/
+classes/
+build/
+data/
+build
+.gradle
+.idea
+out
+*.iml
+*.ipr
+*.iws
+.DS_Store
+coverage
+.coveralls.yml
