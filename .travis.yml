@@ -56,3 +56,6 @@ matrix:
         env: PRO=ApiGatewayApp
 notifications:
   email: false
+after_success:
+    - ./gradlew jacocoTestReport
+    - ./gradlew coveralls

@@ -15,8 +15,7 @@ plugins {
     id 'java-library'
     id "org.springframework.boot" version "2.1.7.RELEASE"
     id "io.spring.dependency-management" version "1.0.8.RELEASE"
-    id 'jacoco'
-    id 'com.github.kt3k.coveralls' version '2.8.4'
+    //id 'com.github.kt3k.coveralls' version '2.8.4'
 }
 
 apply plugin: 'java'
@@ -25,7 +24,6 @@ apply plugin: 'application'
 mainClassName = 'ru.osipov.deploy.DeployApp'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
-apply plugin: 'jacoco'
 apply from: 'libraries.gradle'
 
 group 'ru.osipov.deploy'
@@ -112,14 +110,3 @@ test{
 springBoot{
     buildInfo()
 }
-jacoco {
-    toolVersion = jacocoVersion
-}
-jacocoTestReport {
-    reports {
-        xml.enabled = true // coveralls plugin depends on xml format report
-        html.enabled = true
-        csv.enabled = true
-    }
-}
-test.finalizedBy jacocoTestReport
