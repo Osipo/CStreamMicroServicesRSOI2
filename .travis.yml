@@ -8,9 +8,7 @@ addons:
       - dos2unix
 services:
   - mysql
-env:
-  - PRO=CinemaStreamMicroservices
-  - JVM_OPTS=-Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2"
+env: PRO=CinemaStreamMicroservice
 matrix:
   include:
       -
@@ -59,6 +57,8 @@ matrix:
           - "chmod +x gradlew"
           - ./gradlew coveralls
           - "cd $PRO"
-        env: PRO=ApiGatewayApp
+        env:
+          - PRO=ApiGatewayApp
+          - JVM_OPTS=-Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2"
 notifications:
   email: false
