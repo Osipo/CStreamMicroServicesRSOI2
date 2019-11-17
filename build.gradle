@@ -23,6 +23,7 @@ subprojects{
         }
     }
     check.dependsOn jacocoTestReport
+    test.finalizedBy jacocoTestReport
 }
 group 'ru'
 version '1.0-SNAPSHOT'
@@ -73,5 +74,5 @@ task jacocoRootReport(type: JacocoReport) {
 
 coveralls {
     sourceDirs = subprojects.sourceSets.main.allSource.srcDirs.flatten()
-    jacocoReportPath = "ApiGatewayApp/build/reports/jacoco/xml/jacocoRootReport.xml"
+    jacocoReportPath = "ApiGatewayApp/build/reports/jacoco/xml/jacoco.xml"
 }
