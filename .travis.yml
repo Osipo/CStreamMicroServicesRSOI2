@@ -10,14 +10,12 @@ services:
   - mysql
 env:
   PRO=CinemaStreamMicroservices
-
-
 matrix:
   include:
       -
         before_install:
-        - "cd SeanceApp"
-        - "chmod +x "gradlew"
+          - "cd SeanceApp"
+          - "chmod +x gradlew"
         script: gradlew clean test
         after_script: gradlew clean build
         env: PRO=SeanceApp
