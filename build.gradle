@@ -14,16 +14,6 @@ allprojects{
 apply plugin: 'com.palantir.jacoco-full-report'
 subprojects{
     version '1.0-SHAPSHOT'
-    jacocoTestReport {
-        reports {
-            html.enabled = true
-            xml.enabled = true
-            xml.setDestination(file("${buildDir}/reports/jacoco/xml/jacoco.xml"))
-            csv.enabled = false
-        }
-    }
-    check.dependsOn jacocoTestReport
-    test.finalizedBy jacocoTestReport
 }
 group 'ru'
 version '1.0-SNAPSHOT'
@@ -50,27 +40,6 @@ task copyToLib(type: Copy) {
 }
 
 stage.dependsOn(copyToLib)
-task jacocoRootReport(type: JacocoReport) {
-    dependsOn = subprojects.test
-    getAdditionalSourceDirs().setFrom(files(subprojects.sourceSets.main.allSource.srcDirs))
-    getSourceDirectories().setFrom(files(subprojects.sourceSets.main.allSource.srcDirs))
-    getClassDirectories().setFrom(files(subprojects.sourceSets.main.output))
-    getExecutionData().setFrom(files(subprojects.jacocoTestReport.executionData))
-    reports {
-        html.enabled = true
-        xml.enabled = true
-        xml.setDestination(file("${buildDir}/jacoco/xml/jacocoRootReport.xml"))
-        csv.enabled = false
-    }
-    onlyIf = {
-        true
-    }
-    doFirst {
-        getExecutionData().setFrom(files(executionData.findAll {
-            it.exists()
-        }))
-    }
-}
 
 coveralls {
     sourceDirs = subprojects.sourceSets.main.allSource.srcDirs.flatten()

@@ -12,6 +12,7 @@ buildscript{
 plugins {
     id 'java'
     id 'application'
+    id 'jacoco'
     id 'java-library'
     id "org.springframework.boot" version "2.1.7.RELEASE"
     id "io.spring.dependency-management" version "1.0.8.RELEASE"
@@ -19,6 +20,7 @@ plugins {
 }
 
 apply plugin: 'java'
+apply plugin: 'jacoco'
 apply plugin: 'idea'
 apply plugin: 'application'
 mainClassName = 'ru.osipov.deploy.DeployApp'
@@ -110,3 +112,14 @@ test{
 springBoot{
     buildInfo()
 }
+jacoco {
+    toolVersion = jacocoVersion
+}
+jacocoTestReport {
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
+        csv.enabled = true
+    }
+}
+test.finalizedBy jacocoTestReport
