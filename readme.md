@@ -1,6 +1,6 @@
 # Cinema Stream Microservices
 [![Build Status](https://travis-ci.org/Osipo/CStreamMicroServicesRSOI2.svg?branch=master)](https://travis-ci.org/Osipo/CStreamMicroServicesRSOI2) 
-<a href='https://coveralls.io/github/Osipo/CStreamMicroServicesRSOI2?branch=c7125358d188af72ce15c99ea548b7fc1edd6cc4'><img src='https://coveralls.io/repos/github/Osipo/CStreamMicroServicesRSOI2/badge.svg?branch=c7125358d188af72ce15c99ea548b7fc1edd6cc4' alt='Coverage Status' /></a>
+[![Coverage Status](https://coveralls.io/repos/github/Osipo/CStreamMicroServicesRSOI2/badge.svg?branch=c7125358d188af72ce15c99ea548b7fc1edd6cc4&service=github)](https://coveralls.io/github/Osipo/CStreamMicroServicesRSOI2?branch=c7125358d188af72ce15c99ea548b7fc1edd6cc4&service=github)
 
 Simple application with microservice architecture.
 Allow users:
