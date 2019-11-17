@@ -53,11 +53,12 @@ matrix:
           - "chmod +x gradlew"
         script: ./gradlew clean test
         after_script: ./gradlew clean build
+        after_success:
+          - "cd .."
+          - "chmod +x gradlew"
+          - ./gradlew jacocoTestReport
+          - ./gradlew coveralls
+          - "cd $PRO"
         env: PRO=ApiGatewayApp
 notifications:
   email: false
-after_success:
-    - "cd .."
-    - ./gradlew jacocoTestReport
-    - ./gradlew coveralls
-    - "cd $PRO"
