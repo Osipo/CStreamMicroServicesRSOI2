@@ -1,0 +1,31 @@
+DROP TABLE IF EXISTS seance;
+CREATE TABLE IF NOT EXISTS seance(
+	cid BIGINT NOT NULL,
+    fid BIGINT NOT NULL,
+    begining DATE NOT NULL,
+    CONSTRAINT seance_PK PRIMARY KEY(cid,fid),
+    CONSTRAINT date_check CHECK(begining > CURDATE())
+);
+--CREATE TABLE IF NOT EXISTS seance(
+--    sid BIGINT NOT NULL auto_increment,
+--    cid BIGINT NOT NULL,
+--    fid BIGINT NOT NULL,
+--    CONSTRAINT seance_PK PRIMARY KEY(sid)
+----    CONSTRAINT seance_cid_FK FOREIGN KEY(cid) REFERENCES cinemas.cinema(cid) ON UPDATE CASCADE ON DELETE CASCADE,
+----    CONSTRAINT seance_fid_FK FOREIGN KEY(fid) REFERENCES movies.film(fid) ON UPDATE CASCADE ON DELETE CASCADE
+--);
+
+DELIMITER //
+CREATE FUNCTION ch1(r int) RETURNS BIT
+BEGIN
+
+	DECLARE s BIT;
+    SET S = 0;
+    IF r = 0 THEN SET
+		S = 1;
+        INSERT INTO seance VALUES (1,11,N'2019-12-03'),(1,12,N'2019-12-05'),(2,10,N'2019-11-25'),(2,12,N'2019-11-24');
+    END IF;
+    RETURN S;
+END //
+
+DELIMITER ;

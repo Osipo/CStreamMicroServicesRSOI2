@@ -1,0 +1,1 @@
+INSERT INTO film VALUES (10,'IT',18,21),(11,'Hellboy',16,23),(12,'MYST',22,22);

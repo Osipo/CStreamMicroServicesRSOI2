@@ -1,0 +1,7 @@
+ext {
+    guavaVersion = "20.0"
+    commonsLangVersion = "3.7"
+    lombokVersion = "1.18.2"
+    findBugsVersion = "3.0.2"
+    jacocoVersion = "0.8.2"
+}
