@@ -51,9 +51,7 @@ matrix:
         before_install:
           - "cd ApiGatewayApp"
           - "chmod +x gradlew"
-        script:
-          - ./gradlew clean test
-          - -jvm-opts travis/jvmopts
+        script: ./gradlew clean test
         after_script: ./gradlew clean build
         after_success:
           - "cd .."
