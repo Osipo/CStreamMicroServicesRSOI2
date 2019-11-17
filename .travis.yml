@@ -9,7 +9,8 @@ addons:
 services:
   - mysql
 env:
-  PRO=CinemaStreamMicroservices
+  - PRO=CinemaStreamMicroservices
+  - JVM_OPTS=-Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2"
 matrix:
   include:
       -
