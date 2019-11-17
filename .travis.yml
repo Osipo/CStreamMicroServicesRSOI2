@@ -59,6 +59,6 @@ matrix:
           - "cd $PRO"
         env:
           - PRO=ApiGatewayApp
-          - JVM_OPTS=-Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2"
+#          - JVM_OPTS=-Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2"
 notifications:
   email: false
