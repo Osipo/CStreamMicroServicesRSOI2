@@ -42,7 +42,6 @@ matrix:
         script: gradlew clean test
         after_script: gradlew clean build
         env: PRO=CinemaApp
-
       -
         before_install:
           - "cd DiscoveryService"
