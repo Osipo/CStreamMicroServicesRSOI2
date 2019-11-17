@@ -1,7 +1,7 @@
 sudo: false
 language: java
 jdk:
-  - oraclejdk13
+  - oraclejdk12
 addons:
   apt:
     packages:
@@ -51,7 +51,9 @@ matrix:
         before_install:
           - "cd ApiGatewayApp"
           - "chmod +x gradlew"
-        script: ./gradlew clean test
+        script:
+          - ./gradlew clean test
+          - -jvm-opts travis/jvmopts
         after_script: ./gradlew clean build
         after_success:
           - "cd .."
