@@ -58,5 +58,4 @@ matrix:
         after_script: gradlew clean build
         env: PRO=ApiGatewayApp
 notifications:
-  email:
-    -
+  email: false
