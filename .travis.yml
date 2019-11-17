@@ -16,31 +16,29 @@ matrix:
   include:
       -
         before_install:
-#        - "cd SeanceApp"
-        - "echo $PWD"
-        - "ls"
-        - "chmod +x $TRAVIS_BUILD_DIR/SeanceApp/gradlew"
+        - "cd SeanceApp"
+        - "chmod +x "gradlew"
         script: gradlew clean test
         after_script: gradlew clean build
         env: PRO=SeanceApp
       -
         before_install:
           - "cd GenreApp"
-          - "chmod +x /gradlew"
+          - "chmod +x gradlew"
         script: gradlew clean test
         after_script: gradlew clean build
         env: PRO=GenreApp
       -
         before_install:
           - "cd FilmApp"
-          - "chmod +x /gradlew"
+          - "chmod +x gradlew"
         script: gradlew clean test
         after_script: gradlew clean build
         env: PRO=FilmApp
       -
         before_install:
           - "cd CinemaApp"
-          - "chmod +x /gradlew"
+          - "chmod +x gradlew"
         script: gradlew clean test
         after_script: gradlew clean build
         env: PRO=CinemaApp
@@ -48,14 +46,14 @@ matrix:
       -
         before_install:
           - "cd DiscoveryService"
-          - "chmod +x /gradlew"
+          - "chmod +x gradlew"
         script: gradlew clean test
         after_script: gradlew clean build
         env: PRO=DiscoveryService
       -
         before_install:
           - "cd ApiGatewayApp"
-          - "chmod +x /gradlew"
+          - "chmod +x gradlew"
         script: gradlew clean test
         after_script: gradlew clean build
         env: PRO=ApiGatewayApp
