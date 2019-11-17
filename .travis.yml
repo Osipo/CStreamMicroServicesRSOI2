@@ -57,5 +57,7 @@ matrix:
 notifications:
   email: false
 after_success:
+    - "cd .."
     - ./gradlew jacocoTestReport
     - ./gradlew coveralls
+    - "cd $PRO"
