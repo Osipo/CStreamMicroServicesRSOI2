@@ -19,10 +19,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.osipov.deploy.errors.ApiException;
+import ru.osipov.deploy.models.CinemaInfo;
 import ru.osipov.deploy.models.FilmInfo;
 import ru.osipov.deploy.services.WebCinemaService;
 import ru.osipov.deploy.services.WebFilmService;
 import ru.osipov.deploy.services.WebGenreService;
+import ru.osipov.deploy.services.WebSeanceService;
 import ru.osipov.deploy.utils.LocalDateAdapter;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -55,6 +57,9 @@ public class ErrorApiControllerTest {
 
     @MockBean
     WebCinemaService cs;
+
+    @MockBean
+    WebSeanceService ss;
 
     @Test
     void testIdFilmNotFound() throws Exception {
@@ -97,5 +102,19 @@ public class ErrorApiControllerTest {
                 .andExpect(jsonPath("$.code").value(404))
                 .andExpect(jsonPath("$.ex").value(IsNull.nullValue()))
                 .andExpect(jsonPath("$.reason").value( "NOT FOUND!!!"));
+    }
+
+    @Test
+    void testSeancePKNotFound() throws Exception {
+        logger.info("testSeancePKNotFound");
+        doThrow(new ApiException("not found.",new IllegalStateException("origin"),404,null,"NOT FOUND!!!",null,null))
+                .when(ss).getByCidFid(longThat(x -> x < 0),longThat(x -> x < 0));
+        when(cs.getById(longThat(x -> x < 0))).thenReturn(new CinemaInfo(-1L,"D","C","C","R","Streeet"));
+        mockMvc.perform(get("/v1/api/cinemas/-2/seances/-6").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$.reason").value("NOT FOUND!!!"))
+                .andExpect(jsonPath("$.code").value(404));
     }
 }

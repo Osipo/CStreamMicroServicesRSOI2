@@ -41,7 +41,7 @@ public class WebGenreService {
             this.serviceUrl = "http://"+serviceUrl;
     }
 
-    public String getByName(String name){
+    public GenreInfo[] getByName(String name){
         // HttpHeaders
         HttpHeaders headers = new HttpHeaders();
 
@@ -57,10 +57,10 @@ public class WebGenreService {
         RestTemplate restTemplate = new RestTemplate();
 
         // Send request with GET method, and Headers.
-        ResponseEntity<String> response;
+        ResponseEntity<GenreInfo[]> response;
         try {
             response = restTemplate.exchange(serviceUrl + "/v1/genres/" + name,
-                    HttpMethod.GET, entity, String.class);
+                    HttpMethod.GET, entity, GenreInfo[].class);
         }
         catch(HttpClientErrorException e){
             logger.info("Error message: '{}'",e.getMessage());

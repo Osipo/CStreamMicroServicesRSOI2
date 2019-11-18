@@ -10,12 +10,14 @@ import ru.osipov.deploy.services.WebCinemaService;
 import ru.osipov.deploy.services.WebFilmService;
 import ru.osipov.deploy.services.WebGenreService;
 import ru.osipov.deploy.services.WebSeanceService;
+import ru.osipov.deploy.utils.Paginator;
 
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.List.of;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 @RestController
@@ -41,8 +43,12 @@ public class ApiController {
     }
 
     //GET: /v1/api/films?r=number
+    //GET: /v1/api/films?r=number&page=X&size=Y
+    //GET: /v1/api/films?r=number&page=X[size = 1]
     @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE,path="/films")
-    public ResponseEntity getAllFilms(@RequestParam(required = false, name= "r") Short rating){
+    public ResponseEntity getAllFilms(@RequestParam(required = false, name= "r") Short rating,
+                                      @RequestParam(required = false, name = "page") Integer page,
+                                      @RequestParam(required = false, name = "size") Integer size){
         FilmInfo[] f;
         if(rating == null){
             f = filmService.getAll();
@@ -56,13 +62,25 @@ public class ApiController {
             FilmGenre fg = new FilmGenre(i.getId(),i.getName(),i.getRating(),g);
             result.add(fg);
         }
+        if(page != null){
+            if(size == null || size <= 0)//size was not specified. [set size = 1]
+                size = 1;
+            result = Paginator.getResult(result,page,size,page);
+        }
+        else if(size != null){//size specified but page not. [set page = 1]
+            if(size <= 0)
+                size = 1;
+            result = Paginator.getResult(result,1,size,1);
+        }
         return ResponseEntity.ok(result);
     }
 
 
     //GET: /v1/api/films/genre/{genre_id}
     @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE,path = {"/films/genre/{gid}","/films/genre/"})
-    public ResponseEntity getFilmsByGenreId(@PathVariable(required = true, name = "gid") Long gid){
+    public ResponseEntity getFilmsByGenreId(@PathVariable(required = true, name = "gid") Long gid,
+                                            @RequestParam(required = false, name = "page") Integer page,
+                                            @RequestParam(required = false, name = "size") Integer size){
         List<FilmGenre> result = new ArrayList<>();
         FilmInfo[]  f = filmService.getByGid(gid);
         GenreInfo g =  genreService.getById(gid);
@@ -70,6 +88,18 @@ public class ApiController {
             FilmGenre fg = new FilmGenre(i.getId(),i.getName(),i.getRating(),g);
             result.add(fg);
         }
+
+        if(page != null){
+            if(size == null || size <= 0)//size was not specified. [set size = 1]
+                size = 1;
+            result = Paginator.getResult(result,page,size,page);
+        }
+        else if(size != null){//size specified but page not. [set page = 1]
+            if(size <= 0)
+                size = 1;
+            result = Paginator.getResult(result,1,size,1);
+        }
+
         return ResponseEntity.ok(result);
     }
 
@@ -90,9 +120,23 @@ public class ApiController {
     }
 
     //GET: /v1/api/genres
+    //GET: /v1/api/genres?page=X&size=Y
+    //GET: /v1/api/genres?page=X
     @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE,path={"/genres","/genres/"})
-    public ResponseEntity getAllGenres(){
-        return ResponseEntity.ok(genreService.getAll());
+    public ResponseEntity getAllGenres(@RequestParam(required = false, name = "page") Integer page,
+                                       @RequestParam(required = false, name = "size") Integer size){
+        List<GenreInfo> result = List.of(genreService.getAll());
+        if(page != null){
+            if(size == null || size <= 0)//size was not specified. [set size = 1]
+                size = 1;
+            result = Paginator.getResult(result,page,size,page);
+        }
+        else if(size != null){//size specified but page not. [set page = 1]
+            if(size <= 0)
+                size = 1;
+            result = Paginator.getResult(result,1,size,1);
+        }
+        return ResponseEntity.ok(result);
     }
 
 

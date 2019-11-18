@@ -34,11 +34,11 @@ public class SeanceInfo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SeanceInfo si = (SeanceInfo) o;
-        return  Objects.equal(cid,si.cid) && Objects.equal(fid,si.fid);
+        return  Objects.equal(cid,si.cid) && Objects.equal(fid,si.fid) && Objects.equal(date,si.date);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(cid,fid);
+        return Objects.hashCode(cid,fid,date);
     }
 }

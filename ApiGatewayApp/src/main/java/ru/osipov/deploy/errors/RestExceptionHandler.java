@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -49,6 +50,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         headers.set("Content-Type",MediaType.APPLICATION_JSON_UTF8_VALUE);
         return new  ResponseEntity<Object>(err,headers2,HttpStatus.OK);
     }
+
+    /*
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        String error = "Invalid method parameter. BADREQUEST: "+ex.getMessage();
+        ApiError err = new ApiError(error, request.getContextPath(),400,ex.getClass().getName());
+        HttpHeaders headers2 = new HttpHeaders();
+        headers.set("Content-Type",MediaType.APPLICATION_JSON_UTF8_VALUE);
+        return new  ResponseEntity<Object>(err,headers2,HttpStatus.OK);
+    }*/
 
     @ExceptionHandler(ApiException.class)
     protected ResponseEntity<Object> handleApiException(

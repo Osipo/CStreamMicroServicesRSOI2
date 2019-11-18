@@ -26,7 +26,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -36,6 +35,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.mockito.Mockito.when;
+import static ru.osipov.deploy.TestParams.*;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(ApiController.class)
@@ -110,6 +110,43 @@ public class ApiControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").exists())
                 .andExpect(jsonPath("$").isEmpty());
+
+        mockMvc.perform(get("/v1/api/films?page=1&size=2").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void testFilmPages() throws Exception {
+        when(fs.getAll()).thenReturn(FILMS);
+        mockMvc.perform(get("/v1/api/films?size=2").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[1]").hasJsonPath())
+                .andExpect(jsonPath("$[2]").doesNotHaveJsonPath())//check length = 2.
+                .andExpect(jsonPath("$[0].id").value(FILMS[0].getId()))
+                .andExpect(jsonPath("$[0].name").value(FILMS[0].getName()))
+                .andExpect(jsonPath("$[1].id").value(FILMS[1].getId()))
+                .andExpect(jsonPath("$[1].name").value(FILMS[1].getName()));
+        mockMvc.perform(get("/v1/api/films?page=3").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0]").hasJsonPath())
+                .andExpect(jsonPath("$[1]").doesNotHaveJsonPath())
+                .andExpect(jsonPath("$[0].id").value(FILMS[2].getId()))
+                .andExpect(jsonPath("$[0].name").value(FILMS[2].getName()));
+        mockMvc.perform(get("/v1/api/films?page=2&size=47").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0]").hasJsonPath())
+                .andExpect(jsonPath("$[1]").doesNotHaveJsonPath())
+                .andExpect(jsonPath("$[0].id").value(FILMS[4].getId()))
+                .andExpect(jsonPath("$[0].name").value(FILMS[4].getName()));
     }
 
     @Test
@@ -144,6 +181,101 @@ public class ApiControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").exists())
                 .andExpect(jsonPath("$.ex").value("org.springframework.web.bind.MissingPathVariableException"));
+
+        mockMvc.perform(get("/v1/api/films/genre/21?page=23&size=4").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0]").hasJsonPath())
+                .andExpect(jsonPath("$[1]").doesNotHaveJsonPath())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].name").value("IT"))
+                .andExpect(jsonPath("$[0].rating").value(16))
+                .andExpect(jsonPath("$[0].genre").exists())
+                .andExpect(jsonPath("$[0].genre.id").value(21L))
+                .andExpect(jsonPath("$[0].genre.name").value("Horror"))
+                .andExpect(jsonPath("$[0].genre.remarks").value("Scary story."));
+    }
+
+    @Test
+    void testGetByGidWithPages() throws Exception {
+        when(fs.getByGid(longThat(x -> x >= 0))).thenReturn(FILMS);
+        GenreInfo genre = new GenreInfo(21L,"Horror","Scary story.");
+        doThrow(new ApiException("err",new IllegalStateException("origin"),404,null,"NOT FOUND!",null,null))
+                .when(fs).getByGid(longThat(x -> x < -25));
+        when(gs.getById(longThat(x -> x > 0))).thenReturn(genre);
+        when(gs.getById(longThat(x -> x <=0))).thenReturn(null);
+
+        mockMvc.perform(get("/v1/api/films/genre/24?page=1&size=4").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[3]").hasJsonPath())
+                .andExpect(jsonPath("$[4]").doesNotHaveJsonPath())
+                .andExpect(jsonPath("$[3].id").value(FILMS[3].getId()))
+                .andExpect(jsonPath("$[3].name").value(FILMS[3].getName()))
+                .andExpect(jsonPath("$[3].rating").value(15))//FILMS[3].getRating()
+                .andExpect(jsonPath("$[3].genre").exists())
+                .andExpect(jsonPath("$[3].genre.id").value(genre.getId()))
+                .andExpect(jsonPath("$[3].genre.name").value(genre.getName()))
+                .andExpect(jsonPath("$[3].genre.remarks").value(genre.getRemarks()));
+
+        mockMvc.perform(get("/v1/api/films/genre/12?page=6&size=4").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0]").hasJsonPath())
+                .andExpect(jsonPath("$[1]").doesNotHaveJsonPath())
+                .andExpect(jsonPath("$[0].id").value(FILMS[4].getId()))
+                .andExpect(jsonPath("$[0].name").value(FILMS[4].getName()))
+                .andExpect(jsonPath("$[0].rating").value(16))//FILMS[4].getRating()
+                .andExpect(jsonPath("$[0].genre").exists())
+                .andExpect(jsonPath("$[0].genre.id").value(genre.getId()))
+                .andExpect(jsonPath("$[0].genre.name").value(genre.getName()))
+                .andExpect(jsonPath("$[0].genre.remarks").value(genre.getRemarks()));
+
+
+        mockMvc.perform(get("/v1/api/films/genre/0?page=1&size=4").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[3]").hasJsonPath())
+                .andExpect(jsonPath("$[4]").doesNotHaveJsonPath())
+                .andExpect(jsonPath("$[3].id").value(FILMS[3].getId()))
+                .andExpect(jsonPath("$[3].name").value(FILMS[3].getName()))
+                .andExpect(jsonPath("$[3].rating").value(15))//FILMS[3].getRating()
+                .andExpect(jsonPath("$[3].genre").value(IsNull.nullValue()));
+
+        mockMvc.perform(get("/v1/api/films/genre/-26").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$.ex").value(IsNull.nullValue()))
+                .andExpect(jsonPath("$.reason").value("NOT FOUND!"))
+                .andExpect(jsonPath("$.code").value(404));
+
+        mockMvc.perform(get("/v1/api/films/genre/-26?pages=-3").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$.ex").value(IsNull.nullValue()))
+                .andExpect(jsonPath("$.reason").value("NOT FOUND!"))
+                .andExpect(jsonPath("$.code").value(404));
+        mockMvc.perform(get("/v1/api/films/genre/-26?size=999").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$.ex").value(IsNull.nullValue()))
+                .andExpect(jsonPath("$.reason").value("NOT FOUND!"))
+                .andExpect(jsonPath("$.code").value(404));
+        mockMvc.perform(get("/v1/api/films/genre/-26?pages=-3&size=666").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$.ex").value(IsNull.nullValue()))
+                .andExpect(jsonPath("$.reason").value("NOT FOUND!"))
+                .andExpect(jsonPath("$.code").value(404));
+
     }
 
     @Test
@@ -218,6 +350,61 @@ public class ApiControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").exists())
                 .andExpect(jsonPath("$").isEmpty());
+        mockMvc.perform(get("/v1/api/genres?page=4&size=9").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void testGenresPageAll() throws Exception {
+        when(gs.getAll()).thenReturn(GENRES);
+        mockMvc.perform(get("/v1/api/genres?page=3&size=4").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0]").hasJsonPath())
+                .andExpect(jsonPath("$[1]").doesNotHaveJsonPath())
+                .andExpect(jsonPath("$[0].id").value(GENRES[8].getId()))
+                .andExpect(jsonPath("$[0].name").value(GENRES[8].getName()))
+                .andExpect(jsonPath("$[0].remarks").value(GENRES[8].getRemarks()));
+        mockMvc.perform(get("/v1/api/genres?page=2").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0]").hasJsonPath())
+                .andExpect(jsonPath("$[1]").doesNotHaveJsonPath())
+                .andExpect(jsonPath("$[0].id").value(GENRES[1].getId()))
+                .andExpect(jsonPath("$[0].name").value(GENRES[1].getName()))
+                .andExpect(jsonPath("$[0].remarks").value(GENRES[1].getRemarks()));
+        mockMvc.perform(get("/v1/api/genres?page=-4&size=").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0]").hasJsonPath())
+                .andExpect(jsonPath("$[1]").doesNotHaveJsonPath())
+                .andExpect(jsonPath("$[0].id").value(GENRES[0].getId()))
+                .andExpect(jsonPath("$[0].name").value(GENRES[0].getName()))
+                .andExpect(jsonPath("$[0].remarks").value(GENRES[0].getRemarks()));
+        mockMvc.perform(get("/v1/api/genres?page=534&size=124").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0]").hasJsonPath())
+                .andExpect(jsonPath("$[1]").doesNotHaveJsonPath())
+                .andExpect(jsonPath("$[0].id").value(GENRES[8].getId()))
+                .andExpect(jsonPath("$[0].name").value(GENRES[8].getName()))
+                .andExpect(jsonPath("$[0].remarks").value(GENRES[8].getRemarks()));
+        mockMvc.perform(get("/v1/api/genres?page=2&size=-3").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0]").hasJsonPath())
+                .andExpect(jsonPath("$[1]").doesNotHaveJsonPath())
+                .andExpect(jsonPath("$[0].id").value(GENRES[1].getId()))
+                .andExpect(jsonPath("$[0].name").value(GENRES[1].getName()))
+                .andExpect(jsonPath("$[0].remarks").value(GENRES[1].getRemarks()));
     }
 
     @Test
@@ -411,10 +598,15 @@ public class ApiControllerTest {
         CinemaInfo r = new CinemaInfo(2L,"MAX","RUS","CITY",null,"Street");
         CreateCinema data = new CreateCinema("MAX","RUS","CITY",null,"Street",null);
         LocalDate date = LocalDate.now();
-        CreateCinema data2 = new CreateCinema("MAX","RUS","CITY",null,"Street",new CreateSeance[]{new CreateSeance(2L,11L,date)});
+        CreateSeance c = new CreateSeance();
+        c.setCid(2L);
+        c.setFid(11L);
+        c.setDate(date);
+        CreateCinema data2 = new CreateCinema("MAX","RUS","CITY",null,"Street",new CreateSeance[]{c});
         CreateCinema bad = new CreateCinema("MAX","RU",null,null,"Str",null);
         when(cs.updateCinema(1L,data)).thenReturn(r);
         when(ss.getByCid(2L)).thenReturn(new SeanceInfo[]{new SeanceInfo(2L,11L,date)});
+        when(cs.updateCinema(1L,bad)).thenReturn(r);
 
         mockMvc.perform(patch("/v1/api/cinemas/1").accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(data)))
                 .andExpect(status().isOk())
@@ -431,6 +623,13 @@ public class ApiControllerTest {
                 .andExpect(jsonPath("$.seances[0].cid").value(2L))
                 .andExpect(jsonPath("$.seances[0].fid").value(11L))
                 .andExpect(jsonPath("$.seances[0].date").value(date.toString()));
+
+        mockMvc.perform(patch("/v1/api/cinemas/1").accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(bad)))
+               .andExpect(status().isBadRequest());
+//                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+//                .andExpect(jsonPath("$").exists())
+//                .andExpect(jsonPath("$.ex").value("org.springframework.web.bind.MethodArgumentNotValidException"))
+//                .andExpect(jsonPath("$.code").value(400));
 
     }
 
