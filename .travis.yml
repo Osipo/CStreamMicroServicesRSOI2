@@ -55,7 +55,7 @@ matrix:
         after_success:
           - "cd .."
           - "chmod +x gradlew"
-          - ./gradlew coveralls
+#          - ./gradlew coveralls
           - "cd $PRO"
         env:
           - PRO=ApiGatewayApp
