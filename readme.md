@@ -2,6 +2,8 @@
 [![Build Status](https://travis-ci.org/Osipo/CStreamMicroServicesRSOI2.svg?branch=master)](https://travis-ci.org/Osipo/CStreamMicroServicesRSOI2) 
 [![Coveralls][coveralls-badge]][coveralls]
 
+[![Coverage Status](https://coveralls.io/repos/github/Osipo/CStreamMicroServicesRSOI2/badge.svg?branch=master&service=github)](https://coveralls.io/github/Osipo/CStreamMicroServicesRSOI2?branch=master&service=github)
+
 [coveralls-badge]: https://img.shields.io/coveralls/Osipo/CStreamMicroServicesRSOI2/master.png?style=flat-square
 [coveralls]: https://coveralls.io/github/Osipo/CStreamMicroServicesRSOI2
 
