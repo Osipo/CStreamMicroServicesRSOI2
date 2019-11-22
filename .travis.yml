@@ -8,6 +8,9 @@ addons:
       - dos2unix
 services:
   - mysql
+branches:
+  except:
+    - react_ui
 env: PRO=CinemaStreamMicroservice
 matrix:
   include:
