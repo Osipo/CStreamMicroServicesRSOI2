@@ -8,6 +8,9 @@ addons:
       - dos2unix
 services:
   - mysql
+branches:
+  only:
+    - master
 env: PRO=CinemaStreamMicroservice
 matrix:
   include:
