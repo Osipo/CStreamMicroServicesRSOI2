@@ -42,6 +42,13 @@ public class ApiController {
         this.seanceService = ss;
     }
 
+
+    //GET: /v1/api/home
+    @GetMapping(path = {"/home"})
+    public String home(){
+        return "index";
+    }
+
     //GET: /v1/api/films?r=number
     //GET: /v1/api/films?r=number&page=X&size=Y
     //GET: /v1/api/films?r=number&page=X[size = 1]

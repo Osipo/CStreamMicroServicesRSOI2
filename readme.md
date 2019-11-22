@@ -1,4 +1,4 @@
-# Cinema Stream Microservices
+# CinemaStreamMicroservices (LAB 2)
 Simple application with architecture of the microservices.
 <br/>
 Services:
