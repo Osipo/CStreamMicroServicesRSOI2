@@ -51,15 +51,15 @@ matrix:
         env: PRO=DiscoveryService
       -
         before_install:
-          - "cd ./WebApp"
+          - "cd ./WebApp" #With frontend: REACT_JS
           - "chmod +x gradlew"
         script: ./gradlew clean test
         after_script: ./gradlew clean build
         after_success:
-          - "cd .."
-          - "chmod +x gradlew"
-#          - ./gradlew coverageAll
-          - "cd $PRO"
+#          - "cd .."
+#          - "chmod +x gradlew"
+#          - ./gradlew coveralls UNCOMMENT THIS LINE!
+#          - "cd $PRO"
         env:
           - PRO=ApiGatewayApp
 #          - JVM_OPTS=-Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2"
