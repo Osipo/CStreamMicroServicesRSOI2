@@ -1,1 +1,3 @@
 rootProject.name = 'CinemaStreamMicroservices'
+includeBuild './WebApp'
+includeBuild './Microservices'
