@@ -1,4 +1,4 @@
-rootProject.name = 'CinemaStreamMicroservices'
+rootProject.name = 'Microservices'
 include 'DiscoveryService'
 include 'GenreApp'
 include 'FilmApp'

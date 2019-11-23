@@ -46,4 +46,4 @@ coveralls {
     jacocoReportPath = "ApiGatewayApp/build/reports/jacoco/xml/jacoco.xml"
 }
 task cleanFull { dependsOn subprojects.each {project -> project.tasks.findByName('clean') } }
-//task clean { dependsOn gradle.includedBuilds*.task(':clean') }
+task testAll{ dependsOn subprojects.each {project -> project.tasks.findByName('test')} }
