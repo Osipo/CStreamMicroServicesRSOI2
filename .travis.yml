@@ -16,49 +16,49 @@ matrix:
   include:
       -
         before_install:
-          - "cd SeanceApp"
+          - "cd ./Microservices/SeanceApp"
           - "chmod +x gradlew"
         script: ./gradlew clean test
         after_script: ./gradlew clean build
         env: PRO=SeanceApp
       -
         before_install:
-          - "cd GenreApp"
+          - "cd ./Microservices/GenreApp"
           - "chmod +x gradlew"
         script: ./gradlew clean test
         after_script: ./gradlew clean build
         env: PRO=GenreApp
       -
         before_install:
-          - "cd FilmApp"
+          - "cd ./Microservices/FilmApp"
           - "chmod +x gradlew"
         script: ./gradlew clean test
         after_script: ./gradlew clean build
         env: PRO=FilmApp
       -
         before_install:
-          - "cd CinemaApp"
+          - "cd ./Microservices/CinemaApp"
           - "chmod +x gradlew"
         script: ./gradlew clean test
         after_script: ./gradlew clean build
         env: PRO=CinemaApp
       -
         before_install:
-          - "cd DiscoveryService"
+          - "cd ./Microservices/DiscoveryService"
           - "chmod +x gradlew"
         script: ./gradlew clean test
         after_script: ./gradlew clean build
         env: PRO=DiscoveryService
       -
         before_install:
-          - "cd ApiGatewayApp"
+          - "cd ./WebApp"
           - "chmod +x gradlew"
         script: ./gradlew clean test
         after_script: ./gradlew clean build
         after_success:
           - "cd .."
           - "chmod +x gradlew"
-#          - ./gradlew coveralls
+#          - ./gradlew coverageAll
           - "cd $PRO"
         env:
           - PRO=ApiGatewayApp

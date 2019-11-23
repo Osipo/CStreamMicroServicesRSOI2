@@ -1,7 +1,13 @@
 plugins {
     id 'java'
+    id 'com.github.kt3k.coveralls' version '2.8.4'
 }
 
+wrapper {
+    description "Regenerates the Gradle Wrapper files"
+    gradleVersion = '6.0.1'
+    distributionUrl = "http://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
+}
 group 'ru.osipov.deploy'
 version '1.0-SNAPSHOT'
 
@@ -14,5 +20,9 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
-task cleanFull { dependsOn subprojects.each {project -> project.tasks.findByName('clean') } }
-task testAll { dependsOn subprojects.each {project -> project.tasks.findByName('test') } }
+task cleanFull { subprojects.each { dependsOn("${it.name}:clean") }  }
+task testAll { subprojects.each { dependsOn("${it.name}:test") } }
+coveralls {
+    sourceDirs = subprojects.sourceSets.main.allSource.srcDirs.flatten()
+    jacocoReportPath = "ApiGatewayApp/build/reports/jacoco/xml/jacoco.xml"
+}
