@@ -21,7 +21,7 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 task cleanFull { subprojects.each { dependsOn("${it.name}:clean") }  }
-task testAll { subprojects.each { dependsOn("${it.name}:test") } }
+task testAll { subprojects.each { dependsOn("${it.name}:test")} }
 coveralls {
     sourceDirs = subprojects.sourceSets.main.allSource.srcDirs.flatten()
     jacocoReportPath = "ApiGatewayApp/build/reports/jacoco/xml/jacoco.xml"
