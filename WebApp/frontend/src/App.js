@@ -39,7 +39,7 @@ class App extends Component {
             </a>*/
             <div className="App-intro">
                 <h2>Film list</h2>
-                {films.map(f => <div key={film.id}>{film.name}</div>)}
+                {films.map(f => <div key={f.id}>{f.name}</div>)}
             </div>
           </header>
         </div>
