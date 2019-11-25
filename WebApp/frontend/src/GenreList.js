@@ -45,7 +45,7 @@ class GenreList extends Component {
         <td>{g.remarks}</td>
         <td>
           <ButtonGroup>
-            <Button size="sm" color="danger" tag={Link} to={"/"} onClick={() => this.remove(g.id)}>Delete</Button> {/*Delete genre.*/}
+            <Button size="sm" color="danger" tag={Link} to={"/views/genres"} onClick={() => this.remove(g.id)}>Delete</Button> {/*Delete genre.*/}
           </ButtonGroup>
         </td>
       </tr>
@@ -57,7 +57,7 @@ class GenreList extends Component {
         <AppNavbar/>
         <Container fluid>
           <div className="float-right">
-            <Button color="success" tag={Link} to="/v1/genres/new">Add Genre</Button>
+            <Button color="success" tag={Link} to="/genres/new">Add Genre</Button>
           </div>
           <h3>Genres</h3>
           <Table className="mt-4">

@@ -4,17 +4,18 @@ import { Button, Container, Form, FormGroup, Input, Label } from 'reactstrap';
 import AppNavbar from './AppNavbar';
 import { FormErrors } from './FormErrors';
 import './Error.css';
-class GenreEdit extends Component {
-
-
-  constructor(props) {
+class FilmEdit extends Component {
+    
+    constructor(props) {
     super(props);
     this.state = {
         name: '',
-        remarks: '',
-        formErrors: {name: '', remarks: ''},
+        rating: 0,
+        gid: -1,
+        formErrors: {name: '', rating: '', gid: ''},
         nameValid: false,
-        remarksValid: false,
+        ratingValid: false,
+        gidValid: false,
         formValid: false
     };
     this.handleChange = this.handleChange.bind(this);
@@ -23,8 +24,18 @@ class GenreEdit extends Component {
 
   async componentDidMount() {
     if (this.props.match.params.id !== 'new') {
-      const genre = await (await fetch('$/v1/api/genres/{this.props.match.params.id}')).json();
-      this.setState(genre);
+      const film = await (await fetch('$/v1/api/films/{this.props.match.params.id}')).json();
+      this.setState({
+          name: film.name,
+          rating: film.rating,
+          gid: film.genre.id,
+          gname: film.genre.name,
+          formErrors: {name: '', rating: '', gname: ''},
+          nameValid: false,
+          ratingValid: false,
+          gidValid: false,
+          formValid: false
+      });
     }
   }
 
@@ -38,48 +49,57 @@ class GenreEdit extends Component {
 
   async handleSubmit(event) {
     event.preventDefault();
+    let fid = 0;
+    if (this.props.match.params.id !== 'new')
+        fid = this.props.match.params.id;
     const item = {
         name:this.state.name,
-        remarks:this.state.remarks
+        rating:this.state.rating,
+        gid: this.state.gid
     }
-
-    await fetch('/v1/api/genres/create', {
-      method: (item.id) ? 'PUT' : 'POST',
+    
+    await fetch('/v1/api/films/'+fid, {
+      method: 'PATCH',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(item),
     });
-    this.props.history.push('/v1/views/genres');
+    this.props.history.push('/v1/views/films');
   }
 
   validateField(fieldName, value) {
     const item = this.state;
     let fieldValidationErrors = item.formErrors;
     let nameValid = item.nameValid;
-    let remarksValid = item.remarksValid;
+    let ratingValid = item.ratingValid;
+    let gidValid = item.gidValid;
 
     switch(fieldName) {
       case 'name':
         nameValid = value.match(/^[A-Z][a-z_]+$/);
         fieldValidationErrors.name = nameValid ? '' : ' is invalid. Require words!';
         break;
-      case 'remarks':
-        remarksValid = value.length == 0 || (value.length > 0 && value.match(/^(.*?\=\s*\w)(.*)$/));
-        fieldValidationErrors.remarks = remarksValid ? '': ' Must be 0 or Sentence form.';
+      case 'rating':
+        ratingValid = value.length == 0 || (value.length > 0 && value.match(/^(.*?\=\s*\w)(.*)$/));
+        fieldValidationErrors.rating = ratingValid ? '': ' Must be 0 or Sentence form.';
         break;
+      case 'gid':
+        gidValid = value > -1;
+        fieldValidationErrors.gid = gidValid ? '' : 'Must be greater than -1';
       default:
         break;
     }
     this.setState({formErrors: fieldValidationErrors,
                     nameValid: nameValid,
-                    remarksValid: remarksValid
+                    ratingValid: ratingValid,
+                    gidValid: gidValid
                   }, this.validateForm);
   }
 
   validateForm() {
-      this.setState({formValid: this.state.nameValid && this.state.remarksValid});
+      this.setState({formValid: this.state.nameValid && this.state.ratingValid && this.state.gidValid});
   }
 
   errorClass(error) {
@@ -88,7 +108,7 @@ class GenreEdit extends Component {
   
   render() {
     const item = this.state;
-    const title = <h2>{item.id ? 'Edit Genre' : 'Add Genre'}</h2>;
+    const title = <h2>{item.id ? 'Edit Film' : 'Add Film'}</h2>;
 
     return <div>
       <AppNavbar/>
@@ -103,19 +123,24 @@ class GenreEdit extends Component {
             <Input type="text" name="name" id="name" className="form-control" value={item.name || ''}
                    onChange={this.handleChange} autoComplete="name"/>
           </FormGroup>
-          <FormGroup className='{form-group ${this.errorClass(item.formErrors.remarks)}}'>
-            <Label htmlFor="remarks">Remarks</Label>
-            <Input type="text" name="remarks" id="remarks" className="form-control" value={item.remarks || ''}
-                   onChange={this.handleChange} autoComplete="remarks"/>
+          <FormGroup className='{form-group ${this.errorClass(item.formErrors.rating)}}'>
+            <Label htmlFor="rating">Rating</Label>
+            <Input type="text" name="rating" id="rating" className="form-control" value={item.rating || ''}
+                   onChange={this.handleChange} autoComplete="rating"/>
+          </FormGroup>
+          <FormGroup className='{form-group ${this.errorClass(item.formErrors.gid)}}'>
+            <Label htmlFor="gid">Genre</Label>
+            <Input type="text" name="gid" id="gid" className="form-control" value={item.gid || ''}
+                   onChange={this.handleChange} autoComplete="gid"/>
           </FormGroup>
           <FormGroup>
             <Button color="primary" type="submit" className="btn btn-primary" disabled={!item.formValid}>Save</Button>{' '}
-            <Button color="secondary" tag={Link} to="/views/genres">Cancel</Button>
+            <Button color="secondary" tag={Link} to="/views/films">Cancel</Button>
           </FormGroup>
         </Form>
       </Container>
     </div>
   }
+    
 }
-
-export default withRouter(GenreEdit);
+export default withRouter(FilmEdit);

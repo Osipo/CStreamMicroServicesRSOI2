@@ -1,3 +1,6 @@
-.has-error .formErrors {
+.formErrors>p {
+    color:red;
+}
+.has-error{
     color:red;
 }
