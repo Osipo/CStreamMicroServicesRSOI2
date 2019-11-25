@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.osipov.deploy.models.*;
 import ru.osipov.deploy.services.WebCinemaService;
@@ -42,20 +43,14 @@ public class ApiController {
         this.seanceService = ss;
     }
 
-
-    //GET: /v1/api/home
-    @GetMapping(path = {"/home"})
-    public String home(){
-        return "index";
-    }
-
+    
     //GET: /v1/api/films?r=number
     //GET: /v1/api/films?r=number&page=X&size=Y
     //GET: /v1/api/films?r=number&page=X[size = 1]
     @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE,path="/films")
     public ResponseEntity getAllFilms(@RequestParam(required = false, name= "r") Short rating,
-                                      @RequestParam(required = false, name = "page") Integer page,
-                                      @RequestParam(required = false, name = "size") Integer size){
+                              @RequestParam(required = false, name = "page") Integer page,
+                              @RequestParam(required = false, name = "size") Integer size){
         FilmInfo[] f;
         if(rating == null){
             f = filmService.getAll();

@@ -8,7 +8,7 @@ class GenreList extends Component {
   constructor(props) {
     super(props);
     this.state = {genres: [], isLoading: true};
-    //this.remove = this.remove.bind(this);
+    this.remove = this.remove.bind(this);
   }
 
   async remove(id) {
