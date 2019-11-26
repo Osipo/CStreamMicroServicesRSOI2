@@ -22,7 +22,7 @@ class App extends Component {
                 <Route path='/views/genres' exact={true} component={GenreList} />
                 <Route path='/views/cinemas' exact={true} component={CinemaList}/>
                 <Route path='/genres/new' exact={true} component={GenreEdit}/>
-                <Route path='/films/:id' exact={true} component={FilmEdit} />
+                <Route path='/films/:id'  component={FilmEdit} />
                 <Route path='/views/cinemas/seances/:id' exact={true} component={SeanceCinemaList} />
             </Switch>
         </Router>

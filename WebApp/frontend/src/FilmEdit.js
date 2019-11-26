@@ -23,8 +23,11 @@ class FilmEdit extends Component {
   }
 
   async componentDidMount() {
-    if (this.props.match.params.id !== 'new') {
-      const film = await (await fetch('$/v1/api/films/{this.props.match.params.id}')).json();
+    let id = this.props.match.params.id;
+    //id = id.substring(1);
+    console.log(id);
+    if (id !== 'new') {
+      const film = await (await fetch('/v1/api/films/'+id).then(response => response.json()));
       this.setState({
           name: film.name,
           rating: film.rating,
@@ -108,7 +111,7 @@ class FilmEdit extends Component {
   
   render() {
     const item = this.state;
-    const title = <h2>{item.id ? 'Edit Film' : 'Add Film'}</h2>;
+    const title = <h2>{item.name !== '' ? 'Edit Film' : 'Add Film'}</h2>;
 
     return <div>
       <AppNavbar/>

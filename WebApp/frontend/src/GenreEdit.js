@@ -64,6 +64,8 @@ class GenreEdit extends Component {
       case 'name':
         nameValid = value.match(/^[A-Z][a-z_]+$/);
         fieldValidationErrors.name = nameValid ? '' : ' is invalid. Require words!';
+        nameValid = nameValid && value.length > 5;
+        fieldValidationErrors.name = nameValid ? '' : fieldValidationErrors.name+' Length must be more than 5 characters!';
         break;
       case 'remarks':
         remarksValid = value.length == 0 || (value.length > 0 && value.match(/^(.*?\=\s*\w)(.*)$/));
