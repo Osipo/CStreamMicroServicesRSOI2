@@ -39,6 +39,8 @@ class FilmEdit extends Component {
           gidValid: false,
           formValid: false
       });
+      for p in this.state
+        this.validateField(p,this.state[p]);//check all fields from db.
     }
   }
 
