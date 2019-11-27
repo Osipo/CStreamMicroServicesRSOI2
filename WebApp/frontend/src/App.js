@@ -9,6 +9,8 @@ import GenreList from './GenreList';
 import GenreEdit from './GenreEdit';
 import CinemaList from './CinemaList';
 import SeanceCinemaList from './SeanceCinemaList';
+import SeanceInformation from './SeanceInformation';
+import SeanceList from './SeanceList';
 const ReactDOM = require('react-dom');
 
 class App extends Component {
@@ -21,9 +23,11 @@ class App extends Component {
                 <Route path='/views/films' exact={true} component={FilmList} />
                 <Route path='/views/genres' exact={true} component={GenreList} />
                 <Route path='/views/cinemas' exact={true} component={CinemaList}/>
-                <Route path='/genres/new' exact={true} component={GenreEdit}/>
-                <Route path='/films/:id'  component={FilmEdit} />
-                <Route path='/views/cinemas/seances/:id' exact={true} component={SeanceCinemaList} />
+                <Route path='/views/seances' exact={true} component={SeanceList}/>
+                <Route path='/views/genres/new' exact={true} component={GenreEdit}/>
+                <Route path='/views/films/:id'  component={FilmEdit} />
+                <Route path='/views/cinemas/:id/seances' exact={true} component={SeanceCinemaList} />
+                <Route path='/views/seances/:cid/:fid' exact={true} component={SeanceInformation} />
             </Switch>
         </Router>
       );

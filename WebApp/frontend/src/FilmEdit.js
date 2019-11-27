@@ -34,13 +34,11 @@ class FilmEdit extends Component {
           gid: film.genre.id,
           gname: film.genre.name,
           formErrors: {name: '', rating: '', gname: ''},
-          nameValid: false,
-          ratingValid: false,
-          gidValid: false,
-          formValid: false
-      });
-      for p in this.state
-        this.validateField(p,this.state[p]);//check all fields from db.
+          nameValid: true,
+          ratingValid: true,
+          gidValid: true,
+          formValid: true
+      }, () => {for(let p in this.state){ this.validateField(p,this.state[p]);}});
     }
   }
 
@@ -83,16 +81,16 @@ class FilmEdit extends Component {
 
     switch(fieldName) {
       case 'name':
-        nameValid = value.match(/^[A-Z][a-z_]+$/);
+        nameValid = value.match(/^[A-Za-z\s]+$/);
         fieldValidationErrors.name = nameValid ? '' : ' is invalid. Require words!';
         break;
       case 'rating':
-        ratingValid = value.length == 0 || (value.length > 0 && value.match(/^(.*?\=\s*\w)(.*)$/));
-        fieldValidationErrors.rating = ratingValid ? '': ' Must be 0 or Sentence form.';
+        ratingValid = value >= 0 && value <= 100;
+        fieldValidationErrors.rating = ratingValid ? '': ' Must be in [0..100].';
         break;
       case 'gid':
-        gidValid = value > -1;
-        fieldValidationErrors.gid = gidValid ? '' : 'Must be greater than -1';
+        gidValid = value >= -1;
+        fieldValidationErrors.gid = gidValid ? '' : 'Must be greater than or equal -1';
       default:
         break;
     }
@@ -100,11 +98,12 @@ class FilmEdit extends Component {
                     nameValid: nameValid,
                     ratingValid: ratingValid,
                     gidValid: gidValid
-                  }, this.validateForm);
+                  }, () => this.validateForm());
   }
 
   validateForm() {
       this.setState({formValid: this.state.nameValid && this.state.ratingValid && this.state.gidValid});
+      console.log(this.state.formValid);
   }
 
   errorClass(error) {

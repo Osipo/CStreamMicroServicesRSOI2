@@ -8,11 +8,12 @@ class Home extends Component {
   render() {
     return (
       <div>
-        <AppNavbar/>
+        <AppNavbar meid={0}/>
         <Container fluid>
           <Button color="link"><Link to="/views/films">Manage Films</Link></Button>
           <Button color="link"><Link to="/views/genres">Manage Genres</Link></Button>
           <Button color="link"><Link to="/views/cinemas">Manage Cinemas</Link></Button>
+          <Button color="link"><Link to="/views/seances">Manage Seances</Link></Button>
           <div>React version: {REACT_VERSION}</div>
         </Container>
       </div>

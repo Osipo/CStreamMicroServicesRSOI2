@@ -40,7 +40,7 @@ class FilmList extends Component {
         </td>
         <td>
           <ButtonGroup>
-            <Button size="sm" color="primary" tag={Link} to={"/films/"+f.id}>Edit</Button> {/*Edit is not very yet.*/}
+            <Button size="sm" color="primary" tag={Link} to={"/views/films/"+f.id}>Edit</Button> {/*Edit is not very yet.*/}
           </ButtonGroup>
         </td>
       </tr>
@@ -49,7 +49,7 @@ class FilmList extends Component {
     
     return (
       <div>
-        <AppNavbar/>
+        <AppNavbar meid={2}/>
         <Container fluid>
           <div className="float-right">
             <Button color="danger" tag={Link} to="/">Back</Button>

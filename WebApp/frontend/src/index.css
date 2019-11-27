@@ -11,3 +11,17 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+#last-nav-m {
+    margin-right: 3.5rem;
+}
+.menu-app {
+    margin-right: 2rem;
+}
+.active-l {
+    border-radius: 20px;
+    background-color:orange;
+}
+.navbar-brand:hover{
+    background-color:orange;
+    
+}

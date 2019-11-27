@@ -54,10 +54,10 @@ class GenreList extends Component {
     
     return (
       <div>
-        <AppNavbar/>
+        <AppNavbar meid={1}/>
         <Container fluid>
           <div className="float-right">
-            <Button color="success" tag={Link} to="/genres/new">Add Genre</Button>
+            <Button color="success" tag={Link} to="/views/genres/new">Add Genre</Button>
           </div>
           <h3>Genres</h3>
           <Table className="mt-4">
