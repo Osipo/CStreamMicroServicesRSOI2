@@ -33,7 +33,7 @@ class FilmEdit extends Component {
           rating: film.rating,
           gid: film.genre.id,
           gname: film.genre.name,
-          formErrors: {name: '', rating: '', gname: ''},
+          formErrors: {name: '', rating: '', gid: ''},
           nameValid: true,
           ratingValid: true,
           gidValid: true,
@@ -104,10 +104,29 @@ class FilmEdit extends Component {
   validateForm() {
       this.setState({formValid: this.state.nameValid && this.state.ratingValid && this.state.gidValid});
       console.log(this.state.formValid);
+      this.moveToP();
   }
 
+   moveToP(){
+      
+      let p = document.getElementsByClassName('has-error');
+      console.log(p.length);
+      if(p.length !== 0){
+          Array.prototype.forEach.call(p, function(el,idx,arr){
+              //console.log(el.tagName);
+              if(el.tagName === 'P'){
+                  let parid = el.textContent.split(' ')[0];
+                  console.log('Id = ',parid);
+                  let par = document.getElementById(parid).parentNode;
+                  par.appendChild(el);
+              }
+          },this);
+      }
+      return 1;
+  }
+  
   errorClass(error) {
-    return(error.length === 0 ? '' : 'has-error');
+    return(error.length === 0 ? '' : ' has-error');
   }
   
   render() {
@@ -122,17 +141,17 @@ class FilmEdit extends Component {
           <div className="panel panel-default">
             <FormErrors formErrors={item.formErrors} />
           </div>
-          <FormGroup className='{form-group ${this.errorClass(item.formErrors.name)}}'>
+          <FormGroup className={'form-group'+this.errorClass(item.formErrors.name)}>
             <Label htmlFor="name">Name</Label>
             <Input type="text" name="name" id="name" className="form-control" value={item.name || ''}
                    onChange={this.handleChange} autoComplete="name"/>
           </FormGroup>
-          <FormGroup className='{form-group ${this.errorClass(item.formErrors.rating)}}'>
+          <FormGroup className={'form-group'+this.errorClass(item.formErrors.rating)}>
             <Label htmlFor="rating">Rating</Label>
             <Input type="text" name="rating" id="rating" className="form-control" value={item.rating || ''}
                    onChange={this.handleChange} autoComplete="rating"/>
           </FormGroup>
-          <FormGroup className='{form-group ${this.errorClass(item.formErrors.gid)}}'>
+          <FormGroup className={'form-group'+this.errorClass(item.formErrors.gid)}>
             <Label htmlFor="gid">Genre</Label>
             <Input type="text" name="gid" id="gid" className="form-control" value={item.gid || ''}
                    onChange={this.handleChange} autoComplete="gid"/>

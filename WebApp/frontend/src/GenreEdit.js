@@ -77,7 +77,7 @@ class GenreEdit extends Component {
         break;
       case 'remarks':
         remarksValid = value.length === 0 || (value.length > 0 && value.match(/^(.*?\=\s*\w)(.*)$/));
-        fieldValidationErrors.remarks = remarksValid ? '': ' Must be 0 or Sentence form.';
+        fieldValidationErrors.remarks = remarksValid ? '': ' Must be empty or Sentence form.';
         break;
       default:
         break;

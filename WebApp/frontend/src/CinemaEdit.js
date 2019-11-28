@@ -103,6 +103,25 @@ class CinemaEdit extends Component {
       validateForm() {
           this.setState({formValid: this.state.nameValid && this.state.countryValid && this.state.cityValid && this.state.regionValid && this.state.streetValid && this.state.seanceValid});
           console.log(this.state.formValid);
+          this.moveToP();
+      }
+    
+      moveToP(){
+          
+          let p = document.getElementsByClassName('has-error');
+          console.log(p.length);
+          if(p.length !== 0){
+              Array.prototype.forEach.call(p, function(el,idx,arr){
+                  //console.log(el.tagName);
+                  if(el.tagName === 'P'){
+                      let parid = el.textContent.split(' ')[0];
+                      console.log('Id = ',parid);
+                      let par = document.getElementById(parid).parentNode;
+                      par.appendChild(el);
+                  }
+              },this);
+          }
+          return 1;
       }
     
     handleChange(event) {
@@ -113,8 +132,10 @@ class CinemaEdit extends Component {
                       () => { this.validateField(name, value) });
     }
     
+    
+    
     errorClass(error) {
-        return(error.length === 0 ? '' : 'has-error');
+        return(error.length === 0 ? '' : ' has-error');
     }
     
     render(){
@@ -129,27 +150,27 @@ class CinemaEdit extends Component {
           <div className="panel panel-default">
             <FormErrors formErrors={item.formErrors} />
           </div>
-          <FormGroup className='{form-group ${this.errorClass(item.formErrors.name)}}'>
+          <FormGroup className={'form-group'+this.errorClass(item.formErrors.name)}>
             <Label htmlFor="name">Name</Label>
             <Input type="text" name="name" id="name" className="form-control" value={item.name || ''}
                    onChange={this.handleChange} autoComplete="name"/>
           </FormGroup>
-          <FormGroup className='{form-group ${this.errorClass(item.formErrors.rating)}}'>
+          <FormGroup className={'form-group'+this.errorClass(item.formErrors.country)}>
             <Label htmlFor="country">Country</Label>
             <Input type="text" name="country" id="country" className="form-control" value={item.country || ''}
                    onChange={this.handleChange} autoComplete="country"/>
           </FormGroup>
-          <FormGroup className='{form-group ${this.errorClass(item.formErrors.rating)}}'>
+          <FormGroup className={'form-group'+this.errorClass(item.formErrors.city)}>
             <Label htmlFor="city">City</Label>
             <Input type="text" name="city" id="city" className="form-control" value={item.city || ''}
                    onChange={this.handleChange} autoComplete="city"/>
           </FormGroup>
-          <FormGroup className='{form-group ${this.errorClass(item.formErrors.rating)}}'>
+          <FormGroup className={'form-group'+this.errorClass(item.formErrors.region)}>
             <Label htmlFor="region">Region</Label>
             <Input type="text" name="region" id="region" className="form-control" value={item.region || ''}
                    onChange={this.handleChange} autoComplete="region"/>
           </FormGroup>
-          <FormGroup className='{form-group ${this.errorClass(item.formErrors.rating)}}'>
+          <FormGroup className={'form-group'+this.errorClass(item.formErrors.street)}>
             <Label htmlFor="street">Street</Label>
             <Input type="text" name="street" id="street" className="form-control" value={item.street || ''}
                    onChange={this.handleChange} autoComplete="street"/>

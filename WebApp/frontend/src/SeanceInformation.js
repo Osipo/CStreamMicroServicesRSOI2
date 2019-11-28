@@ -24,7 +24,7 @@ class SeanceInformation extends Component {
         
         return (
             <div>
-            <AppNavbar/>
+            <AppNavbar meid={4}/>
             <Container fluid>
                 <h2>Cinema: {seance.cinema}</h2>
                 <p>Location: {seance.location}</p>
