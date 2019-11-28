@@ -4,3 +4,14 @@
 .has-error{
     color:red;
 }
+.has-error>input{
+    color: red;
+    border: 2px solid #ce3947;
+}
+.has-error>input:focus {
+    color: red;
+    background-color: #fff;
+    border-color: #ce3947;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(123,123,255,.25);
+}

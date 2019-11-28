@@ -14,7 +14,7 @@ class GenreEdit extends Component {
         remarks: '',
         formErrors: {name: '', remarks: ''},
         nameValid: false,
-        remarksValid: false,
+        remarksValid: true,
         formValid: false
     };
     this.handleChange = this.handleChange.bind(this);
@@ -24,7 +24,15 @@ class GenreEdit extends Component {
   async componentDidMount() {
     if (this.props.match.params.id !== 'new') {
       const genre = await (await fetch('$/v1/api/genres/{this.props.match.params.id}')).json();
-      this.setState(genre);
+      this.setState({
+          name: genre.name,
+          remarks: genre.remarks,
+          formErrors: {name: '', remarks: ''},
+          nameValid: true,
+          remarksValid: true,
+          formValid: true
+      },() => {for(let p in this.state){ this.validateField(p,this.state[p]);} });
+      
     }
   }
 
@@ -40,7 +48,7 @@ class GenreEdit extends Component {
     event.preventDefault();
     const item = {
         name:this.state.name,
-        remarks:this.state.remarks
+        remarks:this.state.remarks === '' ? null : this.state.remarks
     }
 
     await fetch('/v1/api/genres/create', {
@@ -68,7 +76,7 @@ class GenreEdit extends Component {
         fieldValidationErrors.name = nameValid ? '' : fieldValidationErrors.name+' Length must be more than 5 characters!';
         break;
       case 'remarks':
-        remarksValid = value.length == 0 || (value.length > 0 && value.match(/^(.*?\=\s*\w)(.*)$/));
+        remarksValid = value.length === 0 || (value.length > 0 && value.match(/^(.*?\=\s*\w)(.*)$/));
         fieldValidationErrors.remarks = remarksValid ? '': ' Must be 0 or Sentence form.';
         break;
       default:
@@ -82,10 +90,29 @@ class GenreEdit extends Component {
 
   validateForm() {
       this.setState({formValid: this.state.nameValid && this.state.remarksValid});
+      this.moveToP();
   }
 
+  moveToP(){
+      
+      let p = document.getElementsByClassName('has-error');
+      console.log(p.length);
+      if(p.length !== 0){
+          Array.prototype.forEach.call(p, function(el,idx,arr){
+              //console.log(el.tagName);
+              if(el.tagName === 'P'){
+                  let parid = el.textContent.split(' ')[0];
+                  console.log('Id = ',parid);
+                  let par = document.getElementById(parid).parentNode;
+                  par.appendChild(el);
+              }
+          },this);
+      }
+      return 1;
+  }
+  
   errorClass(error) {
-    return(error.length === 0 ? '' : 'has-error');
+    return(error.length === 0 ? '' : ' has-error');
   }
   
   render() {
@@ -93,19 +120,19 @@ class GenreEdit extends Component {
     const title = <h2>{item.id ? 'Edit Genre' : 'Add Genre'}</h2>;
 
     return <div>
-      <AppNavbar/>
+      <AppNavbar meid={1}/>
       <Container>
         {title}
         <Form onSubmit={this.handleSubmit}>
           <div className="panel panel-default">
-            <FormErrors formErrors={item.formErrors} />
+            <FormErrors formErrors={item.formErrors} id='erp'/>
           </div>
-          <FormGroup className='{form-group ${this.errorClass(item.formErrors.name)}}'>
+          <FormGroup className={'form-group'+this.errorClass(item.formErrors.name)}>
             <Label htmlFor="name">Name</Label>
             <Input type="text" name="name" id="name" className="form-control" value={item.name || ''}
                    onChange={this.handleChange} autoComplete="name"/>
           </FormGroup>
-          <FormGroup className='{form-group ${this.errorClass(item.formErrors.remarks)}}'>
+          <FormGroup className={'form-group'+this.errorClass(item.formErrors.remarks)}>
             <Label htmlFor="remarks">Remarks</Label>
             <Input type="text" name="remarks" id="remarks" className="form-control" value={item.remarks || ''}
                    onChange={this.handleChange} autoComplete="remarks"/>

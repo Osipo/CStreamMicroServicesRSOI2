@@ -115,7 +115,7 @@ class FilmEdit extends Component {
     const title = <h2>{item.name !== '' ? 'Edit Film' : 'Add Film'}</h2>;
 
     return <div>
-      <AppNavbar/>
+      <AppNavbar meid={2}/>
       <Container>
         {title}
         <Form onSubmit={this.handleSubmit}>

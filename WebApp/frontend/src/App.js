@@ -8,6 +8,7 @@ import FilmEdit from './FilmEdit';
 import GenreList from './GenreList';
 import GenreEdit from './GenreEdit';
 import CinemaList from './CinemaList';
+import CinemaEdit from './CinemaEdit';
 import SeanceCinemaList from './SeanceCinemaList';
 import SeanceInformation from './SeanceInformation';
 import SeanceList from './SeanceList';
@@ -23,6 +24,7 @@ class App extends Component {
                 <Route path='/views/films' exact={true} component={FilmList} />
                 <Route path='/views/genres' exact={true} component={GenreList} />
                 <Route path='/views/cinemas' exact={true} component={CinemaList}/>
+                <Route path='/views/cinemas/:id' exact={true} component={CinemaEdit}/>
                 <Route path='/views/seances' exact={true} component={SeanceList}/>
                 <Route path='/views/genres/new' exact={true} component={GenreEdit}/>
                 <Route path='/views/films/:id'  component={FilmEdit} />

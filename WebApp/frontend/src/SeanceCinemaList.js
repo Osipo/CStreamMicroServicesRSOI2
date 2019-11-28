@@ -43,7 +43,7 @@ class SeanceCinemaList extends Component {
     
     return (
       <div>
-        <AppNavbar/>
+        <AppNavbar meid={3}/>
         <Container fluid>
           <div className="float-right">
             <Button color="danger" tag={Link} to="/views/cinemas">Back</Button>
