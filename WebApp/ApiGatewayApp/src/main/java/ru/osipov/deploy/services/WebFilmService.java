@@ -33,6 +33,27 @@ public class WebFilmService {
 
     public WebFilmService(){}
 
+    public FilmInfo[] getByName(String name){
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON_UTF8, MediaType.APPLICATION_JSON));
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<FilmInfo[]> response;
+        try {
+            response = restTemplate.exchange(serviceUrl + "/v1/films/name" + name,
+                    HttpMethod.GET, entity, FilmInfo[].class);
+        }
+        catch(HttpClientErrorException e){
+            logger.info("Error message: '{}'",e.getMessage());
+            logger.info("Error status: '{}'",e.getRawStatusCode());
+            logger.info("Response: '{}'",e.getResponseBodyAsString());
+            throw new ApiException(e.getMessage(), e, e.getRawStatusCode(), e.getResponseHeaders(),
+                    e.getResponseBodyAsString(), serviceUrl+"/v1/films/name"+name, null);
+        }
+        return response.getBody();
+    }
+
     public FilmInfo[] getByRating(Short rating){
         // HttpHeaders
         HttpHeaders headers = new HttpHeaders();
@@ -49,8 +70,18 @@ public class WebFilmService {
         RestTemplate restTemplate = new RestTemplate();
 
         // Send request with GET method, and Headers.
-        ResponseEntity<FilmInfo[]> response = restTemplate.exchange(serviceUrl+"/v1/films?r="+rating.toString(),
-                HttpMethod.GET, entity, FilmInfo[].class);
+        ResponseEntity<FilmInfo[]> response;
+        try {
+            response = restTemplate.exchange(serviceUrl + "/v1/films?r=" + rating.toString(),
+                    HttpMethod.GET, entity, FilmInfo[].class);
+        }
+        catch(HttpClientErrorException e){
+            logger.info("Error message: '{}'",e.getMessage());
+            logger.info("Error status: '{}'",e.getRawStatusCode());
+            logger.info("Response: '{}'",e.getResponseBodyAsString());
+            throw new ApiException(e.getMessage(), e, e.getRawStatusCode(), e.getResponseHeaders(),
+                    e.getResponseBodyAsString(), serviceUrl+"/v1/films?r="+rating, null);
+        }
         return response.getBody();
     }
 

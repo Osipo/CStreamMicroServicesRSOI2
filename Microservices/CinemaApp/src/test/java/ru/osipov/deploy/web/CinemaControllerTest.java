@@ -6,6 +6,8 @@ import com.google.gson.GsonBuilder;
 import org.hamcrest.core.IsNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -296,6 +298,12 @@ public class CinemaControllerTest {
         CinemaInfo ans = new CinemaInfo(1l,PARAMS1[0],PARAMS1[1],PARAMS1[2],PARAMS1[3],PARAMS1[4]);
         when(serv.getAllCinemas()).thenReturn(empt);
         when(serv.getByName("CMax")).thenReturn(ans);
+        doAnswer(new Answer<CinemaInfo>() {
+            @Override
+            public CinemaInfo answer(InvocationOnMock invocation) throws Throwable {
+                return new CinemaInfo(-2l,"","","","","");
+            }
+        }).when(serv).getByName("AKA47");
 
         mockMvc.perform(get("/v1/cinemas/name/CMax").accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
@@ -318,6 +326,11 @@ public class CinemaControllerTest {
         mockMvc.perform(get("/v1/cinemas/name").accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isBadRequest());
 
+        mockMvc.perform(get("/v1/cinemas/name/AKA47").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().is(404))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$").value("Cinema with name = AKA47 was not found."));
     }
 
     @Test

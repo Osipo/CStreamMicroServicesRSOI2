@@ -118,19 +118,24 @@ public class CinemaController {
     //GET: /v1/cinemas/name/{cinema_name}
     //if no any parameter was specified -> badRequest()
     @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE, path={"/name/{name}"})
-    public List<CinemaInfo> cinema(@PathVariable(required = true,name = "name") String name){
+    public ResponseEntity cinema(@PathVariable(required = true,name = "name") String name){
         List<CinemaInfo> result;
         logger.info("/v1/cinemas/");
-        if(name == null){
-            logger.info("Name is null.");
+        if(name == null || name.equals("")){
+            logger.info("Name is null. Get all.");
             result = cinemaService.getAllCinemas();
-            return result;
+            return ResponseEntity.ok(result);
         }
         else{
             result = new LinkedList<>();
             logger.info("Name parameter = '{}'",name);
+            CinemaInfo c = cinemaService.getByName(name);
+            if(c.getId() == -2L){
+                logger.info("404 not found.");
+                return ResponseEntity.status(404).body("Cinema with name = "+name+" was not found.");
+            }
             result.add(cinemaService.getByName(name));
-            return result;
+            return ResponseEntity.ok(result);
         }
     }
 

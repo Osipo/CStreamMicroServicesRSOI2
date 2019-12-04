@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -150,6 +152,12 @@ public class FilmControllerTest {
         final FilmInfo f = new FilmInfo(111L,"MYST",(short)100,-1L);
         when(fs.getAllFilms()).thenReturn(emt);
         when(fs.getByName("MYST")).thenReturn(f);
+        doAnswer(new Answer<FilmInfo>() {
+            @Override
+            public FilmInfo answer(InvocationOnMock invocation) throws Throwable {
+                return new FilmInfo(-2l,"IT",(short)-1,-1l);
+            }
+        }).when(fs).getByName("IT");
 
         mockMvc.perform(get("/v1/films/name/MYST").accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
@@ -170,7 +178,11 @@ public class FilmControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").exists())
                 .andExpect(jsonPath("$").isEmpty());
-
+        mockMvc.perform(get("/v1/films/name/IT").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().is(404))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$").value("Film with name = IT was not found."));
     }
 
     @Test

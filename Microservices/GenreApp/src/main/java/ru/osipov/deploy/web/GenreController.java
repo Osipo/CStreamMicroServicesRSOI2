@@ -50,7 +50,7 @@ public class GenreController {
     //GET: /v1/genres?name='...'
     //If no any name was specified -> getAll() [GET: /v1/genres, /v1/genres/]
     @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE, path={})
-    public List<GenreInfo> getAllByName(@RequestParam(required = false, name= "name") String name){
+    public ResponseEntity getAllByName(@RequestParam(required = false, name= "name") String name){
         logger.info("getAllByName");
         logger.info("/v1/genres");
         List<GenreInfo> genres;
@@ -62,10 +62,16 @@ public class GenreController {
             logger.info("/v1/genres?name='{}'",name);
             logger.info("Name is '{}'",name);
             genres = new ArrayList<GenreInfo>();
+            GenreInfo g = gService.getByName(name);
+            if(g.getId() == -2L){
+                logger.info("not found. 404");
+                return ResponseEntity.status(404).body("Genre with name = "+name+" was not found.");
+            }
+
             genres.add(gService.getByName(name));
         }
         logger.info("Count: "+genres.size());
-        return genres;
+        return ResponseEntity.ok(genres);
     }
 
     //GET: /v1/genres/remarks?r='...'

@@ -77,6 +77,11 @@ public class ApiController {
         return ResponseEntity.ok(result);
     }
 
+    //TODO!
+    @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE, path = {"/"})
+    public ResponseEntity getFilmByName(@PathVariable(required = true, name = "name") String name){
+        return ResponseEntity.ok("");
+    }
 
     //GET: /v1/api/films/genre/{genre_id}
     @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE,path = {"/films/genre/{gid}","/films/genre/"})

@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,6 +127,18 @@ public class GenreControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").isEmpty());
+        doAnswer(new Answer<GenreInfo>() {
+            @Override
+            public GenreInfo answer(InvocationOnMock invocation) throws Throwable {
+                return new GenreInfo(-2l,"err","err");
+            }
+        }).when(gs).getByName("AKBAR!!!");
+
+        mockMvc.perform(get("/v1/genres?name=AKBAR!!!").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().is(404))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$").value("Genre with name = AKBAR!!! was not found."));
     }
 
     @Test

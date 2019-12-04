@@ -75,7 +75,7 @@ public class FilmController {
     //GET: /v1/films/name/{film_name}
     //If no any name was specified -> getAll() [GET: /v1/films/name, /v1/films/name/]
     @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE, path={"/name/{name}","/name/"})
-    public List<FilmInfo> getAllByName(@PathVariable(required = false, name= "name") String name){
+    public ResponseEntity getAllByName(@PathVariable(required = false, name= "name") String name){
         logger.info("Get by name");
         logger.info("/v1/films/name/");
         List<FilmInfo> films;
@@ -87,10 +87,16 @@ public class FilmController {
             logger.info("/v1/films/name/'{}'",name);
             logger.info("Name is '{}'",name);
             films = new ArrayList<FilmInfo>();
+            FilmInfo f = fService.getByName(name);
+            if(f.getId() == -2L){
+                logger.info("not found. 404");
+                return ResponseEntity.status(404).body("Film with name = "+name+" was not found.");
+            }
             films.add(fService.getByName(name));
+
         }
         logger.info("Count: "+films.size());
-        return films;
+        return ResponseEntity.ok(films);
     }
 
     //GET: /v1/films?r='...'

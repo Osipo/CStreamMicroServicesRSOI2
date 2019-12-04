@@ -64,7 +64,7 @@ public class GenreServiceImpl implements GenreService {
     public GenreInfo getByName(@Nonnull String name) {
         logger.info("Get genre by name = '{}'",name);
         Optional<GenreInfo> o =  gRepository.findByName(name).map(this::buildModel);
-        return o.orElseGet(() -> new GenreInfo(-1l, "", ""));
+        return o.orElseGet(() -> new GenreInfo(-2l, "", ""));
     }
 
     @Override

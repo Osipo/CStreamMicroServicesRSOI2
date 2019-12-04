@@ -45,7 +45,7 @@ public class FilmServiceImpl implements FilmService {
     public FilmInfo getByName(@Nonnull String name) {
         logger.info("Get film by name = '{}'",name);
         Optional<FilmInfo> o =  rep.findByFname(name).map(this::buildModel);
-        return o.orElseGet(() -> new FilmInfo(-1l, "", (short)-1,-1l));
+        return o.orElseGet(() -> new FilmInfo(-2l, "", (short)-1,-1l));
     }
 
     @Nonnull
