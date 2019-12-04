@@ -1,9 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component,useState} from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { Button, Container, Form, FormGroup, Input, Label } from 'reactstrap';
 import AppNavbar from './AppNavbar';
 import { FormErrors } from './FormErrors';
 import './Error.css';
+import './CinemaEdit.css';
 class CinemaEdit extends Component {
     constructor(props){
         super(props);
@@ -24,12 +25,34 @@ class CinemaEdit extends Component {
             formValid: false
         };
         this.handleChange = this.handleChange.bind(this);
+        this.addTo = this.addTo.bind(this);
+        this.deleteAllSeances = this.deleteAllSeances.bind(this);
     }
     
     async componentDidMount() {
         let id = this.props.match.params.id;
         console.log(id);
-        if (id !== 'new') {
+        let fromSeance = this.props.location.state;
+        if(fromSeance !== null && fromSeance !== undefined){
+            let ns = fromSeance.ns;
+            this.setState({
+                name: ns.name,
+                country: ns.country,
+                region: ns.region,
+                city: ns.city,
+                street: ns.street,
+                seances: ns.seances,
+                formErrors: {name: '', country: '', region: '', city:'', street: ''},
+                nameValid: true,
+                countryValid: true,
+                regionValid: true,
+                cityValid: true,
+                streetValid: true,
+                seanceValid: true,
+                formValid: true
+            }, () => {for(let p in this.state){ this.validateField(p,this.state[p]);} });
+        }
+        else if (id !== 'new') {
             const cinema = await (await fetch('/v1/api/cinemas/'+id).then(response => response.json()));
             this.setState({
                 name: cinema.name,
@@ -37,7 +60,8 @@ class CinemaEdit extends Component {
                 region: cinema.region,
                 city: cinema.city,
                 street: cinema.street,
-                formErrors: {name: '', rating: '', gname: ''},
+                seances: [],
+                formErrors: {name: '', country: '', region: '', city:'', street: ''},
                 nameValid: true,
                 countryValid: true,
                 regionValid: true,
@@ -60,10 +84,10 @@ class CinemaEdit extends Component {
         let seanceValid = item.seanceValid;
         switch(fieldName) {
           case 'name':
-            nameValid = value.match(/^[A-Za-z\s]+$/);
+            nameValid = value.match(/^[A-Za-z][A-Za-z0-9\s]+$/);
             fieldValidationErrors.name = nameValid ? '' : ' is invalid. Require words!';
-            nameValid = nameValid && value.length > 5;
-            fieldValidationErrors.name = nameValid ? '' : fieldValidationErrors.name+' Length must be more than 5 characters!';
+            nameValid = nameValid && value.length > 3;
+            fieldValidationErrors.name = nameValid ? '' : fieldValidationErrors.name+' Length must be more than 3 characters!';
             break;
           case 'country':
             countryValid =  value.match(/^[A-Za-z\s]+$/);
@@ -78,7 +102,7 @@ class CinemaEdit extends Component {
             fieldValidationErrors.city = cityValid ? '' : fieldValidationErrors.city+' Length must be more than 3 characters!';
             break;
           case 'region':
-            regionValid = value.match(/^[A-Za-z\s]+$/);
+            regionValid = (value === null || value === '') || value.match(/^[A-Za-z_\s]+$/);
             fieldValidationErrors.region = regionValid ? '' : ' is invalid. Require words!';
             break;
           case 'street':
@@ -101,10 +125,22 @@ class CinemaEdit extends Component {
       }
 
       validateForm() {
-          this.setState({formValid: this.state.nameValid && this.state.countryValid && this.state.cityValid && this.state.regionValid && this.state.streetValid && this.state.seanceValid});
+          console.log('Field = ',this.state.nameValid);
+          this.setState({formValid: this.state.nameValid && this.state.countryValid && this.state.cityValid && this.state.regionValid && this.state.streetValid && this.state.seanceValid}, () => this.moveToP());
           console.log(this.state.formValid);
-          this.moveToP();
+          //this.moveToP();
       }
+    
+     /*
+     const [seances, setSeance] = React.useState(
+     {seances: this.state.seances});*/
+     addTo(s){
+         //setSeance(
+            let seances = this.state.seances;
+            seances.push(s);
+            this.setState({seances: seances});
+         //);
+     }
     
       moveToP(){
           
@@ -136,6 +172,25 @@ class CinemaEdit extends Component {
     
     errorClass(error) {
         return(error.length === 0 ? '' : ' has-error');
+    }
+    
+    deleteAllSeances(item){
+        this.setState({
+                name: item.name,
+                country: item.country,
+                region: item.region,
+                city: item.city,
+                street: item.street,
+                seances: [],
+                formErrors: {name: '', country: '', region: '', city:'', street: ''},
+                nameValid: true,
+                countryValid: true,
+                regionValid: true,
+                cityValid: true,
+                streetValid: true,
+                seanceValid: true,
+                formValid: true
+        });
     }
     
     render(){
@@ -174,6 +229,13 @@ class CinemaEdit extends Component {
             <Label htmlFor="street">Street</Label>
             <Input type="text" name="street" id="street" className="form-control" value={item.street || ''}
                    onChange={this.handleChange} autoComplete="street"/>
+          </FormGroup>
+          <FormGroup>
+            <Button color="success" tag={Link} to={{pathname:"/views/cinemas/"+this.props.match.params.id+"/seances/add", state: {ns: item}}} className="btn btn-primary" >
+                Add Seance
+            </Button>
+            {(item.seances.length > 0) ? <Button color="danger" className="btn btn-primary btn-scs-rm" onClick={() => this.deleteAllSeances(item)}>Clear all seances</Button> : null}
+            <p>Count: {item.seances.length}</p>
           </FormGroup>
           <FormGroup>
             <Button color="primary" type="submit" className="btn btn-primary" disabled={!item.formValid}>Save</Button>{' '}
