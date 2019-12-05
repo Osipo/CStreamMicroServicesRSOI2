@@ -119,6 +119,29 @@ public class ApiControllerTest {
     }
 
     @Test
+    void testFilmByName() throws Exception{
+        logger.info("test get film by name");
+        FilmInfo[] ans1 = {new FilmInfo(1L,"IT",(short)18,10L)};
+        when(fs.getByName("IT")).thenReturn(ans1);
+        mockMvc.perform(get("/v1/api/films/name/").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$.reason").value("Required path parameter: Missing URI template variable 'name' for method parameter of type String"))
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.ex").value("org.springframework.web.bind.MissingPathVariableException"));
+
+        mockMvc.perform(get("/v1/api/films/name/IT").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].name").value("IT"))
+                .andExpect(jsonPath("$[0].rating").value(18))
+                .andExpect(jsonPath("$[0].genre").value(IsNull.nullValue()));
+    }
+
+    @Test
     void testFilmPages() throws Exception {
         when(fs.getAll()).thenReturn(FILMS);
         mockMvc.perform(get("/v1/api/films?size=2").accept(MediaType.APPLICATION_JSON_UTF8))
@@ -405,6 +428,28 @@ public class ApiControllerTest {
                 .andExpect(jsonPath("$[0].id").value(GENRES[1].getId()))
                 .andExpect(jsonPath("$[0].name").value(GENRES[1].getName()))
                 .andExpect(jsonPath("$[0].remarks").value(GENRES[1].getRemarks()));
+    }
+
+    @Test
+    void testGenreByName() throws Exception{
+        logger.info("testGenreByName");
+        GenreInfo[] g = {new GenreInfo(1l,"Horror",null)};
+        when(gs.getByName("Horror")).thenReturn(g);
+        mockMvc.perform(get("/v1/api/genres/name/").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$.reason").value("Required path parameter: Missing URI template variable 'name' for method parameter of type String"))
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.ex").value("org.springframework.web.bind.MissingPathVariableException"));
+
+        mockMvc.perform(get("/v1/api/genres/name/Horror").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].name").value("Horror"))
+                .andExpect(jsonPath("$[0].remarks").value(IsNull.nullValue()));
     }
 
     @Test

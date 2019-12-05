@@ -21,7 +21,11 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 task cleanFull { subprojects.each { dependsOn("${it.name}:clean") }  }
-task testAll { subprojects.each { dependsOn("${it.name}:test")} }
+task testAll(type: GradleBuild){
+    def t1 = subprojects.find { p -> p.name == "frontend"}.getTasks().getByPath(":test")
+    def t2 = subprojects.find { p -> p.name == "ApiGatewayApp"}.getTasks().getByPath(":test")
+    tasks = [':frontend:test', 'ApiGatewayApp:test']
+}
 coveralls {
     sourceDirs = subprojects.sourceSets.main.allSource.srcDirs.flatten()
     jacocoReportPath = "ApiGatewayApp/build/reports/jacoco/xml/jacoco.xml"

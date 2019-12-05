@@ -31,7 +31,9 @@ npm_run_build {
     // make sure the build task is executed only when appropriate files change
     inputs.files fileTree('public')
     inputs.files fileTree('src')
-
+    inputs.files fileTree('WebApp').matching {
+        exclude "**/.gradle"
+    }
     // 'node_modules' appeared not reliable for dependency change detection (the task was rerun without changes)
     // though 'package.json' and 'package-lock.json' should be enough anyway
     inputs.file 'package.json'
@@ -51,7 +53,7 @@ task packageNpmApp(type: Zip) {
         into 'static'
     }
 }
-
+//println tasks.getByPath("packageNpmApp")
 // declare a dedicated scope for publishing the packaged JAR
 configurations {
     npmResources

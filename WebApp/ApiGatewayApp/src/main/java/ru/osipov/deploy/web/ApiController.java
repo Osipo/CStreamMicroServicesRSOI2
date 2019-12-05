@@ -77,10 +77,17 @@ public class ApiController {
         return ResponseEntity.ok(result);
     }
 
-    //TODO!
-    @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE, path = {"/"})
+    //GET: /v1/api/films/name/{film_name}
+    @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE, path = {"/films/name/{name}", "/films/name/"})
     public ResponseEntity getFilmByName(@PathVariable(required = true, name = "name") String name){
-        return ResponseEntity.ok("");
+        FilmInfo[] f = filmService.getByName(name);//exception here: 404
+        List<FilmGenre> result = new ArrayList<>();
+        for (FilmInfo i : f){
+            GenreInfo g = genreService.getById(i.getGid());
+            FilmGenre fg = new FilmGenre(i.getId(),i.getName(),i.getRating(),g);
+            result.add(fg);
+        }
+        return ResponseEntity.ok(result);
     }
 
     //GET: /v1/api/films/genre/{genre_id}
@@ -150,6 +157,14 @@ public class ApiController {
     //GET: /v1/api/genres/{genre_id}
     @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE,path = "/genres/{id}")
     public ResponseEntity getGenreById(@PathVariable(required = true, name = "id") Long id){return ResponseEntity.ok(genreService.getById(id));}
+
+
+    //GET: /v1/api/genres/name/{genre_name}
+    @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE, path={"/genres/name/{name}", "/genres/name/"})
+    public ResponseEntity getGenreByName(@PathVariable(required = true, name = "name") String name){
+        GenreInfo[] result = genreService.getByName(name);
+        return ResponseEntity.ok(result);
+    }
 
     //POST: /v1/api/genres/delete/{genre_id}
     //This is also deletes old genre_id from films.
