@@ -53,8 +53,7 @@ matrix:
         before_install:
           - "cd ./WebApp" #With frontend: REACT_JS
           - "chmod +x gradlew"
-        script: ./gradlew clean test
-        after_script: ./gradlew clean build
+        script: ./gradlew cleanFull testAll
         after_success:
 #          - "cd .."
 #          - "chmod +x gradlew"
