@@ -28,6 +28,8 @@ code {
 #page-numbers {
     left: 50%;
     position:relative;
+    margin-top:10%;
+    height:2rem;
 }
 #page-numbers li{
     margin-right:1rem;
