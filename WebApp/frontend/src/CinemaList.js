@@ -31,7 +31,7 @@ class CinemaList extends Component {
       return <p>Loading...</p>;
     }
 
-    const cList = this.state.pageItems.map(c => {
+    const cList = cinemas.map(c => {
            return(<tr key={c.id}>
                 <td style={{whiteSpace: 'nowrap'}}>{c.name}</td>
                 <td>{c.country}</td>

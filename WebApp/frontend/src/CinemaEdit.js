@@ -25,6 +25,7 @@ class CinemaEdit extends Component {
             formValid: false
         };
         this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
         this.addTo = this.addTo.bind(this);
         this.deleteAllSeances = this.deleteAllSeances.bind(this);
     }
@@ -34,7 +35,9 @@ class CinemaEdit extends Component {
         console.log(id);
         let fromSeance = this.props.location.state;
         if(fromSeance !== null && fromSeance !== undefined){
+           
             let ns = fromSeance.ns;
+            console.log(ns);
             this.setState({
                 name: ns.name,
                 country: ns.country,
@@ -168,7 +171,35 @@ class CinemaEdit extends Component {
                       () => { this.validateField(name, value) });
     }
     
-    
+    async handleSubmit(event){
+        event.preventDefault();
+        
+         for(let p in this.state){
+            this.validateField(p,this.state[p]);
+        }
+        if(!this.state.formValid){
+            alert('Validation failed!');
+            return -1;
+        }
+        
+        const item = {
+            name:this.state.name,
+            country:this.state.country,
+            city:this.state.city,
+            region:this.state.region === "" ? null : this.state.region,
+            street:this.state.street,
+            seances:this.state.seances
+        };
+        await fetch('/v1/api/cinemas/'+this.props.match.params.id, {
+            method: 'PATCH',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+        body: JSON.stringify(item),
+        });
+    this.props.history.push('/v1/views/cinemas');
+    }
     
     errorClass(error) {
         return(error.length === 0 ? '' : ' has-error');

@@ -11,8 +11,8 @@ class FilmEdit extends Component {
     this.state = {
         name: '',
         rating: 0,
-        gid: -1,
-        formErrors: {name: '', rating: '', gid: ''},
+        gname: '',
+        formErrors: {name: '', rating: '', gname: ''},
         nameValid: false,
         ratingValid: false,
         gidValid: false,
@@ -31,9 +31,8 @@ class FilmEdit extends Component {
       this.setState({
           name: film.name,
           rating: film.rating,
-          gid: film.genre.id,
           gname: film.genre.name,
-          formErrors: {name: '', rating: '', gid: ''},
+          formErrors: {name: '', rating: '', gname: ''},
           nameValid: true,
           ratingValid: true,
           gidValid: true,
@@ -55,21 +54,40 @@ class FilmEdit extends Component {
     let fid = 0;
     if (this.props.match.params.id !== 'new')
         fid = this.props.match.params.id;
-    const item = {
+    
+    for(let p in this.state){
+        this.validateField(p,this.state[p]);
+    }
+        if(!this.state.formValid){
+        alert('Validation failed!');
+        return -1;
+    }
+    const genre  = await (await fetch('/v1/api/genres/name/'+this.state.gname).then(response => response.json()));
+    let s = {
         name:this.state.name,
         rating:this.state.rating,
-        gid: this.state.gid
+        gname: this.state.gname
     }
-    
-    await fetch('/v1/api/films/'+fid, {
-      method: 'PATCH',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(item),
-    });
-    this.props.history.push('/v1/views/films');
+    console.log(genre);
+    if(genre.length === 1){
+        console.log("Array found");
+        s = {name:this.state.name,
+        rating:Number(this.state.rating === "" ? 0 : this.state.rating),
+        gid: genre[0].id};
+        await fetch('/v1/api/films/'+fid, {
+          method: 'PATCH',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(s),
+        });
+        this.props.history.push('/views/films');
+    }
+    else{
+        alert(genre.reason);
+        return -1;
+    }
   }
 
   validateField(fieldName, value) {
@@ -88,9 +106,11 @@ class FilmEdit extends Component {
         ratingValid = value >= 0 && value <= 100;
         fieldValidationErrors.rating = ratingValid ? '': ' Must be in [0..100].';
         break;
-      case 'gid':
-        gidValid = value >= -1;
-        fieldValidationErrors.gid = gidValid ? '' : 'Must be greater than or equal -1';
+      case 'gname':
+        gidValid = value.match(/^[A-Za-z\s]+$/);
+        fieldValidationErrors.gname = gidValid ? '' : 'is invalid. Require words!';
+        gidValid = gidValid && value.length > 3;
+        fieldValidationErrors.gname = gidValid ? '' : fieldValidationErrors.gname + ' Length must be greater than 3 characters!';
       default:
         break;
     }
@@ -151,10 +171,10 @@ class FilmEdit extends Component {
             <Input type="text" name="rating" id="rating" className="form-control" value={item.rating || ''}
                    onChange={this.handleChange} autoComplete="rating"/>
           </FormGroup>
-          <FormGroup className={'form-group'+this.errorClass(item.formErrors.gid)}>
-            <Label htmlFor="gid">Genre</Label>
-            <Input type="text" name="gid" id="gid" className="form-control" value={item.gid || ''}
-                   onChange={this.handleChange} autoComplete="gid"/>
+          <FormGroup className={'form-group'+this.errorClass(item.formErrors.gname)}>
+            <Label htmlFor="gname">Genre</Label>
+            <Input type="text" name="gname" id="gname" className="form-control" value={item.gname || ''}
+                   onChange={this.handleChange} autoComplete="gname"/>
           </FormGroup>
           <FormGroup>
             <Button color="primary" type="submit" className="btn btn-primary" disabled={!item.formValid}>Save</Button>{' '}

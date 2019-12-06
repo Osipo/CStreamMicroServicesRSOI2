@@ -49,15 +49,29 @@ class SeanceEdit extends Component {
     
     async handleSubmit(event) {
         event.preventDefault();//TODO: VALIDATE AGAIN
-        let s = {cid: this.props.match.params.id, fid: this.state.fid, date: this.state.date};
-        this.setState(s,() => {for(let p in this.state){this.validateField(p,this.state[p]);} });
-        const film = await (await fetch('/v1/api/films/name/'+this.state.fid).then(response => response.json()));
+         for(let p in this.state){
+            this.validateField(p,this.state[p]);
+         }
+         if(!this.state.formValid){
+            alert('Validation failed!');
+            return -1;
+        }
         
-        if(film.legnth === 1){
+        
+        let s = {cid: this.props.match.params.id, fid: this.state.fid, date: this.state.date};
+        
+        if(!this.state.formValid){
+            alert('Validation failed');
+            return -1;
+        }
+        const film = await (await fetch('/v1/api/films/name/'+this.state.fid).then(response => response.json()));
+        console.log(film);
+        if(film.length === 1){
             console.log(this.props.location.state);
             for(let p in this.props.location.state){
                 console.log(" ",p,this.props.location.state[p]);
             }
+            s = {cid: Number(this.props.match.params.id), fid: film[0].id, date: this.state.date};
             const {ns} = this.props.location.state;
             ns.seances.push(s);
             this.props.history.push('/views/cinemas/'+this.props.match.params.id, {ns: ns});

@@ -46,6 +46,13 @@ class GenreEdit extends Component {
 
   async handleSubmit(event) {
     event.preventDefault();
+     for(let p in this.state){
+            this.validateField(p,this.state[p]);
+     }
+     if(!this.state.formValid){
+            alert('Validation failed!');
+            return -1;
+        }
     const item = {
         name:this.state.name,
         remarks:this.state.remarks === '' ? null : this.state.remarks
@@ -59,7 +66,7 @@ class GenreEdit extends Component {
       },
       body: JSON.stringify(item),
     });
-    this.props.history.push('/v1/views/genres');
+    this.props.history.push('/views/genres');
   }
 
   validateField(fieldName, value) {
