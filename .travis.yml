@@ -10,7 +10,7 @@ services:
   - mysql
 branches:
   only:
-    - master
+    - react_ui
 env: PRO=CinemaStreamMicroservice
 matrix:
   include:
@@ -58,7 +58,7 @@ matrix:
         after_success:
 #          - "cd .."
 #          - "chmod +x gradlew"
-#          - ./gradlew coveralls UNCOMMENT THIS LINE!
+           - ./gradlew coveralls UNCOMMENT THIS LINE!
 #          - "cd $PRO"
         env:
           - PRO=ApiGatewayApp
