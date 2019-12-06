@@ -5,6 +5,7 @@ import AppNavbar from './AppNavbar';
 import { FormErrors } from './FormErrors';
 import './Error.css';
 class SeanceEdit extends Component {
+    ciname = '';
     constructor(props){
         super(props);
         this.state = {
@@ -28,12 +29,11 @@ class SeanceEdit extends Component {
                      ].join('-');
         };
     }
-    
     async componentDidMount() {
         let id = this.props.match.params.id;
         console.log('Cid = ',id);
         const cinema = await (await fetch('/v1/api/cinemas/'+id).then(response => response.json()));
-        
+        this.ciname = cinema.name;
         this.setState({
                 cid: cinema.name,
                 fid: '',
@@ -49,14 +49,23 @@ class SeanceEdit extends Component {
     
     async handleSubmit(event) {
         event.preventDefault();//TODO: VALIDATE AGAIN
-        const s = {cid: this.props.match.params.id, fid: this.state.fid, date: this.state.date};
-        console.log(this.props.location.state);
-        for(let p in this.props.location.state){
-            console.log(" ",p,this.props.location.state[p]);
+        let s = {cid: this.props.match.params.id, fid: this.state.fid, date: this.state.date};
+        this.setState(s,() => {for(let p in this.state){this.validateField(p,this.state[p]);} });
+        const film = await (await fetch('/v1/api/films/name/'+this.state.fid).then(response => response.json()));
+        
+        if(film.legnth === 1){
+            console.log(this.props.location.state);
+            for(let p in this.props.location.state){
+                console.log(" ",p,this.props.location.state[p]);
+            }
+            const {ns} = this.props.location.state;
+            ns.seances.push(s);
+            this.props.history.push('/views/cinemas/'+this.props.match.params.id, {ns: ns});
         }
-        const {ns} = this.props.location.state;
-        ns.seances.push(s);
-        this.props.history.push('/views/cinemas/'+this.props.match.params.id, {ns: ns});
+        else{
+            alert(film.reason);
+            return -1;
+        }
     }
     
     validateField(fieldName, value) {
@@ -131,7 +140,7 @@ class SeanceEdit extends Component {
    render(){
         const item = this.state;
         const title = <h2>{'Add Seance'}</h2>;
-        const cname = item.cid ? <h5>{'To cinema   '+item.cid}</h5> : null;
+        const cname = this.ciname ? <h5>{'To cinema   '+this.ciname}</h5> : null;
         return <div>
       <AppNavbar meid={3}/>
       <Container>

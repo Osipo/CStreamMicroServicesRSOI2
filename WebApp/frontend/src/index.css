@@ -25,3 +25,34 @@ code {
     background-color:orange;
     
 }
+#page-numbers {
+    left: 50%;
+    position:relative;
+}
+#page-numbers li{
+    margin-right:1rem;
+    background-color:blue;
+    border-radius:10%;
+    border: 1px solid gray;
+    color:white;
+    width:4%;
+}
+#page-numbers  li:not([class]):hover{
+    background-color:red;
+}
+#page-numbers li[class=""]:hover{
+    background-color:red;
+}
+#page-numbers li[class="active"]{
+    background-color:red;
+}
+#page-numbers li[class="disabled"]{
+    text-align:center;
+}
+#page-numbers li a {
+    color:white;
+    position:absolute;
+    width:inherit;
+    text-align:center;
+    height:100%;
+}

@@ -41,7 +41,7 @@ public class WebFilmService {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<FilmInfo[]> response;
         try {
-            response = restTemplate.exchange(serviceUrl + "/v1/films/name" + name,
+            response = restTemplate.exchange(serviceUrl + "/v1/films/name/" + name,
                     HttpMethod.GET, entity, FilmInfo[].class);
         }
         catch(HttpClientErrorException e){
@@ -49,7 +49,7 @@ public class WebFilmService {
             logger.info("Error status: '{}'",e.getRawStatusCode());
             logger.info("Response: '{}'",e.getResponseBodyAsString());
             throw new ApiException(e.getMessage(), e, e.getRawStatusCode(), e.getResponseHeaders(),
-                    e.getResponseBodyAsString(), serviceUrl+"/v1/films/name"+name, null);
+                    e.getResponseBodyAsString(), serviceUrl+"/v1/films/name/"+name, null);
         }
         return response.getBody();
     }

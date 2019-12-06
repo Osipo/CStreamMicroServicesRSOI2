@@ -59,7 +59,7 @@ public class WebGenreService {
         // Send request with GET method, and Headers.
         ResponseEntity<GenreInfo[]> response;
         try {
-            response = restTemplate.exchange(serviceUrl + "/v1/genres/" + name,
+            response = restTemplate.exchange(serviceUrl + "/v1/genres?name=" + name,
                     HttpMethod.GET, entity, GenreInfo[].class);
         }
         catch(HttpClientErrorException e){
@@ -67,7 +67,7 @@ public class WebGenreService {
             logger.info("Error status: '{}'",e.getRawStatusCode());
             logger.info("Response: '{}'",e.getResponseBodyAsString());
             throw new ApiException(e.getMessage(), e, e.getRawStatusCode(), e.getResponseHeaders(),
-                    e.getResponseBodyAsString(), serviceUrl+"/v1/genres/"+name, null);
+                    e.getResponseBodyAsString(), serviceUrl+"/v1/genres?name="+name, null);
         }
         return response.getBody();
     }
