@@ -113,6 +113,13 @@ dependencies {
     compile group: 'org.json', name: 'json', version: '20190722'
     runtimeOnly project(':frontend')
 
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-hystrix'
+}
+
+dependencyManagement{
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 test{
