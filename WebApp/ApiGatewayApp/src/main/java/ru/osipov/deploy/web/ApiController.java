@@ -162,7 +162,8 @@ public class ApiController {
     //GET: /v1/api/genres/name/{genre_name}
     @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE, path={"/genres/name/{name}", "/genres/name/"})
     public ResponseEntity getGenreByName(@PathVariable(required = true, name = "name") String name){
-        GenreInfo[] result = genreService.getByName(name);
+        GenreInfo[] result;
+        result = genreService.getByName(name);
         return ResponseEntity.ok(result);
     }
 

@@ -124,6 +124,19 @@ class GenreList extends Component {
              if (isLoading) {
                 return <p>Loading...</p>;
             }
+            if(genres.reason !== undefined){
+                return(
+                    <div>
+                        <AppNavbar meid={1}/>
+                        <Container fluid>
+                            <div className="attention">
+                                <p>{genres.reason}</p>
+                                <p>{genres.code}</p>
+                            </div>
+                        </Container>
+                    </div>
+                );
+            }
             
             // Logic for displaying current todos
             const indexOfLastTodo = currentPage * pageSize;

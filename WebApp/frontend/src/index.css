@@ -58,3 +58,13 @@ code {
     text-align:center;
     height:100%;
 }
+.attention{
+    color:#d85f5f;
+    position:relative;
+    margin-left:25%;
+    width:50%;
+    height:20%;
+    border: 3px solid blue;
+    text-align:center;
+    border-radius: 25px;
+}

@@ -53,11 +53,13 @@ matrix:
         before_install:
           - "cd ./WebApp" #With frontend: REACT_JS
           - "chmod +x gradlew"
-        script: ./gradlew cleanFull testAll
+        script:
+          - ./gradlew cleanFull
+          - ./gradlew testAll
         after_success:
 #          - "cd .."
 #          - "chmod +x gradlew"
-           - ./gradlew coveralls UNCOMMENT THIS LINE!
+           - ./gradlew coveralls # UNCOMMENT THIS LINE!
 #          - "cd $PRO"
         env:
           - PRO=ApiGatewayApp

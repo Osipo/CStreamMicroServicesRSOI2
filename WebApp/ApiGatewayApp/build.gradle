@@ -107,6 +107,7 @@ dependencies {
     //Registration Service
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter', version: '2.1.3.RELEASE'
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-eureka-server', version: '2.1.3.RELEASE'
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-hystrix-dashboard', version: '1.4.7.RELEASE'
     runtime group: 'org.springframework.cloud', name: 'spring-cloud-dependencies', version: 'Finchley.RELEASE', ext: 'pom'
 
     //JSON API

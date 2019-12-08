@@ -2,6 +2,8 @@ package ru.osipov.deploy.services;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import ru.osipov.deploy.errors.ApiException;
 import ru.osipov.deploy.models.CreateGenreR;
 import ru.osipov.deploy.models.GenreInfo;
 
+import java.net.ConnectException;
 import java.net.URI;
 import java.util.Arrays;
 @Service
@@ -41,6 +44,8 @@ public class WebGenreService {
             this.serviceUrl = "http://"+serviceUrl;
     }
 
+    @HystrixCommand(fallbackMethod = "getByName_fallback",  commandProperties = {
+            @HystrixProperty(name = "execution.isolation.strategy", value = "SEMAPHORE")})
     public GenreInfo[] getByName(String name){
         // HttpHeaders
         HttpHeaders headers = new HttpHeaders();
@@ -54,12 +59,12 @@ public class WebGenreService {
         HttpEntity<String> entity = new HttpEntity<String>(headers);
 
         // RestTemplate
-        RestTemplate restTemplate = new RestTemplate();
+        //RestTemplate restTemplate = new RestTemplate();
 
         // Send request with GET method, and Headers.
         ResponseEntity<GenreInfo[]> response;
         try {
-            response = restTemplate.exchange(serviceUrl + "/v1/genres?name=" + name,
+            response = this.restTemplate.exchange(serviceUrl + "/v1/genres?name=" + name,
                     HttpMethod.GET, entity, GenreInfo[].class);
         }
         catch(HttpClientErrorException e){
@@ -72,6 +77,15 @@ public class WebGenreService {
         return response.getBody();
     }
 
+    @SuppressWarnings("unused")
+    public GenreInfo[] getByName_fallback(String name){
+        HttpHeaders h = new HttpHeaders();
+        h.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        throw new ApiException("Service unavailable.",new ConnectException(),500,h,"Service unavailable. Connection refused.",serviceUrl+"/v1/genres?name="+name,null);
+    }
+
+    @HystrixCommand(fallbackMethod = "getAll_fallback",  commandProperties = {
+            @HystrixProperty(name = "execution.isolation.strategy", value = "SEMAPHORE")})
     public GenreInfo[] getAll(){
             // HttpHeaders
             HttpHeaders headers = new HttpHeaders();
@@ -85,12 +99,19 @@ public class WebGenreService {
             HttpEntity<String> entity = new HttpEntity<String>(headers);
 
             // RestTemplate
-            RestTemplate restTemplate = new RestTemplate();
+            //RestTemplate restTemplate = new RestTemplate();
 
             // Send request with GET method, and Headers.
-            ResponseEntity<GenreInfo[]> response = restTemplate.exchange(serviceUrl+"/v1/genres",
+            ResponseEntity<GenreInfo[]> response = this.restTemplate.exchange(serviceUrl+"/v1/genres",
                     HttpMethod.GET, entity, GenreInfo[].class);
             return response.getBody();
+    }
+
+    @SuppressWarnings("unused")
+    public GenreInfo[] getAll_fallback(){
+        HttpHeaders h = new HttpHeaders();
+        h.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        throw new ApiException("Service unavailable.",new ConnectException(),500,h,"Service unavailable. Connection refused.",serviceUrl+"/v1/genres",null);
     }
 
     public GenreInfo getById(Long id){
@@ -106,11 +127,11 @@ public class WebGenreService {
         HttpEntity<String> entity = new HttpEntity<String>(headers);
 
         // RestTemplate
-        RestTemplate restTemplate = new RestTemplate();
+        //.RestTemplate restTemplate = new RestTemplate();
 
         ResponseEntity<GenreInfo> response;
         try {
-            response = restTemplate.exchange(serviceUrl + "/v1/genres/" + id,
+            response = this.restTemplate.exchange(serviceUrl + "/v1/genres/" + id,
                     HttpMethod.GET, entity, GenreInfo.class);
         }catch (HttpClientErrorException e){
             logger.info("Error message: '{}'",e.getMessage());
@@ -129,10 +150,10 @@ public class WebGenreService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON_UTF8));
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<String> entity = new HttpEntity<String>(headers);
-        RestTemplate restTemplate = new RestTemplate();
+        //RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<GenreInfo> response;
         try {
-            response = restTemplate.exchange(serviceUrl + "/v1/genres/delete/" + genre
+            response = this.restTemplate.exchange(serviceUrl + "/v1/genres/delete/" + genre
                     , HttpMethod.POST, entity, GenreInfo.class);
         }catch (HttpClientErrorException e){
             logger.info("Error message: '{}'",e.getMessage());
@@ -149,8 +170,8 @@ public class WebGenreService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON_UTF8));
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<String> entity = new HttpEntity<>(gson.toJson(data),headers);
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Void> response = restTemplate.exchange(serviceUrl+"/v1/genres/create",
+        // RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<Void> response = this.restTemplate.exchange(serviceUrl+"/v1/genres/create",
                 HttpMethod.POST,entity,Void.class);
 
         return response.getHeaders().getLocation();
