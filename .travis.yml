@@ -58,7 +58,7 @@ matrix:
         after_success:
 #          - "cd .."
 #          - "chmod +x gradlew"
-           - ./gradlew coveralls # UNCOMMENT THIS LINE!
+#           - ./gradlew coveralls # FOR TEST COVERAGE
 #          - "cd $PRO"
         env:
           - PRO=ApiGatewayApp
