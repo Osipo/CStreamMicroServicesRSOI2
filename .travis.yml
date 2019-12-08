@@ -9,59 +9,60 @@ addons:
 services:
   - mysql
 branches:
-  except:
-    - react_ui
+  only:
+    - master
 env: PRO=CinemaStreamMicroservice
 matrix:
   include:
       -
         before_install:
-          - "cd SeanceApp"
+          - "cd ./Microservices/SeanceApp"
           - "chmod +x gradlew"
         script: ./gradlew clean test
         after_script: ./gradlew clean build
         env: PRO=SeanceApp
       -
         before_install:
-          - "cd GenreApp"
+          - "cd ./Microservices/GenreApp"
           - "chmod +x gradlew"
         script: ./gradlew clean test
         after_script: ./gradlew clean build
         env: PRO=GenreApp
       -
         before_install:
-          - "cd FilmApp"
+          - "cd ./Microservices/FilmApp"
           - "chmod +x gradlew"
         script: ./gradlew clean test
         after_script: ./gradlew clean build
         env: PRO=FilmApp
       -
         before_install:
-          - "cd CinemaApp"
+          - "cd ./Microservices/CinemaApp"
           - "chmod +x gradlew"
         script: ./gradlew clean test
         after_script: ./gradlew clean build
         env: PRO=CinemaApp
       -
         before_install:
-          - "cd DiscoveryService"
+          - "cd ./Microservices/DiscoveryService"
           - "chmod +x gradlew"
         script: ./gradlew clean test
         after_script: ./gradlew clean build
         env: PRO=DiscoveryService
       -
         before_install:
-          - "cd ApiGatewayApp"
+          - "cd ./WebApp" #With frontend: REACT_JS
           - "chmod +x gradlew"
-        script: ./gradlew clean test
-        after_script: ./gradlew clean build
+          - ./gradlew cleanFull
+          - ./gradlew testAll
         after_success:
-          - "cd .."
-          - "chmod +x gradlew"
-#          - ./gradlew coveralls
-          - "cd $PRO"
+#          - "cd .."
+#          - "chmod +x gradlew"
+#           - ./gradlew coveralls # FOR TEST COVERAGE
+#          - "cd $PRO"
         env:
           - PRO=ApiGatewayApp
+          - CI=false
 #          - JVM_OPTS=-Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2"
 notifications:
   email: false

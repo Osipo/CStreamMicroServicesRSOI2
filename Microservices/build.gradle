@@ -1,0 +1,41 @@
+plugins{
+    id 'java'
+    id "com.palantir.jacoco-coverage" version "0.4.0"
+}
+allprojects{
+    apply plugin: 'java'
+    apply plugin: 'jacoco'
+    jacoco {
+        toolVersion = "0.8.2"
+    }
+}
+subprojects{
+    version '1.0-SHAPSHOT'
+}
+group 'ru'
+version '1.0-SNAPSHOT'
+sourceCompatibility = 1.12
+targetCompatibility = 1.12
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile group: 'org.eluder.coveralls', name: 'coveralls-maven-plugin', version: '4.3.0'
+}
+test{
+    useJUnitPlatform()
+}
+task stage(dependsOn: ['build', 'clean'])
+build.mustRunAfter clean
+
+task copyToLib(type: Copy) {
+    into "$buildDir/libs"
+    from(configurations.compile)
+}
+
+stage.dependsOn(copyToLib)
+task cleanFull { subprojects.each { dependsOn("${it.name}:clean") } }
+task testAll{ subprojects.each { dependsOn("${it.name}:test") }  }

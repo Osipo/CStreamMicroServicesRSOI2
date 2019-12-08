@@ -1,0 +1,70 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+#last-nav-m {
+    margin-right: 3.5rem;
+}
+.menu-app {
+    margin-right: 2rem;
+}
+.active-l {
+    border-radius: 20px;
+    background-color:orange;
+}
+.navbar-brand:hover{
+    background-color:orange;
+    
+}
+#page-numbers {
+    left: 50%;
+    position:relative;
+    margin-top:10%;
+    height:2rem;
+}
+#page-numbers li{
+    margin-right:1rem;
+    background-color:blue;
+    border-radius:10%;
+    border: 1px solid gray;
+    color:white;
+    width:4%;
+}
+#page-numbers  li:not([class]):hover{
+    background-color:red;
+}
+#page-numbers li[class=""]:hover{
+    background-color:red;
+}
+#page-numbers li[class="active"]{
+    background-color:red;
+}
+#page-numbers li[class="disabled"]{
+    text-align:center;
+}
+#page-numbers li a {
+    color:white;
+    position:absolute;
+    width:inherit;
+    text-align:center;
+    height:100%;
+}
+.attention{
+    color:#d85f5f;
+    position:relative;
+    margin-left:25%;
+    width:50%;
+    height:20%;
+    border: 3px solid blue;
+    text-align:center;
+    border-radius: 25px;
+}

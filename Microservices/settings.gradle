@@ -1,0 +1,6 @@
+rootProject.name = 'Microservices'
+include 'DiscoveryService'
+include 'GenreApp'
+include 'FilmApp'
+include 'SeanceApp'
+include 'CinemaApp'
