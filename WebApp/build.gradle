@@ -27,6 +27,7 @@ task testAll(type: GradleBuild){
     tasks = [':frontend:test', 'ApiGatewayApp:test']
 }
 coveralls {
+    //sourceDirs = subprojects.find{p -> p.name == "ApiGatewayApp"}.sourceSets.main.allSource.srcDirs.flatten()
     sourceDirs = subprojects.sourceSets.main.allSource.srcDirs.flatten()
     jacocoReportPath = "ApiGatewayApp/build/reports/jacoco/xml/jacoco.xml"
 }
