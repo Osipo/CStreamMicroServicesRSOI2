@@ -29,20 +29,6 @@ task testAll(type: GradleBuild){
     def t2 = subprojects.find { p -> p.name == "ApiGatewayApp"}.getTasks().getByPath(":test")
     tasks = [':frontend:test', 'ApiGatewayApp:test']
 }
-coveralls {
-    sourceSets{
-        unitTests{
-            java {
-                srcDirs = new LinkedHashSet<>();
-                srcDirs += 'ApiGatewaApp/src/main/java'
-            }
-            resources {
-                srcDirs = new LinkedHashSet<>();
-                srcDirs += 'ApiGatewayApp/src/main/resources'
-            }
-        }
-    }
-
-    sourceDirs  = project.sourceSets.unitTests.allSource.srcDirs.flatten().toList()
-    jacocoReportPath = "ApiGatewayApp/build/reports/jacoco/xml/jacoco.xml"
+task coverTests {
+    dependsOn ':ApiGatewayApp:coveralls'
 }
