@@ -3,7 +3,6 @@ import org.gradle.api.plugins.internal.DefaultJavaPluginConvention
 
 plugins {
     id 'java'
-    id 'com.github.kt3k.coveralls' version '2.8.4'
 }
 
 wrapper {
