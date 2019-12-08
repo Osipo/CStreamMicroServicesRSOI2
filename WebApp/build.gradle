@@ -1,3 +1,6 @@
+import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.plugins.internal.DefaultJavaPluginConvention
+
 plugins {
     id 'java'
     id 'com.github.kt3k.coveralls' version '2.8.4'
@@ -27,7 +30,19 @@ task testAll(type: GradleBuild){
     tasks = [':frontend:test', 'ApiGatewayApp:test']
 }
 coveralls {
-    //sourceDirs = subprojects.find{p -> p.name == "ApiGatewayApp"}.sourceSets.main.allSource.srcDirs.flatten()
-    sourceDirs = subprojects.sourceSets.main.allSource.srcDirs.flatten()
+    sourceSets{
+        unitTests{
+            java {
+                srcDirs = new LinkedHashSet<>();
+                srcDirs += 'ApiGatewaApp/src/main/java'
+            }
+            resources {
+                srcDirs = new LinkedHashSet<>();
+                srcDirs += 'ApiGatewayApp/src/main/resources'
+            }
+        }
+    }
+
+    sourceDirs  = project.sourceSets.unitTests.allSource.srcDirs.flatten().toList()
     jacocoReportPath = "ApiGatewayApp/build/reports/jacoco/xml/jacoco.xml"
 }
