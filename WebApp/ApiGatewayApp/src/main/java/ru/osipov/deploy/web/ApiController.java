@@ -236,11 +236,11 @@ public class ApiController {
     //SECOND UPDATE.
     @PatchMapping(consumes = APPLICATION_JSON_UTF8_VALUE, path = {"/cinemas/{cid}"})
     public ResponseEntity updateSeance(@PathVariable(required = true, name = "cid") Long id, @RequestBody @Valid CreateCinema request){
-        final CinemaInfo c = cinemaService.updateCinema(id,request);
+        final CinemaInfo c = cinemaService.updateCinema(id,request);//UPDATE
         CreateSeance[] sl = request.getSeances();
         if(sl != null && sl.length > 0)
             for(CreateSeance s : sl){
-                seanceService.createSeance(s);
+                seanceService.createSeance(s);//CREATE
             }
         SeanceInfo[] updated = seanceService.getByCid(c.getId());
         return ResponseEntity.ok(new CinemaSeances(c,updated));

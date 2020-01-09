@@ -47,7 +47,7 @@ public class LinkedQueue<T> implements Collection<T>, Iterable<T> {
     }
 
     //DEQUEUE(Q)
-    public void dequeue(){
+    public void x(){
         if(isEmpty()){
             System.out.println("Error. Queue is empty");
             return;
@@ -193,7 +193,7 @@ public class LinkedQueue<T> implements Collection<T>, Iterable<T> {
         return sb.toString();
     }
 
-    private class QueueIterator<T> implements Iterator<T>{
+    private class QueueIterator<T> implements Iterator<T> {
 
         private ElementType<T> c;
         QueueIterator(LinkedQueue<T> q){

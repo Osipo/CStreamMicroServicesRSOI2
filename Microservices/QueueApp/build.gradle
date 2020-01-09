@@ -16,14 +16,14 @@ plugins {
     id 'java-library'
     id "org.springframework.boot" version "2.1.7.RELEASE"
     id "io.spring.dependency-management" version "1.0.8.RELEASE"
-    id 'com.github.kt3k.coveralls' version '2.8.4'
+    //id 'com.github.kt3k.coveralls' version '2.8.4'
 }
 
 apply plugin: 'java'
-apply plugin: 'idea'
 apply plugin: 'jacoco'
+apply plugin: 'idea'
 apply plugin: 'application'
-mainClassName = 'ru.osipov.deploy.GatewayApp'
+mainClassName = 'ru.osipov.deploy.QueueApp'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply from: 'libraries.gradle'
@@ -62,29 +62,26 @@ dependencies {
     //compile "commons-codec:commons-codec:1.12:sources"
     //compile "commons-codec:commons-codec:1.12:javadoc"
 
-//    // Use MySQL Connector-J
-//    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.15'
-////    // https://mvnrepository.com/artifact/org.flywaydb/flyway-core
-////    compile group: 'org.flywaydb', name: 'flyway-core', version: '6.0.8'
-//
-//    //compile 'mysql:mysql-connector-java'
-//    compile group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
+    // Use MySQL Connector-J
+    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.15'
+    //compile 'mysql:mysql-connector-java'
+    compile group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
 
     //Coveralls plugin
     //compile group: 'org.eluder.coveralls', name: 'coveralls-maven-plugin', version: '4.3.0'
 
-//    //Postgres Driver
-//    implementation "org.postgresql:postgresql"
-//    implementation "com.h2database:h2"
+    //Postgres Driver
+    implementation "org.postgresql:postgresql"
+    implementation "com.h2database:h2"
 
-//    compile group: 'org.hibernate', name: 'hibernate-validator', version: '6.0.17.Final'
-
+    compile group: 'org.hibernate', name: 'hibernate-validator', version: '6.0.17.Final'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'com.google.guava:guava:27.0.1-jre'
     implementation 'org.springframework.boot:spring-boot-dependencies:2.0.5.RELEASE'
     implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "com.google.code.gson:gson"
     implementation "com.google.guava:guava:${guavaVersion}"
@@ -102,27 +99,10 @@ dependencies {
     //Templates ViewReslover
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: '2.1.9.RELEASE'
 
-    compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.8")
-
     //Registration Service
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter', version: '2.1.3.RELEASE'
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-eureka-server', version: '2.1.3.RELEASE'
-    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-hystrix-dashboard', version: '1.4.7.RELEASE'
     runtime group: 'org.springframework.cloud', name: 'spring-cloud-dependencies', version: 'Finchley.RELEASE', ext: 'pom'
-
-
-    //JSON API
-    compile group: 'org.json', name: 'json', version: '20190722'
-    runtimeOnly project(':frontend')
-
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-hystrix'
-//    compile group: 'com.netflix.rxjava', name: 'rxjava-core', version: '0.20.7'
-}
-
-dependencyManagement{
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    }
 }
 
 test{
@@ -138,13 +118,8 @@ jacoco {
 jacocoTestReport {
     reports {
         xml.enabled = true // coveralls plugin depends on xml format report
-        xml.setDestination(file("${buildDir}/reports/jacoco/xml/jacoco.xml"))
         html.enabled = true
         csv.enabled = true
     }
-}
-coveralls{
-    sourceDirs  = project.sourceSets.main.allSource.srcDirs.flatten().toList()
-    jacocoReportPath = "./build/reports/jacoco/xml/jacoco.xml"
 }
 test.finalizedBy jacocoTestReport

@@ -45,7 +45,7 @@ public class WebGenreService {
     }
 
     @HystrixCommand(fallbackMethod = "getByName_fallback",  commandProperties = {
-            @HystrixProperty(name = "execution.isolation.strategy", value = "SEMAPHORE")})
+            @HystrixProperty(name = "execution.isolation.strategy", value = "SEMAPHORE"), @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "6000")})
     public GenreInfo[] getByName(String name){
         // HttpHeaders
         HttpHeaders headers = new HttpHeaders();
@@ -84,8 +84,8 @@ public class WebGenreService {
         throw new ApiException("Service unavailable.",new ConnectException(),500,h,"Service unavailable. Connection refused.",serviceUrl+"/v1/genres?name="+name,null);
     }
 
-    @HystrixCommand(fallbackMethod = "getAll_fallback",  commandProperties = {
-            @HystrixProperty(name = "execution.isolation.strategy", value = "SEMAPHORE")})
+    @HystrixCommand(fallbackMethod = "getAll_fallback",   commandProperties = {
+            @HystrixProperty(name = "execution.isolation.strategy", value = "SEMAPHORE"), @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "6000")})
     public GenreInfo[] getAll(){
             // HttpHeaders
             HttpHeaders headers = new HttpHeaders();
@@ -113,6 +113,7 @@ public class WebGenreService {
         h.setContentType(MediaType.APPLICATION_JSON_UTF8);
         throw new ApiException("Service unavailable.",new ConnectException(),500,h,"Service unavailable. Connection refused.",serviceUrl+"/v1/genres",null);
     }
+
 
     public GenreInfo getById(Long id){
         // HttpHeaders

@@ -2,6 +2,8 @@ package ru.osipov.deploy.services;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +19,14 @@ import ru.osipov.deploy.errors.ApiException;
 import ru.osipov.deploy.models.CinemaInfo;
 import ru.osipov.deploy.models.CreateCinema;
 
+import java.net.ConnectException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Service
 public class WebCinemaService {
@@ -30,11 +37,20 @@ public class WebCinemaService {
     @Value("${service.cinema.url}")
     protected String serviceUrl;
 
+    @Value("${service.queue.url}")
+    protected String queueUrl;
+
+    protected BlockingQueue<CreateCinema> queue;
+
     private static final Logger logger = LoggerFactory.getLogger(WebCinemaService.class);
     private static final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
-    public WebCinemaService(){}
+    public WebCinemaService(){
+        this.queue = new ArrayBlockingQueue<>(100);
+    }
 
+    @HystrixCommand(fallbackMethod = "getAll_fallback",   commandProperties = {
+            @HystrixProperty(name = "execution.isolation.strategy", value = "SEMAPHORE"), @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "6000")})
     public CinemaInfo[] getAll(){
         // HttpHeaders
         HttpHeaders headers = new HttpHeaders();
@@ -55,6 +71,14 @@ public class WebCinemaService {
                 HttpMethod.GET, entity, CinemaInfo[].class);
         return response.getBody();
     }
+
+    @SuppressWarnings("unused")
+    public void getAll_fallback(){
+        HttpHeaders h = new HttpHeaders();
+        h.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        throw new ApiException("Service unavailable.",new ConnectException(),500,h,"Service unavailable. Connection refused.",serviceUrl+"/v1/cinemas",null);
+    }
+
 
     public CinemaInfo getById(Long id){
         // HttpHeaders
@@ -79,6 +103,7 @@ public class WebCinemaService {
         return response.getBody();
     }
 
+    @HystrixCommand(fallbackMethod = "update_fallback")
     public CinemaInfo updateCinema(Long id, CreateCinema data){
         // HttpHeaders
         HttpHeaders headers = new HttpHeaders();
@@ -96,9 +121,25 @@ public class WebCinemaService {
             response = restTemplate.exchange(serviceUrl+"/v1/cinemas/"+id,HttpMethod.PATCH,entity,CinemaInfo.class);
         }
         catch (HttpClientErrorException e){
-            throw new ApiException(e.getMessage(), e, e.getRawStatusCode(), e.getResponseHeaders(),
+            if(e.getRawStatusCode() == 500){
+                response = restTemplate.exchange(queueUrl+"/v1/queue/insert",HttpMethod.POST,entity,CinemaInfo.class);
+                return new CinemaInfo(-1l,data.getName(),data.getCountry(),data.getCity(),data.getRegion(),data.getStreet());
+            }
+            else
+                throw new ApiException(e.getMessage(), e, e.getRawStatusCode(), e.getResponseHeaders(),
                     e.getResponseBodyAsString(), serviceUrl+"/v1/cinemas/"+id, null);
         }
         return response.getBody();
+    }
+
+
+    @SuppressWarnings("unused")
+    public String update_fallback(Long id, CreateCinema data){
+        try{
+            queue.put(data);
+        }catch (InterruptedException e){
+
+        }
+        return "Error";
     }
 }

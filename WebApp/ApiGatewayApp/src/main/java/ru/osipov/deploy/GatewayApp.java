@@ -19,7 +19,6 @@ import ru.osipov.deploy.web.ApiController;
 @EnableDiscoveryClient
 @ComponentScan(useDefaultFilters = true)
 @EnableCircuitBreaker
-@EnableHystrixDashboard
 public class GatewayApp extends SpringBootServletInitializer  {
     public static void main(String[] args){
         SpringApplication.run(GatewayApp.class,args);
