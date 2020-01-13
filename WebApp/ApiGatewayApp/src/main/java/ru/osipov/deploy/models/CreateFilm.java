@@ -18,6 +18,7 @@ public class CreateFilm {
     @NotNull
     @NotEmpty
     @NotBlank
+    @Pattern(regexp = "^[A-Za-z\\s]+$")
     @Expose
     private String name;
 

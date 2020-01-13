@@ -2,6 +2,8 @@ package ru.osipov.deploy.services;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import ru.osipov.deploy.models.CreateFilm;
 import ru.osipov.deploy.models.FilmGenre;
 import ru.osipov.deploy.models.FilmInfo;
 
+import java.net.ConnectException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -85,6 +88,8 @@ public class WebFilmService {
         return response.getBody();
     }
 
+    @HystrixCommand(fallbackMethod = "getAll_fallback",   commandProperties = {
+            @HystrixProperty(name = "execution.isolation.strategy", value = "SEMAPHORE"), @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "6000")})
     public FilmInfo[] getAll(){
         // HttpHeaders
         HttpHeaders headers = new HttpHeaders();
@@ -105,6 +110,13 @@ public class WebFilmService {
                 HttpMethod.GET, entity, FilmInfo[].class);//As it returns raw JSONArray (without any top-level object.)
         //ResponseEntity<FilmInfo[]> response = restTemplate.getForEntity(serviceUrl+"/v1/films", FilmInfo[].class);
         return response.getBody();
+    }
+
+    @SuppressWarnings("unused")
+    public FilmInfo[] getAll_fallback(){
+        HttpHeaders h = new HttpHeaders();
+        h.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        throw new ApiException("Service unavailable.",new ConnectException(),500,h,"Service unavailable. Connection refused.",serviceUrl+"/v1/films",null);
     }
 
     public FilmInfo[] getByGid(Long gid){
@@ -155,8 +167,14 @@ public class WebFilmService {
         headers.set("Content-Type",MediaType.TEXT_PLAIN_VALUE);
         HttpEntity<String> entity = new HttpEntity<String>(nval.toString(),headers);
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<FilmInfo[]> response = restTemplate.exchange(serviceUrl+"/v1/films/genre/"+old,
-                HttpMethod.POST,entity,FilmInfo[].class);
+        ResponseEntity<FilmInfo[]> response;
+        try {
+            response = restTemplate.exchange(serviceUrl + "/v1/films/genre/" + old,
+                    HttpMethod.POST, entity, FilmInfo[].class);
+        }catch (HttpClientErrorException e){
+            throw new ApiException(e.getMessage(), e, e.getRawStatusCode(), e.getResponseHeaders(),
+                    e.getResponseBodyAsString(), serviceUrl+"/v1/films/genre/"+old, null);
+        }
         return response.getBody();
     }
 

@@ -98,8 +98,22 @@ class FilmList extends Component {
    render() {
      const { films,isLoading, currentPage, pageSize,upperPageBound,lowerPageBound,isPrevBtnActive,isNextBtnActive } = this.state;
             
-             if (isLoading) {
+            if (isLoading) {
                 return <p>Loading...</p>;
+            }
+            
+            if(films.reason !== undefined){
+                return(
+                    <div>
+                        <AppNavbar meid={2}/>
+                        <Container fluid>
+                            <div className="attention">
+                                <p>{films.reason}</p>
+                                <p>{films.code}</p>
+                            </div>
+                        </Container>
+                    </div>
+                );
             }
             
             // Logic for displaying current todos

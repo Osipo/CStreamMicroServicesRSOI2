@@ -146,6 +146,8 @@ public class WebGenreService {
         //GenreInfo response = restTemplate.getForObject(serviceUrl+"/v1/genres/"+id, GenreInfo.class);
     }
 
+    @HystrixCommand(fallbackMethod = "deleteFallback",   commandProperties = {
+            @HystrixProperty(name = "execution.isolation.strategy", value = "SEMAPHORE"), @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "6000")})
     public GenreInfo delete(Long genre){
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON_UTF8));
@@ -160,10 +162,30 @@ public class WebGenreService {
             logger.info("Error message: '{}'",e.getMessage());
             logger.info("Error status: '{}'",e.getRawStatusCode());
             logger.info("Response: '{}'",e.getResponseBodyAsString());
+
             throw new ApiException(e.getMessage(), e, e.getRawStatusCode(), e.getResponseHeaders(),
                     e.getResponseBodyAsString(), serviceUrl+"/v1/genres/delete/"+genre, null);
         }
         return response.getBody();
+    }
+
+    @SuppressWarnings("unused")
+    public GenreInfo deleteFallback(Long genre){
+        HttpHeaders h = new HttpHeaders();
+        h.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        throw new ApiException("Service unavailable.",new ConnectException(),500,h,"Service unavailable. Connection refused.",serviceUrl+"/v1/genres",null);
+    }
+
+    /*If genre service successfull delete genre, but FilmService is down, then insert deleted genre and cancel all changes.*/
+    public URI restoreGenre(GenreInfo genre){
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON_UTF8));
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        HttpEntity<String> entity = new HttpEntity<>(gson.toJson(genre),headers);
+        ResponseEntity<Void> response = this.restTemplate.exchange(serviceUrl+"/v1/genres/restore",
+                HttpMethod.POST,entity,Void.class);
+
+        return response.getHeaders().getLocation();
     }
 
     public URI createGenre(CreateGenreR data){

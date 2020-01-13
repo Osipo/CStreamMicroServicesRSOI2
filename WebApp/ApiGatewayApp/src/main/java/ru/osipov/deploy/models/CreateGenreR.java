@@ -5,8 +5,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.*;
 
 @Data
 @Accessors(chain = true)
@@ -15,8 +14,11 @@ import javax.validation.constraints.NotEmpty;
 public class CreateGenreR {
 	@NotEmpty
 	@NotBlank//on null returns true but notEmpty returns false
+	@Size(min = 6)
+	@Pattern(regexp = "^[A-Z][a-z_]+$")
 	private String gname;
 
 
+	@Pattern(regexp =  "^$|^[A-Za-z,\\s]+[.]$")
     private String remarks;
 }

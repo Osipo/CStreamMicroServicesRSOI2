@@ -3,24 +3,31 @@ package ru.osipov.deploy.web;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.osipov.deploy.errors.ApiException;
 import ru.osipov.deploy.models.*;
 import ru.osipov.deploy.services.WebCinemaService;
 import ru.osipov.deploy.services.WebFilmService;
 import ru.osipov.deploy.services.WebGenreService;
 import ru.osipov.deploy.services.WebSeanceService;
 import ru.osipov.deploy.utils.Paginator;
+import ru.osipov.deploy.utils.tasks.CheckQueueTask;
 
 import javax.validation.Valid;
+import java.net.ConnectException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 
 import static java.util.List.of;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-
+import static java.util.concurrent.TimeUnit.*;
 @RestController
 @RequestMapping("/v1/api")
 public class ApiController {
@@ -33,6 +40,14 @@ public class ApiController {
 
     protected WebSeanceService seanceService;
 
+    private final ScheduledExecutorService scheduler;
+    private ScheduledFuture<?> futureTask;
+    private final Runnable checkQueue;
+
+
+    private int timeSpan;
+    private int c;
+
     private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
 
     @Autowired
@@ -41,8 +56,25 @@ public class ApiController {
         this.genreService = gs;
         this.cinemaService = cs;
         this.seanceService = ss;
+        this.scheduler = Executors.newScheduledThreadPool(1);
+        this.checkQueue = new CheckQueueTask(this);
+        this.timeSpan = 10;
+        this.c = 0;
+        this.futureTask = scheduler.scheduleAtFixedRate(checkQueue, timeSpan, timeSpan, SECONDS);
     }
 
+    public void changeInterval(){
+        this.c = this.c + 1;
+        if(c == 10){
+            this.c = -10;
+            if (futureTask != null)
+            {
+                futureTask.cancel(true);
+            }
+            timeSpan *= 2;
+            futureTask = scheduler.scheduleAtFixedRate(checkQueue, timeSpan, timeSpan, SECONDS);
+        }
+    }
     
     //GET: /v1/api/films?r=number
     //GET: /v1/api/films?r=number&page=X&size=Y
@@ -172,9 +204,21 @@ public class ApiController {
     //FIRST UPDATE.
     @PostMapping(produces = APPLICATION_JSON_UTF8_VALUE,path = "/genres/delete/{id}")
     public ResponseEntity deleteGenre(@PathVariable(name = "id") Long genre){
-        GenreInfo g = genreService.delete(genre);
-        Long id = g.getId();
-        filmService.changeGenre(id);
+        logger.info("DELETING....");
+        GenreInfo g = null;
+        try {
+            g = genreService.delete(genre);
+            Long id = g.getId();
+            filmService.changeGenre(id);
+        }catch (ApiException e){
+            if(e.getMessage().toLowerCase().contains("not found"))
+                throw e;
+            if(g != null) {
+                genreService.restoreGenre(g);
+                return ResponseEntity.ok("{\"reason\": \"Failed. FilmService is unavailable.\" }");
+            }
+            return ResponseEntity.ok("{\"reason\": \"Failed. GenreService is unavailable.\" }");
+        }
         return ResponseEntity.ok(g);
     }
 
@@ -237,10 +281,13 @@ public class ApiController {
     @PatchMapping(consumes = APPLICATION_JSON_UTF8_VALUE, path = {"/cinemas/{cid}"})
     public ResponseEntity updateSeance(@PathVariable(required = true, name = "cid") Long id, @RequestBody @Valid CreateCinema request){
         final CinemaInfo c = cinemaService.updateCinema(id,request);//UPDATE
+        if(c.getId() == -2L){//INSERTED TO QUEUE.
+            return ResponseEntity.ok("{\"message\":\"Successfull added.\"}");//return message about queue.
+        }
         CreateSeance[] sl = request.getSeances();
         if(sl != null && sl.length > 0)
             for(CreateSeance s : sl){
-                seanceService.createSeance(s);//CREATE
+                seanceService.createSeance(s, request,id);//CREATE
             }
         SeanceInfo[] updated = seanceService.getByCid(c.getId());
         return ResponseEntity.ok(new CinemaSeances(c,updated));

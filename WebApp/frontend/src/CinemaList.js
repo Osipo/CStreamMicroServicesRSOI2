@@ -103,6 +103,20 @@ class CinemaList extends Component {
                 return <p>Loading...</p>;
             }
             
+            if(cinemas.reason !== undefined){
+                return(
+                    <div>
+                        <AppNavbar meid={3}/>
+                        <Container fluid>
+                            <div className="attention">
+                                <p>{cinemas.reason}</p>
+                                <p>{cinemas.code}</p>
+                            </div>
+                        </Container>
+                    </div>
+                );
+            }
+            
             // Logic for displaying current todos
             const indexOfLastTodo = currentPage * pageSize;
             const indexOfFirstTodo = indexOfLastTodo - pageSize;

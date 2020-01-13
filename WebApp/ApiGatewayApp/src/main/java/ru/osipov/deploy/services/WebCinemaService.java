@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import ru.osipov.deploy.errors.ApiException;
 import ru.osipov.deploy.models.CinemaInfo;
 import ru.osipov.deploy.models.CreateCinema;
+import ru.osipov.deploy.models.UpdateCinema;
 
 import java.net.ConnectException;
 import java.net.URI;
@@ -40,13 +41,12 @@ public class WebCinemaService {
     @Value("${service.queue.url}")
     protected String queueUrl;
 
-    protected BlockingQueue<CreateCinema> queue;
 
     private static final Logger logger = LoggerFactory.getLogger(WebCinemaService.class);
     private static final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
     public WebCinemaService(){
-        this.queue = new ArrayBlockingQueue<>(100);
+
     }
 
     @HystrixCommand(fallbackMethod = "getAll_fallback",   commandProperties = {
@@ -73,7 +73,7 @@ public class WebCinemaService {
     }
 
     @SuppressWarnings("unused")
-    public void getAll_fallback(){
+    public CinemaInfo[] getAll_fallback(){
         HttpHeaders h = new HttpHeaders();
         h.setContentType(MediaType.APPLICATION_JSON_UTF8);
         throw new ApiException("Service unavailable.",new ConnectException(),500,h,"Service unavailable. Connection refused.",serviceUrl+"/v1/cinemas",null);
@@ -121,12 +121,7 @@ public class WebCinemaService {
             response = restTemplate.exchange(serviceUrl+"/v1/cinemas/"+id,HttpMethod.PATCH,entity,CinemaInfo.class);
         }
         catch (HttpClientErrorException e){
-            if(e.getRawStatusCode() == 500){
-                response = restTemplate.exchange(queueUrl+"/v1/queue/insert",HttpMethod.POST,entity,CinemaInfo.class);
-                return new CinemaInfo(-1l,data.getName(),data.getCountry(),data.getCity(),data.getRegion(),data.getStreet());
-            }
-            else
-                throw new ApiException(e.getMessage(), e, e.getRawStatusCode(), e.getResponseHeaders(),
+            throw new ApiException(e.getMessage(), e, e.getRawStatusCode(), e.getResponseHeaders(),
                     e.getResponseBodyAsString(), serviceUrl+"/v1/cinemas/"+id, null);
         }
         return response.getBody();
@@ -134,12 +129,22 @@ public class WebCinemaService {
 
 
     @SuppressWarnings("unused")
-    public String update_fallback(Long id, CreateCinema data){
-        try{
-            queue.put(data);
-        }catch (InterruptedException e){
+    public CinemaInfo update_fallback(Long id, CreateCinema data){
+        // HttpHeaders
+        HttpHeaders headers = new HttpHeaders();
 
-        }
-        return "Error";
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON_UTF8, MediaType.APPLICATION_JSON,MediaType.TEXT_PLAIN));
+        // Request to return JSON format
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+       // headers.set("X-HTTP-Method-Override", "PATCH");
+
+        UpdateCinema item = new UpdateCinema(id,data.getName(),data.getCountry(),data.getCity(),data.getRegion(),data.getStreet(),data.getSeances());
+
+        HttpEntity<String> entity = new HttpEntity<String>(gson.toJson(item),headers);
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+        ResponseEntity<Void> response;
+        response = restTemplate.exchange(queueUrl+"/v1/queue/insert",HttpMethod.POST,entity,Void.class);
+        return new CinemaInfo(-2l,data.getName(),data.getCountry(),data.getCity(),data.getRegion(),data.getStreet());
     }
 }

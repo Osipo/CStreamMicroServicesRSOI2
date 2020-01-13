@@ -101,6 +101,20 @@ class SeanceList extends Component {
                 return <p>Loading...</p>;
             }
             
+            if(seances.reason !== undefined){
+                return(
+                    <div>
+                        <AppNavbar meid={4}/>
+                        <Container fluid>
+                            <div className="attention">
+                                <p>{seances.reason}</p>
+                                <p>{seances.code}</p>
+                            </div>
+                        </Container>
+                    </div>
+                );
+            }
+            
             // Logic for displaying current todos
             const indexOfLastTodo = currentPage * pageSize;
             const indexOfFirstTodo = indexOfLastTodo - pageSize;

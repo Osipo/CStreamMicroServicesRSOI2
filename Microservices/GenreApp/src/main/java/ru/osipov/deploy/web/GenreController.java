@@ -1,6 +1,5 @@
 package ru.osipov.deploy.web;
 
-import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,6 +146,13 @@ public class GenreController {
     public ResponseEntity createGenre(@Valid @RequestBody CreateGenreR request) {
         logger.info("/v1/genres/create");
         final URI location = gService.createGenre(request);
+        return ResponseEntity.created(location).build();
+    }
+
+    @PostMapping(consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE, path = "/restore")
+    public ResponseEntity restoreGenre(@Valid @RequestBody GenreInfo request){
+        logger.info("/v1/genres/restore");
+        final URI location = gService.restoreGenre(request);
         return ResponseEntity.created(location).build();
     }
 

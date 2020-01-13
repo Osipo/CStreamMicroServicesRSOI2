@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.*;
 
@@ -14,7 +13,11 @@ import javax.validation.constraints.*;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateCinema {
+public class UpdateCinema {
+
+
+    @NonNull
+    private Long cid;
 
     @NotNull
     @NotBlank

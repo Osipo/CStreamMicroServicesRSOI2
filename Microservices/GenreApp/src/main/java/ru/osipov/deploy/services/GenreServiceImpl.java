@@ -10,14 +10,12 @@ import ru.osipov.deploy.models.GenreInfo;
 import ru.osipov.deploy.repositories.GenreRepository;
 
 import javax.annotation.Nonnull;
-import javax.persistence.EntityNotFoundException;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Service
@@ -114,6 +112,18 @@ public class GenreServiceImpl implements GenreService {
                 .setRemarks(request.getRemarks());
         g = gRepository.save(g);
         //GenreInfo ng = getById(g.getGid());
+        logger.info("Successful created.");
+        return URI.create("/v1/genres/"+g.getGid());
+    }
+
+    public URI restoreGenre(@Nonnull GenreInfo request){
+        logger.info("Restoring genre...");
+        logger.info("Vals:\n\t name = '{}'\n\t remarks = '{}'",request.getName(),request.getRemarks());
+        Genre g = new Genre()
+                .setGid(request.getId())//RESTORE ID.
+                .setName(request.getName())
+                .setRemarks(request.getRemarks());
+        g = gRepository.save(g);
         logger.info("Successful created.");
         return URI.create("/v1/genres/"+g.getGid());
     }

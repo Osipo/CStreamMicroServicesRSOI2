@@ -83,7 +83,7 @@ class GenreEdit extends Component {
         fieldValidationErrors.name = nameValid ? '' : fieldValidationErrors.name+' Length must be more than 5 characters!';
         break;
       case 'remarks':
-        remarksValid = value.length === 0 || (value.length > 0 && value.match(/^(.*?\=\s*\w)(.*)$/));
+        remarksValid = value.length === 0 || (value.length > 0 && value.match(/^$|^[A-Za-z,\s]+[.]$/)); //^(.*?\=\s*\w)(.*)$/
         fieldValidationErrors.remarks = remarksValid ? '': ' Must be empty or Sentence form.';
         break;
       default:

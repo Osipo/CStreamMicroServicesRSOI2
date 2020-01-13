@@ -2,6 +2,8 @@ package ru.osipov.deploy.services;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +15,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import ru.osipov.deploy.errors.ApiException;
+import ru.osipov.deploy.models.CreateCinema;
 import ru.osipov.deploy.models.CreateSeance;
 import ru.osipov.deploy.models.SeanceInfo;
+import ru.osipov.deploy.models.UpdateCinema;
 import ru.osipov.deploy.utils.LocalDateAdapter;
 
+import java.net.ConnectException;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -29,12 +34,18 @@ public class WebSeanceService {
 
     @Value("${service.seance.url}")
     protected String serviceUrl;
+    
+    @Value("${service.queue.url}")
+    protected String queueUrl;
+    
     private static final Logger logger = LoggerFactory.getLogger(WebSeanceService.class);
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(LocalDate.class,new LocalDateAdapter()).create();
 
     public WebSeanceService(){}
 
+    @HystrixCommand(fallbackMethod = "getAll_fallback",   commandProperties = {
+            @HystrixProperty(name = "execution.isolation.strategy", value = "SEMAPHORE"), @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "6000")})
     public SeanceInfo[] getAll(){
         // HttpHeaders
         HttpHeaders headers = new HttpHeaders();
@@ -48,6 +59,13 @@ public class WebSeanceService {
         ResponseEntity<SeanceInfo[]> response = restTemplate.exchange(serviceUrl+"/v1/seances",
                 HttpMethod.GET, entity, SeanceInfo[].class);
         return response.getBody();
+    }
+
+    @SuppressWarnings("unused")
+    public SeanceInfo[] getAll_fallback(){
+        HttpHeaders h = new HttpHeaders();
+        h.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        throw new ApiException("Service unavailable.",new ConnectException(),500,h,"Service unavailable. Connection refused.",serviceUrl+"/v1/seances",null);
     }
 
     public SeanceInfo getByCidFid(Long cid, Long fid){
@@ -94,7 +112,9 @@ public class WebSeanceService {
         return response.getBody();
     }
 
-    public URI createSeance(CreateSeance data){
+    @HystrixCommand(fallbackMethod = "createFallback",   commandProperties = {
+            @HystrixProperty(name = "execution.isolation.strategy", value = "SEMAPHORE"), @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "6000")})
+    public URI createSeance(CreateSeance data, CreateCinema d, Long id){//SECOND FOR FALLBACK.
         // HttpHeaders
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON_UTF8, MediaType.APPLICATION_JSON));
@@ -115,5 +135,23 @@ public class WebSeanceService {
                     e.getResponseBodyAsString(), serviceUrl+"/v1/seances/create", null);
         }
         return response.getBody();
+    }
+    
+    @SuppressWarnings("unused")
+    public URI createFallback(CreateSeance data, CreateCinema d,Long id){
+         // HttpHeaders
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON_UTF8, MediaType.APPLICATION_JSON));
+        // Request to return JSON format
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+
+        UpdateCinema item = new UpdateCinema(id,d.getName(),d.getCountry(),d.getCity(),d.getRegion(),d.getStreet(),d.getSeances());
+
+        HttpEntity<String> entity = new HttpEntity<String>(gson.toJson(item),headers);
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+        ResponseEntity<Void> response;
+        response = restTemplate.exchange(queueUrl+"/v1/queue/insert",HttpMethod.POST,entity,Void.class);
+        return URI.create("http://localhost:8080");
     }
 }

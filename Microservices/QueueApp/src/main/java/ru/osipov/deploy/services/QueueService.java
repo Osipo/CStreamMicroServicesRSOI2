@@ -5,13 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.osipov.deploy.entities.QueueItemCinema;
 import ru.osipov.deploy.entities.QueueItemSeance;
-import ru.osipov.deploy.models.CreateCinema;
+import ru.osipov.deploy.models.UpdateCinema;
 import ru.osipov.deploy.models.CreateSeance;
 import ru.osipov.deploy.repositories.QueueItemCinemaRepository;
 import ru.osipov.deploy.repositories.QueueItemSeanceRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -19,7 +20,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 @Service
 public class QueueService implements IQueue{
-    private BlockingQueue<CreateCinema> queue;
+    private BlockingQueue<UpdateCinema> queue;
 
     private final QueueItemSeanceRepository rep;
     private final QueueItemCinemaRepository rep2;
@@ -30,7 +31,7 @@ public class QueueService implements IQueue{
     public QueueService(QueueItemSeanceRepository r, QueueItemCinemaRepository r2){
         this.rep = r;
         this.rep2 = r2;
-        this.queue = new LinkedBlockingQueue<CreateCinema>();
+        this.queue = new LinkedBlockingQueue<UpdateCinema>();
         init();
     }
 
@@ -46,14 +47,15 @@ public class QueueService implements IQueue{
                 CreateSeance mseance = new CreateSeance(seance.getCid(), seance.getFid(), seance.getDate());
                 seances.add(mseance);
             }
-            CreateCinema c = new CreateCinema(cinema.getCname(), cinema.getCountry(), cinema.getCity(),cinema.getRegion(),cinema.getStreet(),(CreateSeance[])seances.toArray());
+            UpdateCinema c = new UpdateCinema(cinema.getQid(),cinema.getCname(), cinema.getCountry(), cinema.getCity(),cinema.getRegion(),cinema.getStreet(),(CreateSeance[])seances.toArray());
             queue.add(c);
         }
     }
 
-    private void save(CreateCinema c){
+    private void save(UpdateCinema c){
         logger.info("Save data from request to queue.");
         QueueItemCinema cinema = new QueueItemCinema()
+                .setQid(c.getCid())
                 .setCname(c.getName())
                 .setCountry(c.getCountry())
                 .setCity(c.getCity())
@@ -70,16 +72,20 @@ public class QueueService implements IQueue{
         logger.info("Data are saved in db.");
     }
 
-    public void push(CreateCinema c){
+    public void push(UpdateCinema c){
         save(c);
         queue.add(c);
     }
 
-    public CreateCinema get(){
+    public UpdateCinema get(){
         return queue.poll();
     }
 
     public Integer size(){
         return queue.size();
+    }
+
+    public Queue<UpdateCinema> getQueue(){
+        return this.queue;
     }
 }

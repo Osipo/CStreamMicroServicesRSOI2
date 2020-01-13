@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
@@ -15,7 +16,10 @@ import javax.validation.constraints.Size;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateCinema {
+public class UpdateCinema {
+
+    @NonNull
+    private Long cid;
 
     @NotNull
     @NotBlank

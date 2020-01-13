@@ -1,8 +1,6 @@
 package ru.osipov.deploy.services;
 
-import lombok.NonNull;
 import org.springframework.transaction.annotation.Transactional;
-import ru.osipov.deploy.entities.Genre;
 import ru.osipov.deploy.models.CreateGenreR;
 import ru.osipov.deploy.models.GenreInfo;
 
@@ -32,4 +30,6 @@ public interface GenreService {
     GenreInfo updateGenre(Long id,@Nonnull CreateGenreR request);
 
     GenreInfo deleteGenre(@Nonnull Long id);
+
+    URI restoreGenre(@Nonnull GenreInfo request);
 }

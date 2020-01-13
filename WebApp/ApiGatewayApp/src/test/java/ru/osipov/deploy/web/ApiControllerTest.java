@@ -351,7 +351,10 @@ public class ApiControllerTest {
                 .andExpect(jsonPath("$.genre.name").value("Action"))
                 .andExpect(jsonPath("$.genre.remarks").value(IsNull.nullValue()));
         mockMvc.perform(patch("/v1/api/films/12").accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(badreq)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(400));
+
+
         mockMvc.perform(patch("/v1/api/films/").accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(req)))
                 .andExpect(status().is(405));
         mockMvc.perform(patch("/v1/api/films").accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(req)))
@@ -502,8 +505,8 @@ public class ApiControllerTest {
         logger.info("testCreateGenre");
         URI url = URI.create("http://localhost:8089/path/123");
         Long id = Long.parseLong(url.getPath().substring(url.getPath().lastIndexOf("/") + 1));
-        CreateGenreR data = new CreateGenreR("New","Genre");
-        CreateGenreR bad = new CreateGenreR(" ",null);
+        CreateGenreR data = new CreateGenreR("New_genre","Genre.");
+        CreateGenreR bad = new CreateGenreR("888",null);
         when(gs.createGenre(data)).thenReturn(url);
         mockMvc.perform(post("/v1/api/genres/create").accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson2.toJson(data)))
                 .andExpect(status().isCreated())
@@ -511,7 +514,8 @@ public class ApiControllerTest {
                 .andExpect(jsonPath("$.id").value(id));
 
         mockMvc.perform(post("/v1/api/genres/create").accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson2.toJson(bad)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(400));
     }
 
     @Test
@@ -546,7 +550,8 @@ public class ApiControllerTest {
                 .andExpect(jsonPath("$").isEmpty());
 
         mockMvc.perform(post("/v1/api/films/genre/8").accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson2.toJson(bad)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(400));
     }
 
 
@@ -641,7 +646,7 @@ public class ApiControllerTest {
     void testUpdateCinema() throws Exception {
         logger.info("testUpdateCinema");
         CinemaInfo r = new CinemaInfo(2L,"MAX","RUS","CITY",null,"Street");
-        CreateCinema data = new CreateCinema("MAX","RUS","CITY",null,"Street",null);
+        CreateCinema data = new CreateCinema("MAXIMus","RUS","CITY",null,"Street",null);
         LocalDate date = LocalDate.now();
         CreateSeance c = new CreateSeance();
         c.setCid(2L);
@@ -670,7 +675,8 @@ public class ApiControllerTest {
                 .andExpect(jsonPath("$.seances[0].date").value(date.toString()));
 
         mockMvc.perform(patch("/v1/api/cinemas/1").accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(bad)))
-               .andExpect(status().isBadRequest());
+               .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(400));
 //                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
 //                .andExpect(jsonPath("$").exists())
 //                .andExpect(jsonPath("$.ex").value("org.springframework.web.bind.MethodArgumentNotValidException"))

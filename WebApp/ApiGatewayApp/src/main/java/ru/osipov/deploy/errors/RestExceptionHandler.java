@@ -51,7 +51,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new  ResponseEntity<Object>(err,headers2,HttpStatus.OK);
     }
 
-    /*
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         String error = "Invalid method parameter. BADREQUEST: "+ex.getMessage();
@@ -59,7 +59,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         HttpHeaders headers2 = new HttpHeaders();
         headers.set("Content-Type",MediaType.APPLICATION_JSON_UTF8_VALUE);
         return new  ResponseEntity<Object>(err,headers2,HttpStatus.OK);
-    }*/
+    }
 
     @ExceptionHandler(ApiException.class)
     protected ResponseEntity<Object> handleApiException(

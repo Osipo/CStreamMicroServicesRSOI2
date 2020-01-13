@@ -102,6 +102,21 @@ class SeanceCinemaList extends Component {
              if (isLoading) {
                 return <p>Loading...</p>;
             }
+            
+            if(cs.reason !== undefined){
+                return(
+                    <div>
+                        <AppNavbar meid={3}/>
+                        <Container fluid>
+                            <div className="attention">
+                                <p>{cs.reason}</p>
+                                <p>{cs.code}</p>
+                            </div>
+                        </Container>
+                    </div>
+                );
+            }
+            
             let seances = cs.seances;
             let ci = cs.cinema;
             // Logic for displaying current todos
