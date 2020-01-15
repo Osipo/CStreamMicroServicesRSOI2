@@ -1,0 +1,25 @@
+# Security
+server:
+  session:
+    cookie:
+      name: UISESSION
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          custom-client:
+            client-id: R2dpxQ3vPrtfgF72
+            client-secret: fDw7Mpkk5czHNuSRtmhGmAGL42CaxQB9
+            client-name: Auth Server
+            scope: user_info
+            provider: custom-provider
+            redirect-uri-template: http://localhost:8089/login/oauth2/code/
+            client-authentication-method: basic
+            authorization-grant-type: authorization_code
+        provider:
+          custom-provider:
+            token-uri: http://localhost:8999/auth/oauth/token
+            authorization-uri: http://localhost:8999/auth/oauth/authorize
+            user-info-uri: http://localhost:8999/auth/user/me
+            user-name-attribute: name
