@@ -13,6 +13,7 @@ import SeanceCinemaList from './SeanceCinemaList';
 import SeanceInformation from './SeanceInformation';
 import SeanceList from './SeanceList';
 import SeanceEdit from './SeanceEdit';
+import Login from './auth/Login';
 const ReactDOM = require('react-dom');
 
 class App extends Component {
@@ -32,6 +33,7 @@ class App extends Component {
                 <Route path='/views/cinemas/:id/seances' exact={true} component={SeanceCinemaList} />
                 <Route path='/views/seances/:cid/:fid' exact={true} component={SeanceInformation} />
                 <Route path='/views/cinemas/:id/seances/add' exact={true} component={SeanceEdit} />
+                <Route path='/views/login' exact={true} component={Login} />
             </Switch>
         </Router>
       );
