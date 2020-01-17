@@ -13,6 +13,7 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import ru.osipov.deploy.entities.Role;
 import ru.osipov.deploy.entities.UserEntity;
 
 import javax.sql.DataSource;
@@ -44,7 +45,7 @@ public class UsersInstance {
             EntityManagerFactoryBuilder builder) {
         return builder
                 .dataSource(usersDataSource())
-                .packages(UserEntity.class)
+                .packages(UserEntity.class, Role.class)
                 .build();
     }
 

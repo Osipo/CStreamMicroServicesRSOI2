@@ -9,7 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.osipov.deploy.entities.UserEntity;
-import ru.osipov.deploy.repositories.UserRepository;
+import ru.osipov.deploy.repositories.UserEntityRepository;
 
 import javax.persistence.EntityManager;
 import javax.sql.DataSource;
@@ -28,7 +28,7 @@ public class UsersRepositoryTest {
     @Autowired
     private EntityManager entityManager;
     @Autowired
-    private UserRepository cRep;
+    private UserEntityRepository cRep;
 
     @Test
     void injectedComponentsAreNotNull() {

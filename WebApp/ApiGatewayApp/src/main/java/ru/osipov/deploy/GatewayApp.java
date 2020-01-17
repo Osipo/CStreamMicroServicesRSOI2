@@ -14,11 +14,12 @@ import org.springframework.web.client.RestTemplate;
 import ru.osipov.deploy.services.WebFilmService;
 import ru.osipov.deploy.services.WebGenreService;
 import ru.osipov.deploy.web.ApiController;
-
+//import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 @SpringBootApplication
 @EnableDiscoveryClient
 @ComponentScan(useDefaultFilters = true)
 @EnableCircuitBreaker
+//@EnableWebSecurity
 public class GatewayApp extends SpringBootServletInitializer  {
     public static void main(String[] args){
         SpringApplication.run(GatewayApp.class,args);

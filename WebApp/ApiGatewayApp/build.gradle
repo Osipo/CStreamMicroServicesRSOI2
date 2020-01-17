@@ -116,8 +116,9 @@ dependencies {
     runtimeOnly project(':frontend')
 
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-hystrix'
-
-    implementation 'org.springframework.security.oauth:spring-security-oauth2:2.3.3.RELEASE'
+    //compile group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: '5.2.1.RELEASE'
+    
+//    implementation 'org.springframework.security.oauth:spring-security-oauth2:2.3.3.RELEASE'
 //    compile group: 'com.netflix.rxjava', name: 'rxjava-core', version: '0.20.7'
 
 }
