@@ -77,8 +77,9 @@ public class FilmController {
 
     //POST: /v1/films/genre/{genre_id}
     //if no ngid was specified then -> badRequest()
+    //PROTECTED.
     @PostMapping(produces = APPLICATION_JSON_UTF8_VALUE, path = {"/genre/{gid}"}, consumes = {TEXT_PLAIN_VALUE})
-    public ResponseEntity updateGenre(@PathVariable(required = true, name = "gid") Long oldgid, @Valid @RequestBody String ngid){
+    public ResponseEntity updateGenre(@PathVariable(required = true, name = "gid") Long oldgid, @Valid @RequestBody String ngid, @RequestHeader HttpHeaders headers){
         if(ngid == null || ngid.equals("")){
             return ResponseEntity.badRequest().build();
         }
@@ -134,8 +135,9 @@ public class FilmController {
 
     //POST: /v1/films/update/{film_name}?r='...'
     //if no parameter was specified -> badRequest()
+    //PROTECTED.
     @PostMapping(produces = APPLICATION_JSON_UTF8_VALUE, path = {"/update/{fname}"})
-    public ResponseEntity updateRating(@PathVariable(name = "fname") String fname, @RequestParam(required = true,name = "r",defaultValue = "-1") Short rating){
+    public ResponseEntity updateRating(@PathVariable(name = "fname") String fname, @RequestParam(required = true,name = "r",defaultValue = "-1") Short rating, @RequestHeader HttpHeaders headers){
         logger.info("/v1/films/update/");
         logger.info("Rating = '{}'",rating);
         FilmInfo f = null;
@@ -160,8 +162,9 @@ public class FilmController {
     //PATCH: /v1/films/{film_id}
     //If no film_id was specified -> badRequest()
     //If no any data in body was specified -> badRequest()
+    //PROTECTED.
     @PatchMapping(produces = APPLICATION_JSON_UTF8_VALUE, consumes = APPLICATION_JSON_UTF8_VALUE, path = "/{id}")
-    public ResponseEntity updateFilm(@PathVariable(name = "id",required = true) Long id, @RequestBody @Valid CreateFilm data){
+    public ResponseEntity updateFilm(@PathVariable(name = "id",required = true) Long id, @RequestBody @Valid CreateFilm data, @RequestHeader HttpHeaders headers){
         FilmInfo f = null;
         try{
             f = fService.updateFilm(id,data);
@@ -174,8 +177,9 @@ public class FilmController {
 
     //POST: /v1/films/delete/{film_name}
     //if no parameter was specified -> badRequest()
+    //PROTECTED.
     @PostMapping(produces = APPLICATION_JSON_UTF8_VALUE,path = "/delete/{fname}")
-    public ResponseEntity deleteFilm(@PathVariable(name = "fname")String name){
+    public ResponseEntity deleteFilm(@PathVariable(name = "fname")String name, @RequestHeader HttpHeaders headers){
         logger.info("/v1/films/delete/'{}'",name);
         FilmInfo f = null;
         try{

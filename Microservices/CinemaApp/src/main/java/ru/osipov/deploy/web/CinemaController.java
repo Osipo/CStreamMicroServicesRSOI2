@@ -170,8 +170,9 @@ public class CinemaController {
         return ResponseEntity.ok(c);
     }
 
+    //PROTECTED.
     @PatchMapping(consumes = APPLICATION_JSON_UTF8_VALUE,produces = APPLICATION_JSON_UTF8_VALUE, path = {"/{id}"})
-    public ResponseEntity updateCinema(@PathVariable(required = true, name = "id") Long id, @RequestBody @Valid CreateCinema request){
+    public ResponseEntity updateCinema(@PathVariable(required = true, name = "id") Long id, @RequestBody @Valid CreateCinema request, @RequestHeader HttpHeaders headers){
         CinemaInfo c;
         logger.info("updateCinema");
         logger.info("/v1/cinemas/'{}'",id);

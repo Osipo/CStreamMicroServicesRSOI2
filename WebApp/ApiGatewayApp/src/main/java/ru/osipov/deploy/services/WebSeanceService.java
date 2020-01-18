@@ -9,11 +9,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import ru.osipov.deploy.WebConfig;
 import ru.osipov.deploy.errors.ApiException;
 import ru.osipov.deploy.models.CreateCinema;
 import ru.osipov.deploy.models.CreateSeance;
@@ -25,6 +27,7 @@ import java.net.ConnectException;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Map;
 
 @Service
 public class WebSeanceService {
@@ -37,12 +40,37 @@ public class WebSeanceService {
     
     @Value("${service.queue.url}")
     protected String queueUrl;
-    
+
+    private String seanceToken;
+
     private static final Logger logger = LoggerFactory.getLogger(WebSeanceService.class);
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(LocalDate.class,new LocalDateAdapter()).create();
 
-    public WebSeanceService(){}
+    public WebSeanceService(){
+        if(serviceUrl == null || queueUrl == null){
+            this.queueUrl = "http://localhost:8888";
+            this.serviceUrl = "http://localhost:1111";
+            this.seanceToken = getToken();
+        }
+    }
+
+    public String getToken(){
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON_UTF8));
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        headers.set("Authorization","Basic "+String.format("base64(%s:%s)", WebConfig.getAppKey(), WebConfig.getAppSecret()));//set basic auth between services.
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<Map<String, String>> response;
+        try{
+            response = this.restTemplate.exchange(serviceUrl + "/v1/seances/token", HttpMethod.GET, entity, new ParameterizedTypeReference<Map<String, String>>() {});
+        }
+        catch (HttpClientErrorException e){
+            throw new ApiException(e.getMessage(), e, e.getRawStatusCode(), e.getResponseHeaders(),
+                    e.getResponseBodyAsString(), serviceUrl+"/v1/seances/token/", null);
+        }
+        return response.getBody().get("access_token");
+    }
 
     @HystrixCommand(fallbackMethod = "getAll_fallback",   commandProperties = {
             @HystrixProperty(name = "execution.isolation.strategy", value = "SEMAPHORE"), @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "6000")})
@@ -120,6 +148,7 @@ public class WebSeanceService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON_UTF8, MediaType.APPLICATION_JSON));
         // Request to return JSON format
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        headers.set("Authorization","Basic "+seanceToken);//service token.
         HttpEntity<String> entity = new HttpEntity<String>(gson.toJson(data),headers);
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());

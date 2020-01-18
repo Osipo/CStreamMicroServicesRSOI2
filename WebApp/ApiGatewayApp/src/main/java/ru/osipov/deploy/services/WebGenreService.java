@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import ru.osipov.deploy.WebConfig;
 import ru.osipov.deploy.errors.ApiException;
 import ru.osipov.deploy.models.CreateGenreR;
 import ru.osipov.deploy.models.GenreInfo;
@@ -24,6 +26,8 @@ import ru.osipov.deploy.models.GenreInfo;
 import java.net.ConnectException;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Map;
+
 @Service
 public class WebGenreService {
     @Autowired
@@ -35,9 +39,17 @@ public class WebGenreService {
     private static final Logger logger = LoggerFactory.getLogger(WebFilmService.class);
     private static final Gson gson = new GsonBuilder().serializeNulls().create();
 
-    public WebGenreService(){}
+
+    protected String genreToken;
+
+    public WebGenreService(){
+        if(serviceUrl == null)
+            serviceUrl = "http://localhost:4444";
+        this.genreToken = getToken();
+    }
 
     public WebGenreService(String url){
+        this();
         if(url.contains("http"))
             this.serviceUrl = url;
         else
@@ -152,6 +164,7 @@ public class WebGenreService {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON_UTF8));
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        headers.set("Authorization", "Basic "+genreToken);
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         //RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<GenreInfo> response;
@@ -188,12 +201,29 @@ public class WebGenreService {
         return response.getHeaders().getLocation();
     }
 
+    public String getToken(){
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON_UTF8));
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        headers.set("Authorization","Basic "+String.format("base64(%s:%s)", WebConfig.getAppKey(), WebConfig.getAppSecret()));//set basic auth between services.
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<Map<String, String>> response;
+        try{
+            response = this.restTemplate.exchange(serviceUrl + "/v1/genres/token", HttpMethod.GET, entity, new ParameterizedTypeReference<Map<String, String>>() {});
+        }
+        catch (HttpClientErrorException e){
+            throw new ApiException(e.getMessage(), e, e.getRawStatusCode(), e.getResponseHeaders(),
+                    e.getResponseBodyAsString(), serviceUrl+"/v1/genres/token/", null);
+        }
+        return response.getBody().get("access_token");
+    }
+
     public URI createGenre(CreateGenreR data){
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON_UTF8));
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        headers.set("Authorization", "Basic "+genreToken);
         HttpEntity<String> entity = new HttpEntity<>(gson.toJson(data),headers);
-        // RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<Void> response = this.restTemplate.exchange(serviceUrl+"/v1/genres/create",
                 HttpMethod.POST,entity,Void.class);
 

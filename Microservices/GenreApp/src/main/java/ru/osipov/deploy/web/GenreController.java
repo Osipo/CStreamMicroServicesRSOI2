@@ -156,8 +156,9 @@ public class GenreController {
     }
 
     //POST: /v1/genres/create
+    //PROTECTED.
     @PostMapping(consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE, path = "/create")
-    public ResponseEntity createGenre(@Valid @RequestBody CreateGenreR request) {
+    public ResponseEntity createGenre(@Valid @RequestBody CreateGenreR request, @RequestHeader HttpHeaders headers) {
         logger.info("/v1/genres/create");
         final URI location = gService.createGenre(request);
         return ResponseEntity.created(location).build();
@@ -171,8 +172,9 @@ public class GenreController {
     }
 
     //POST: /v1/genres/delete/{genre_name}
+    //PROTECTED.
     @PostMapping(produces = APPLICATION_JSON_UTF8_VALUE, path={"/delete/{genre}","/delete/"})
-    public ResponseEntity deleteGenre(@PathVariable(name = "genre")Long id){
+    public ResponseEntity deleteGenre(@PathVariable(name = "genre")Long id, @RequestHeader HttpHeaders headers){
         logger.info("/v1/genres/delete/'{}'",id);
         GenreInfo g = null;
         try{
