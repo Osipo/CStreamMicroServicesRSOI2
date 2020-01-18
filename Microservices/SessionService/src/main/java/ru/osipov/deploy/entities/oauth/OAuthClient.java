@@ -18,17 +18,6 @@ public class OAuthClient implements Serializable {
     private static final long serialVersionUID = 43127469381264723L;
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-            name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator",
-            parameters = {
-                    @org.hibernate.annotations.Parameter(
-                            name = "uuid_gen_strategy_class",
-                            value = "org.hibernate.id.uuid.CustomVersionOneStrategy"
-                    )
-            }
-    )
     @Column(name = "client_id", nullable = false, updatable = false, unique = true)
     private UUID clientId;
 

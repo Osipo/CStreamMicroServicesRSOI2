@@ -97,8 +97,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .permitAll()
                 .antMatchers(OAUTH_ENDPOINT, REGISTRATION_ENDPOINT, CSS_ENDPOINT, JS_ENDPOINT, SIGN_IN_ENDPOINT,
                         REG_CLIENT_ENDPOINT, REG_USER_ENDPOINT, USERS_BY_ID_ENDPOINT, CLIENTS_BY_ID_ENDPOINT).permitAll()
-                    .antMatchers("/api/user/checkUsernameAvailability", "/api/user/checkEmailAvailability")
-                        .permitAll()
                    .antMatchers(ADMIN_ENDPOINT).hasRole("ADMIN")
                     .anyRequest()
                         .authenticated()

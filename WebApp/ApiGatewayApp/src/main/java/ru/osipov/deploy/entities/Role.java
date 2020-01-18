@@ -1,5 +1,7 @@
 package ru.osipov.deploy.entities;
+
 import org.hibernate.annotations.NaturalId;
+
 import javax.persistence.*;
 
 @Entity
@@ -11,7 +13,7 @@ public class Role {
 
     @Enumerated(EnumType.STRING)
     @NaturalId
-    @Column(length = 60, name = "rname")
+    @Column(length = 60)
     private RoleName name;
 
     public Role() {
