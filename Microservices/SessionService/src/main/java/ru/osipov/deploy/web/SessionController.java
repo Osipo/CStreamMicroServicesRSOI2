@@ -58,12 +58,12 @@ public class SessionController {
         this.authorizationCodeService = codeService;
     }
 
-//    @PostMapping(value = "/oauth/token", produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
-//            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-//    public Map<String, String> getTokenByForm(@RequestParam HashMap<String, String> requestDto,
-//                                              HttpServletRequest request) {
-//        return getTokenByJson(requestDto, request);
-//    }
+    @PostMapping(value = "/oauth/token", produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public Map<String, String> getTokenByForm(@RequestParam HashMap<String, String> requestDto,
+                                              HttpServletRequest request) {
+        return getTokenByJson(requestDto, request);
+    }
 
     //GET TOKEN BY CODE.
     @PostMapping(path = "/oauth/token", produces = MediaType.APPLICATION_JSON_UTF8_VALUE,

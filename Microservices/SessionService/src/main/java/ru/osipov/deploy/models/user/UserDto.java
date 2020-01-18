@@ -17,6 +17,8 @@ public class UserDto implements UserModel {
     private List<Role> roles;
     private LocalDate createdAt;
     private LocalDate updatedAt;
+    private String password;
+
 
     public UserEntity toUser() {
         UserEntity user = new UserEntity();
@@ -25,6 +27,7 @@ public class UserDto implements UserModel {
         user.setName(name);
         user.setEmail(email);
         user.setRoles(roles);
+        user.setPassword(password);
         return user;
     }
 
@@ -36,6 +39,7 @@ public class UserDto implements UserModel {
         this.setName(user.getName());
         this.setEmail(user.getEmail());
         this.setRoles(user.getRoles());
+        this.setPassword(user.getPassword());
         this.setCreatedAt(user.getCreatedAt());
         this.setUpdatedAt(user.getUpdatedAt());
     }
@@ -73,6 +77,10 @@ public class UserDto implements UserModel {
     public String getEmail() {
         return email;
     }
+
+    public String getPassword(){return password;}
+
+    public void setPassword(String password){this.password = password;}
 
     public void setRoles(List<Role> roles){this.roles = roles;}
 

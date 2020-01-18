@@ -10,6 +10,7 @@ import ru.osipov.deploy.models.oauth.RegistrationOAuthClientDto;
 import ru.osipov.deploy.models.oauth.TokenObject;
 import ru.osipov.deploy.models.sign.SignInRequest;
 import ru.osipov.deploy.models.sign.SignUpRequest;
+import ru.osipov.deploy.models.user.UserModel;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -39,7 +40,7 @@ public interface SessionClient {
 
 
     @GetMapping(value = "/v1/api/users/{id}")
-    Optional<UserEntity> findUserById(@PathVariable Long id);
+    Optional<UserModel> findUserById(@PathVariable Long id);
 
     @GetMapping(value = "/v1/api/clients/{id}")
     Optional<OAuthClient> findClientById(@PathVariable UUID id);

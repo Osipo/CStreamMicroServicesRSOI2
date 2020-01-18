@@ -13,6 +13,7 @@ import ru.osipov.deploy.models.oauth.RegistrationOAuthClientDto;
 import ru.osipov.deploy.models.oauth.TokenObject;
 import ru.osipov.deploy.models.sign.SignInRequest;
 import ru.osipov.deploy.models.sign.SignUpRequest;
+import ru.osipov.deploy.models.user.UserModel;
 import ru.osipov.deploy.services.client.SessionClient;
 import ru.osipov.deploy.services.jwt.JwtTokenProvider;
 
@@ -72,13 +73,12 @@ public class SessionServiceImpl implements SessionService {
 
 
     @Override
-    public UserEntity findUserById(Long id) {
+    public UserModel findUserById(Long id) {
         logger.info("findUserById() method called:");
-        UserEntity user = sessionClient.findUserById(id)
+        UserModel user = sessionClient.findUserById(id)
                 .orElseThrow(() -> new HttpCanNotCreateException("User could not be found"));
 
-        UUID zeroUUID = new UUID(0, 0);
-        if (user.getId().equals(zeroUUID))
+        if (user.getId().equals(-1L))
             throw new ServiceAccessException("Session service unavailable.");
 
         logger.info("\t" + user);
@@ -117,11 +117,10 @@ public class SessionServiceImpl implements SessionService {
     public void updateUser(Long id, UserEntity user, String token) {
         logger.info("updateUser() method called.");
         checkToken(token);
-        UserEntity checkUser = sessionClient.findUserById(id)
+        UserModel checkUser = sessionClient.findUserById(id)
                 .orElseThrow(() -> new HttpCanNotCreateException("User could not be checked"));
 
-        UUID zeroUUID = new UUID(0, 0);
-        if (checkUser.getId().equals(zeroUUID))
+        if (checkUser.getId().equals(-1L))
             throw new ServiceAccessException("Session service unavailable.");
 
         user.setId(id);
@@ -133,11 +132,10 @@ public class SessionServiceImpl implements SessionService {
     public void deleteUser(Long id, String token) {
         logger.info("deleteUser() method called.");
         checkToken(token);
-        UserEntity user = sessionClient.findUserById(id)
+        UserModel user = sessionClient.findUserById(id)
                 .orElseThrow(() -> new HttpCanNotCreateException("User could not be checked"));
 
-        UUID zeroUUID = new UUID(0, 0);
-        if (user.getId().equals(zeroUUID))
+        if (user.getId().equals(-1L))
             throw new ServiceAccessException("Session service unavailable.");
 
         sessionClient.deleteUser(id, "Bearer " + token);

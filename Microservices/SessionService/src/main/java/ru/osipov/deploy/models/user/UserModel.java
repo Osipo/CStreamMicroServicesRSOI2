@@ -11,6 +11,7 @@ public interface UserModel  {
     String getUsername();
     String getName();
     String getEmail();
+    String getPassword();
     List<Role> getRoles();
     LocalDate getCreatedAt();
     LocalDate getUpdatedAt();

@@ -3,15 +3,21 @@ package ru.osipov.deploy.web;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.osipov.deploy.configuration.jwt.JwtTokenProvider;
 import ru.osipov.deploy.models.CreateSeance;
 import ru.osipov.deploy.models.SeanceInfo;
 import ru.osipov.deploy.services.SeanceService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
@@ -20,12 +26,21 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 @RequestMapping("/v1/seances")
 public class SeanceController {
     private final SeanceService seanceService;
+    private JwtTokenProvider tokenProvider;
 
     private static final Logger logger = getLogger(SeanceController.class);
 
     @Autowired
-    public SeanceController(SeanceService service){
+    public SeanceController(SeanceService service, JwtTokenProvider tokenProvider){
         this.seanceService = service;
+        this.tokenProvider = tokenProvider;
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping(value = "/token", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public Map<String, String> getToken(@RequestHeader HttpHeaders headers, HttpServletRequest req) {
+        logger.info("GET http://{}/v1/api/token", headers.getHost());
+        return tokenProvider.getToken(req).toMap();
     }
 
     //GET: /v1/seances?date=yyyy-MM-dd
