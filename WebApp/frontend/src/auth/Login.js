@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { login } from '../utils/AuthUtils';
+import { login } from '../utils/AuthAPI';
 import './Login.css';
 import { Link } from 'react-router-dom';
 import { ACCESS_TOKEN } from '../utils/AuthConfig';
