@@ -25,7 +25,7 @@ const request = (options) => {
 
 export function login(loginRequest) {
     return request({
-        url: API_BASE_URL + "/oauth/token",
+        url: API_BASE_URL + "/oauth2/token",
         method: 'POST',
         body: JSON.stringify(loginRequest)
     });

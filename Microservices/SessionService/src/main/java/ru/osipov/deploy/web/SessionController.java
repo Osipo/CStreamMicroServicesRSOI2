@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import ru.osipov.deploy.entities.UserEntity;
 import ru.osipov.deploy.models.*;
+import ru.osipov.deploy.models.sign.SignInRequest;
 import ru.osipov.deploy.models.sign.SignUpRequest;
 import ru.osipov.deploy.models.user.*;
 import ru.osipov.deploy.services.oauth.*;
@@ -25,6 +26,7 @@ import ru.osipov.deploy.services.jwt.JwtTokenProvider;
 import ru.osipov.deploy.entities.oauth.*;
 import ru.osipov.deploy.services.UserService;
 
+import javax.print.attribute.standard.Media;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -76,6 +78,15 @@ public class SessionController {
                 return getTokenByCodeAuthorization(requestDto, request).toMap();
         }
         throw new BadCredentialsException("Undefined error");
+    }
+
+    @PostMapping(value = "/oauth2/token", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public Map<String, String> getTokenByLForm(@RequestBody @Valid SignInRequest data, HttpServletRequest request){
+        HashMap<String, String> requestDto = new HashMap<>();
+        requestDto.put("grant_type","password");
+        requestDto.put("login",data.getUsernameOrEmail());
+        requestDto.put("password",data.getPassword());
+        return getTokenByUsernameAndPassword(requestDto).toMap();
     }
 
     @PostMapping(value = "/oauth/token/validity", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
