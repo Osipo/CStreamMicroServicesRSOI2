@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-@FeignClient(name = "session-service", configuration = FeignConfig.class, fallbackFactory = SessionFallbackFactory.class)
+@FeignClient(name = "session-service", url="http://localhost:8999/auth", configuration = FeignConfig.class, fallbackFactory = SessionFallbackFactory.class)
 public interface SessionClient {
 
     @PostMapping(value = "/v1/api/oauth/token", produces = MediaType.APPLICATION_JSON_UTF8_VALUE,

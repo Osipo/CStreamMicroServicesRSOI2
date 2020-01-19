@@ -19,6 +19,8 @@ import ru.osipov.deploy.entities.UserEntity;
 import ru.osipov.deploy.errors.JwtAuthenticationException;
 import ru.osipov.deploy.models.oauth.TokenObject;
 import ru.osipov.deploy.models.jwt.UserPrincipal;
+import ru.osipov.deploy.models.user.UserDto;
+import ru.osipov.deploy.models.user.UserModel;
 import ru.osipov.deploy.services.SessionService;
 
 import javax.annotation.PostConstruct;
@@ -52,8 +54,16 @@ public class JwtTokenProvider {
     public Authentication getAuthentication(String token) {
         Claims claims = getJwsClaimsFromToken(token).getBody();
         Long userId = Long.parseLong(claims.get("user_id", String.class));
-        UserEntity user = sessionService.findUserById(userId);
-        if (user != null) {
+        UserModel u = sessionService.findUserById(userId);
+        if(u != null){
+        UserEntity user = new UserEntity();
+        user.setName(u.getName());
+        user.setUsername(u.getUsername());
+        user.setEmail(u.getEmail());
+        user.setPassword(u.getPassword());
+        user.setRoles(u.getRoles());
+        user.setCreatedAt(u.getCreatedAt());
+        user.setUpdatedAt(u.getUpdatedAt());
             UserDetails userDetails = UserPrincipal.create(user);
             return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
         }

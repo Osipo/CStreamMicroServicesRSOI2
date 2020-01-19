@@ -9,11 +9,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import ru.osipov.deploy.WebConfig;
 import ru.osipov.deploy.errors.ApiException;
 import ru.osipov.deploy.models.CreateFilm;
 import ru.osipov.deploy.models.FilmGenre;
@@ -22,6 +24,7 @@ import ru.osipov.deploy.models.FilmInfo;
 import java.net.ConnectException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class WebFilmService {
@@ -34,12 +37,39 @@ public class WebFilmService {
     private static final Logger logger = LoggerFactory.getLogger(WebFilmService.class);
     private static final Gson gson = new GsonBuilder().create();
 
-    public WebFilmService(){}
+    private String filmToken;
+
+    public WebFilmService(){
+        if(serviceUrl == null)
+            serviceUrl = "http://localhost:3333";
+        this.filmToken = getToken();
+    }
+
+    public String getToken(){
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON_UTF8));
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        headers.set("Authorization","Basic "+String.format("base64(%s:%s)", WebConfig.getAppKey(), WebConfig.getAppSecret()));//set basic auth between services.
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<Map<String, String>> response;
+        try{
+            response = restTemplate.exchange(serviceUrl + "/v1/films/token", HttpMethod.GET, entity, new ParameterizedTypeReference<Map<String, String>>() {});
+        }
+        catch (HttpClientErrorException e){
+            throw new ApiException(e.getMessage(), e, e.getRawStatusCode(), e.getResponseHeaders(),
+                    e.getResponseBodyAsString(), serviceUrl+"/v1/films/token/", null);
+        }
+        logger.info("Get genre token: '{}'",response.getBody().get("access_token"));
+        return response.getBody().get("access_token");
+    }
 
     public FilmInfo[] getByName(String name){
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON_UTF8, MediaType.APPLICATION_JSON));
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        logger.info("film_token: "+filmToken);
+        headers.set("Authorization","Basic "+filmToken);
         HttpEntity<String> entity = new HttpEntity<>(headers);
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<FilmInfo[]> response;
@@ -65,6 +95,8 @@ public class WebFilmService {
         // Request to return JSON format
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         headers.set("my_other_key", "my_other_value");
+        logger.info("film_token: "+filmToken);
+        headers.set("Authorization","Basic "+filmToken);
 
         // HttpEntity<String>: To get result as String.
         HttpEntity<String> entity = new HttpEntity<String>(headers);
@@ -98,7 +130,8 @@ public class WebFilmService {
         // Request to return JSON format
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         headers.set("my_other_key", "my_other_value");
-
+        logger.info("film_token: "+filmToken);
+        headers.set("Authorization","Basic "+filmToken);
         // HttpEntity<String>: To get result as json_String.
         HttpEntity<String> entity = new HttpEntity<String>(headers);
 
@@ -124,6 +157,8 @@ public class WebFilmService {
 
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON_UTF8, MediaType.APPLICATION_JSON));
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        logger.info("film_token: "+filmToken);
+        headers.set("Authorization","Basic "+filmToken);
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<FilmInfo[]> response = restTemplate.exchange(serviceUrl+"/v1/films/genre/"+gid,
@@ -134,6 +169,8 @@ public class WebFilmService {
     public FilmInfo getById(Long id){
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON,MediaType.APPLICATION_JSON_UTF8));
+        logger.info("film_token: "+filmToken);
+        headers.set("Authorization","Basic "+filmToken);
         HttpEntity<String> entity = new HttpEntity<>(headers);
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<FilmInfo> response;
@@ -154,6 +191,8 @@ public class WebFilmService {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON_UTF8, MediaType.APPLICATION_JSON));
         headers.set("Content-Type",MediaType.TEXT_PLAIN_VALUE);
+        logger.info("film_token: "+filmToken);
+        headers.set("Authorization","Basic "+filmToken);
         HttpEntity<String> entity = new HttpEntity<String>("-1",headers);
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<FilmInfo[]> response = restTemplate.exchange(serviceUrl+"/v1/films/genre/"+old,
@@ -165,6 +204,8 @@ public class WebFilmService {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON_UTF8, MediaType.APPLICATION_JSON));
         headers.set("Content-Type",MediaType.TEXT_PLAIN_VALUE);
+        logger.info("film_token: "+filmToken);
+        headers.set("Authorization","Basic "+filmToken);
         HttpEntity<String> entity = new HttpEntity<String>(nval.toString(),headers);
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<FilmInfo[]> response;
@@ -182,6 +223,8 @@ public class WebFilmService {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON_UTF8, MediaType.APPLICATION_JSON));
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        logger.info("film_token: "+filmToken);
+        headers.set("Authorization","Basic "+filmToken);
         HttpEntity<String> entity = new HttpEntity<String>(gson.toJson(data)/*"{ id:+"data.getId()+"name:"+data.getName()+"rating:"+data.getRating()+"gid:"+data.getGid()+ "}"*/,headers);
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());

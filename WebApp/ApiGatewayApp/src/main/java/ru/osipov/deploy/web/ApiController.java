@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.osipov.deploy.WebConfig;
 import ru.osipov.deploy.errors.ApiException;
 import ru.osipov.deploy.models.*;
 import ru.osipov.deploy.services.WebCinemaService;
@@ -75,7 +76,12 @@ public class ApiController {
             futureTask = scheduler.scheduleAtFixedRate(checkQueue, timeSpan, timeSpan, SECONDS);
         }
     }
-    
+
+//    @GetMapping(path = "/tttt", produces = APPLICATION_JSON_UTF8_VALUE)
+//    public ResponseEntity tok(){
+//        return ResponseEntity.ok("{\"tok\": \""+String.format("base64(%s:%s)", WebConfig.getAppKey(), WebConfig.getAppSecret())+"\"}");
+//    }
+
     //GET: /v1/api/films?r=number
     //GET: /v1/api/films?r=number&page=X&size=Y
     //GET: /v1/api/films?r=number&page=X[size = 1]

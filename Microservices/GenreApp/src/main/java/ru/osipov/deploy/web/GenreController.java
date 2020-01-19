@@ -62,6 +62,7 @@ public class GenreController {
 
     //GET: /v1/genres?name='...'
     //If no any name was specified -> getAll() [GET: /v1/genres, /v1/genres/]
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE, path={})
     public ResponseEntity getAllByName(@RequestParam(required = false, name= "name") String name){
         logger.info("getAllByName");

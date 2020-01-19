@@ -8,6 +8,8 @@ import ru.osipov.deploy.models.oauth.RegistrationOAuthClientDto;
 import ru.osipov.deploy.models.oauth.TokenObject;
 import ru.osipov.deploy.models.sign.SignInRequest;
 import ru.osipov.deploy.models.sign.SignUpRequest;
+import ru.osipov.deploy.models.user.UserDto;
+import ru.osipov.deploy.models.user.UserModel;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -61,12 +63,12 @@ public class SessionFeignClientFallback implements SessionClient {
 
 
     @Override
-    public Optional<UserEntity> findUserById(Long id) {
+    public Optional<UserModel> findUserById(Long id) {
         logger.error("findUserById() method called.");
         logger.error(cause.getMessage());
-        UserEntity fallback = new UserEntity();
-        fallback.setId(-1L);
-        return Optional.of(fallback);
+        UserDto m = new UserDto();
+        m.setId(-1L);
+        return Optional.of(m);
     }
 
     @Override

@@ -43,6 +43,7 @@ public class UserDto implements UserModel {
         this.setUpdatedAt(user.getUpdatedAt());
     }
 
+    public UserDto(){}
 
     public void setId(Long id) {
         this.id = id;

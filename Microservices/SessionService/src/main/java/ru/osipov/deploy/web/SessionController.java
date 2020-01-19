@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import ru.osipov.deploy.entities.UserEntity;
 import ru.osipov.deploy.models.*;
+import ru.osipov.deploy.models.sign.AuthCodeModel;
 import ru.osipov.deploy.models.sign.SignInRequest;
 import ru.osipov.deploy.models.sign.SignUpRequest;
 import ru.osipov.deploy.models.user.*;
@@ -111,16 +112,21 @@ public class SessionController {
     //GET: /auth/v1/api/oauth?response_type='code'&client_id='xxx'&redirect_uri='zz'
     //RedirectUrl:
     @GetMapping(path = "/oauth", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public AuthorizationCode getCode(@RequestParam(value = "response_type") String responseType,
-                                     @RequestParam(value = "client_id") UUID clientId,
-                                     @RequestParam(value = "redirect_uri") String redirectUri,
-                                     HttpServletRequest request,
-                                     HttpServletResponse response) {
+    public AuthCodeModel getCode(@RequestParam(value = "response_type") String responseType,
+                                 @RequestParam(value = "client_id") UUID clientId,
+                                 @RequestParam(value = "redirect_uri") String redirectUri,
+                                 HttpServletRequest request,
+                                 HttpServletResponse response) {
         if (responseType.equals("code")) {
             String token = jwtTokenProvider.resolveToken(request);
             if (token != null && jwtTokenProvider.validateAccessToken(token)) {
                 Long userId = jwtTokenProvider.getUserIdByToken(token);
-                return authorizationCodeService.generationCode(userId, clientId, redirectUri);
+                AuthorizationCode code =  authorizationCodeService.generationCode(userId, clientId, redirectUri);
+                AuthCodeModel model = new AuthCodeModel();
+                model.setCode(code.getCode());
+                model.setClientId(code.getClientId());
+                model.setUserId(code.getUserId());
+                return model;
             }
         }
         throw new BadCredentialsException("Code Flow invalid.");

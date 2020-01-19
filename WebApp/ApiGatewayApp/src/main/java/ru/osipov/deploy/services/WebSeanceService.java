@@ -56,6 +56,7 @@ public class WebSeanceService {
     }
 
     public String getToken(){
+        RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON_UTF8));
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
@@ -63,12 +64,13 @@ public class WebSeanceService {
         HttpEntity<String> entity = new HttpEntity<>(headers);
         ResponseEntity<Map<String, String>> response;
         try{
-            response = this.restTemplate.exchange(serviceUrl + "/v1/seances/token", HttpMethod.GET, entity, new ParameterizedTypeReference<Map<String, String>>() {});
+            response = restTemplate.exchange(serviceUrl + "/v1/seances/token", HttpMethod.GET, entity, new ParameterizedTypeReference<Map<String, String>>() {});
         }
         catch (HttpClientErrorException e){
             throw new ApiException(e.getMessage(), e, e.getRawStatusCode(), e.getResponseHeaders(),
                     e.getResponseBodyAsString(), serviceUrl+"/v1/seances/token/", null);
         }
+        logger.info("Get seance token: '{}'",response.getBody().get("access_token"));
         return response.getBody().get("access_token");
     }
 
@@ -80,6 +82,8 @@ public class WebSeanceService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON_UTF8, MediaType.APPLICATION_JSON));
         // Request to return JSON format
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        logger.info("Seancetoken: "+seanceToken);
+        headers.set("Authorization","Basic "+seanceToken);
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         RestTemplate restTemplate = new RestTemplate();
 
@@ -102,6 +106,8 @@ public class WebSeanceService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON_UTF8, MediaType.APPLICATION_JSON));
         // Request to return JSON format
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        logger.info("Seancetoken: "+seanceToken);
+        headers.set("Authorization","Basic "+seanceToken);
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<SeanceInfo> response;
@@ -124,6 +130,8 @@ public class WebSeanceService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON_UTF8, MediaType.APPLICATION_JSON));
         // Request to return JSON format
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        logger.info("Seancetoken: "+seanceToken);
+        headers.set("Authorization","Basic "+seanceToken);
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<SeanceInfo[]> response;
@@ -148,6 +156,7 @@ public class WebSeanceService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON_UTF8, MediaType.APPLICATION_JSON));
         // Request to return JSON format
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        logger.info("Seance_token: "+seanceToken);
         headers.set("Authorization","Basic "+seanceToken);//service token.
         HttpEntity<String> entity = new HttpEntity<String>(gson.toJson(data),headers);
         RestTemplate restTemplate = new RestTemplate();
