@@ -20,6 +20,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import ru.osipov.deploy.WebConfig;
 import ru.osipov.deploy.errors.ApiException;
+import ru.osipov.deploy.errors.ServiceAccessException;
+import ru.osipov.deploy.errors.feign.ClientAuthenticationExceptionWrapper;
 import ru.osipov.deploy.models.CreateGenreR;
 import ru.osipov.deploy.models.GenreInfo;
 
@@ -175,7 +177,19 @@ public class WebGenreService {
         try {
             response = restTemplate.exchange(serviceUrl + "/v1/genres/delete/" + genre
                     , HttpMethod.POST, entity, GenreInfo.class);
-        }catch (HttpClientErrorException e){
+        }
+        catch (ClientAuthenticationExceptionWrapper e){
+            genreToken = getToken();
+            if(genreToken != null){
+                headers.set("Authorization","Basic "+genreToken);
+                entity = new HttpEntity<>(headers);
+                response = restTemplate.exchange(serviceUrl + "/v1/genres/delete",
+                        HttpMethod.POST, entity, GenreInfo.class);
+            }
+            else
+                throw new ServiceAccessException("Genre Service unavailable");
+        }
+        catch (HttpClientErrorException e){
             logger.info("Error message: '{}'",e.getMessage());
             logger.info("Error status: '{}'",e.getRawStatusCode());
             logger.info("Response: '{}'",e.getResponseBodyAsString());
@@ -235,8 +249,21 @@ public class WebGenreService {
         headers.set("Authorization","Basic "+genreToken);//token from service: type basic.
         logger.info("token: "+genreToken);
         HttpEntity<String> entity = new HttpEntity<>(gson.toJson(data),headers);
-        ResponseEntity<Void> response = restTemplate.exchange(serviceUrl+"/v1/genres/create",
-                HttpMethod.POST,entity,Void.class);
+        ResponseEntity<Void> response;
+        try {
+            response = restTemplate.exchange(serviceUrl + "/v1/genres/create",
+                    HttpMethod.POST, entity, Void.class);
+        }catch (ClientAuthenticationExceptionWrapper e){
+            genreToken = getToken();
+            if(genreToken != null){
+                headers.set("Authorization","Basic "+genreToken);
+                entity = new HttpEntity<>(gson.toJson(data),headers);
+                response = restTemplate.exchange(serviceUrl + "/v1/genres/create",
+                        HttpMethod.POST, entity, Void.class);
+            }
+            else
+                throw new ServiceAccessException("Genre Service unavailable");
+        }
 
         return response.getHeaders().getLocation();
     }

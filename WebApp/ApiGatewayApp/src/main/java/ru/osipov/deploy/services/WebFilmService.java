@@ -17,6 +17,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import ru.osipov.deploy.WebConfig;
 import ru.osipov.deploy.errors.ApiException;
+import ru.osipov.deploy.errors.ServiceAccessException;
+import ru.osipov.deploy.errors.feign.ClientAuthenticationExceptionWrapper;
 import ru.osipov.deploy.models.CreateFilm;
 import ru.osipov.deploy.models.FilmGenre;
 import ru.osipov.deploy.models.FilmInfo;
@@ -77,6 +79,17 @@ public class WebFilmService {
             response = restTemplate.exchange(serviceUrl + "/v1/films/name/" + name,
                     HttpMethod.GET, entity, FilmInfo[].class);
         }
+        catch (ClientAuthenticationExceptionWrapper e){
+            filmToken = getToken();
+            if(filmToken != null){
+                headers.set("Authorization","Basic "+filmToken);
+                entity = new HttpEntity<>(headers);
+                response = restTemplate.exchange(serviceUrl + "/v1/films/name"+name,
+                        HttpMethod.GET, entity, FilmInfo[].class);
+            }
+            else
+                throw new ServiceAccessException("Film Service unavailable");
+        }
         catch(HttpClientErrorException e){
             logger.info("Error message: '{}'",e.getMessage());
             logger.info("Error status: '{}'",e.getRawStatusCode());
@@ -110,6 +123,17 @@ public class WebFilmService {
             response = restTemplate.exchange(serviceUrl + "/v1/films?r=" + rating.toString(),
                     HttpMethod.GET, entity, FilmInfo[].class);
         }
+        catch (ClientAuthenticationExceptionWrapper e){
+            filmToken = getToken();
+            if(filmToken != null){
+                headers.set("Authorization","Basic "+filmToken);
+                entity = new HttpEntity<>(headers);
+                response = restTemplate.exchange(serviceUrl + "/v1/films?r="+rating.toString(),
+                        HttpMethod.GET, entity, FilmInfo[].class);
+            }
+            else
+                throw new ServiceAccessException("Film Service unavailable");
+        }
         catch(HttpClientErrorException e){
             logger.info("Error message: '{}'",e.getMessage());
             logger.info("Error status: '{}'",e.getRawStatusCode());
@@ -139,8 +163,22 @@ public class WebFilmService {
         RestTemplate restTemplate = new RestTemplate();
 
         // Send request with GET method, and Headers.
-        ResponseEntity<FilmInfo[]> response = restTemplate.exchange(serviceUrl+"/v1/films",
-                HttpMethod.GET, entity, FilmInfo[].class);//As it returns raw JSONArray (without any top-level object.)
+        ResponseEntity<FilmInfo[]> response;
+        try {
+            response = restTemplate.exchange(serviceUrl + "/v1/films",
+                    HttpMethod.GET, entity, FilmInfo[].class);//As it returns raw JSONArray (without any top-level object.)
+        }
+        catch (ClientAuthenticationExceptionWrapper e){
+            filmToken = getToken();
+            if(filmToken != null){
+                headers.set("Authorization","Basic "+filmToken);
+                entity = new HttpEntity<>(headers);
+                response = restTemplate.exchange(serviceUrl + "/v1/films",
+                        HttpMethod.GET, entity, FilmInfo[].class);
+            }
+            else
+                throw new ServiceAccessException("Film Service unavailable");
+        }
         //ResponseEntity<FilmInfo[]> response = restTemplate.getForEntity(serviceUrl+"/v1/films", FilmInfo[].class);
         return response.getBody();
     }
@@ -161,8 +199,22 @@ public class WebFilmService {
         headers.set("Authorization","Basic "+filmToken);
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<FilmInfo[]> response = restTemplate.exchange(serviceUrl+"/v1/films/genre/"+gid,
-                HttpMethod.GET,entity,FilmInfo[].class);
+        ResponseEntity<FilmInfo[]> response;
+        try {
+            response = restTemplate.exchange(serviceUrl + "/v1/films/genre/" + gid,
+                    HttpMethod.GET, entity, FilmInfo[].class);
+        }
+        catch (ClientAuthenticationExceptionWrapper e){
+            filmToken = getToken();
+            if(filmToken != null){
+                headers.set("Authorization","Basic "+filmToken);
+                entity = new HttpEntity<>(headers);
+                response = restTemplate.exchange(serviceUrl + "/v1/films/genre/"+gid,
+                        HttpMethod.GET, entity, FilmInfo[].class);
+            }
+            else
+                throw new ServiceAccessException("Film Service unavailable");
+        }
         return response.getBody();
     }
 
@@ -177,7 +229,19 @@ public class WebFilmService {
         try {
             response = restTemplate.exchange(serviceUrl + "/v1/films/" + id
                     , HttpMethod.GET, entity, FilmInfo.class);
-        }catch (HttpClientErrorException e){
+        }
+        catch (ClientAuthenticationExceptionWrapper e){
+            filmToken = getToken();
+            if(filmToken != null){
+                headers.set("Authorization","Basic "+filmToken);
+                entity = new HttpEntity<>(headers);
+                response = restTemplate.exchange(serviceUrl + "/v1/films/"+id,
+                        HttpMethod.GET, entity, FilmInfo.class);
+            }
+            else
+                throw new ServiceAccessException("Film Service unavailable");
+        }
+        catch (HttpClientErrorException e){
             logger.info("Error message: '{}'",e.getMessage());
             logger.info("Error status: '{}'",e.getRawStatusCode());
             logger.info("Response: '{}'",e.getResponseBodyAsString());
@@ -195,8 +259,22 @@ public class WebFilmService {
         headers.set("Authorization","Basic "+filmToken);
         HttpEntity<String> entity = new HttpEntity<String>("-1",headers);
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<FilmInfo[]> response = restTemplate.exchange(serviceUrl+"/v1/films/genre/"+old,
-                HttpMethod.POST,entity,FilmInfo[].class);
+        ResponseEntity<FilmInfo[]> response;
+        try {
+            response = restTemplate.exchange(serviceUrl + "/v1/films/genre/" + old,
+                    HttpMethod.POST, entity, FilmInfo[].class);
+        }
+        catch (ClientAuthenticationExceptionWrapper e){
+            filmToken = getToken();
+            if(filmToken != null){
+                headers.set("Authorization","Basic "+filmToken);
+                entity = new HttpEntity<>("-1",headers);
+                response = restTemplate.exchange(serviceUrl + "/v1/films/genre/"+old,
+                        HttpMethod.POST, entity, FilmInfo[].class);
+            }
+            else
+                throw new ServiceAccessException("Film Service unavailable");
+        }
         return response.getBody();
     }
 
@@ -212,7 +290,19 @@ public class WebFilmService {
         try {
             response = restTemplate.exchange(serviceUrl + "/v1/films/genre/" + old,
                     HttpMethod.POST, entity, FilmInfo[].class);
-        }catch (HttpClientErrorException e){
+        }
+        catch (ClientAuthenticationExceptionWrapper e){
+            filmToken = getToken();
+            if(filmToken != null){
+                headers.set("Authorization","Basic "+filmToken);
+                entity = new HttpEntity<>(nval.toString(),headers);
+                response = restTemplate.exchange(serviceUrl + "/v1/films/genre"+old,
+                        HttpMethod.POST, entity, FilmInfo[].class);
+            }
+            else
+                throw new ServiceAccessException("Film Service unavailable");
+        }
+        catch (HttpClientErrorException e){
             throw new ApiException(e.getMessage(), e, e.getRawStatusCode(), e.getResponseHeaders(),
                     e.getResponseBodyAsString(), serviceUrl+"/v1/films/genre/"+old, null);
         }
@@ -231,6 +321,17 @@ public class WebFilmService {
         ResponseEntity<FilmInfo> response;
         try {
             response = restTemplate.exchange(serviceUrl + "/v1/films/" + id, HttpMethod.PATCH, entity, FilmInfo.class);
+        }
+        catch (ClientAuthenticationExceptionWrapper e){
+            filmToken = getToken();
+            if(filmToken != null){
+                headers.set("Authorization","Basic "+filmToken);
+                entity = new HttpEntity<>(gson.toJson(data),headers);
+                response = restTemplate.exchange(serviceUrl + "/v1/films/"+id,
+                        HttpMethod.PATCH, entity, FilmInfo.class);
+            }
+            else
+                throw new ServiceAccessException("Film Service unavailable");
         }
         catch(HttpClientErrorException e){
             logger.info("Error message: '{}'",e.getMessage());

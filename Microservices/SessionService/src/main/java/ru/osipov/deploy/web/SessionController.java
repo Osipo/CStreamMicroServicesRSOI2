@@ -110,9 +110,8 @@ public class SessionController {
 
     //GENERATE CODE FLOW.
     //GET: /auth/v1/api/oauth?response_type='code'&client_id='xxx'&redirect_uri='zz'
-    //RedirectUrl:
     @GetMapping(path = "/oauth", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public AuthCodeModel getCode(@RequestParam(value = "response_type") String responseType,
+    public TokenObject getCode(@RequestParam(value = "response_type") String responseType,
                                  @RequestParam(value = "client_id") UUID clientId,
                                  @RequestParam(value = "redirect_uri") String redirectUri,
                                  HttpServletRequest request,
@@ -122,11 +121,13 @@ public class SessionController {
             if (token != null && jwtTokenProvider.validateAccessToken(token)) {
                 Long userId = jwtTokenProvider.getUserIdByToken(token);
                 AuthorizationCode code =  authorizationCodeService.generationCode(userId, clientId, redirectUri);
-                AuthCodeModel model = new AuthCodeModel();
-                model.setCode(code.getCode());
-                model.setClientId(code.getClientId());
-                model.setUserId(code.getUserId());
-                return model;
+                HashMap<String, String> requestDto = new HashMap<>();
+                requestDto.put("redirect_uri",redirectUri);
+                requestDto.put("code",code.getCode().toString());
+                requestDto.put("client_id",clientId.toString());
+                OAuthClient client = oAuthClientService.findById(clientId);
+                requestDto.put("client_secret",client.getClientSecret());
+                return getTokenByCodeAuthorization(requestDto,request);
             }
         }
         throw new BadCredentialsException("Code Flow invalid.");
@@ -234,8 +235,8 @@ public class SessionController {
     }
 
     private TokenObject getTokenByCodeAuthorization(Map<String, String> requestDto, HttpServletRequest request) {
-        String userToken = jwtTokenProvider.resolveToken(request);
-        if (userToken != null && jwtTokenProvider.validateAccessToken(userToken)) {
+        //String userToken = jwtTokenProvider.resolveToken(request);
+        //if (userToken != null && jwtTokenProvider.validateAccessToken(userToken)) {
             if (authorizationCodeService.validateCode(UUID.fromString(requestDto.get("code")))) {
                 AuthorizationCode authorizationCode = authorizationCodeService
                         .findById(UUID.fromString(requestDto.get("code")));
@@ -254,13 +255,15 @@ public class SessionController {
                     user.setId(userModel.getId());
                     user.setEmail(userModel.getEmail());
                     authorizationCodeService.deleteById(authorizationCode.getCode());
-                    return jwtTokenProvider.createToken(user, client);
+                    TokenObject o = jwtTokenProvider.createToken(user, client);
+                    TokenObjectCode to = new TokenObjectCode(o, requestDto.get("redirect_uri"));
+                    return to;
                 } catch (AuthenticationException e) {
                     throw new BadCredentialsException("Invalid code flow");
                 }
             } else
                 throw new BadCredentialsException("Authorization code is invalid");
-        }
-        throw new BadCredentialsException("User Token is invalid");
+        //}
+       // throw new BadCredentialsException("User Token is invalid");
     }
 }

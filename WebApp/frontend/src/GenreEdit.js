@@ -4,6 +4,7 @@ import { Button, Container, Form, FormGroup, Input, Label } from 'reactstrap';
 import AppNavbar from './AppNavbar';
 import { FormErrors } from './FormErrors';
 import './Error.css';
+import { API_BASE_URL, ACCESS_TOKEN } from './utils/AuthConfig';
 class GenreEdit extends Component {
 
 
@@ -15,7 +16,8 @@ class GenreEdit extends Component {
         formErrors: {name: '', remarks: ''},
         nameValid: false,
         remarksValid: true,
-        formValid: false
+        formValid: false,
+        auth: {}
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -30,7 +32,8 @@ class GenreEdit extends Component {
           formErrors: {name: '', remarks: ''},
           nameValid: true,
           remarksValid: true,
-          formValid: true
+          formValid: true,
+          auth: {}
       },() => {for(let p in this.state){ this.validateField(p,this.state[p]);} });
       
     }
@@ -62,10 +65,16 @@ class GenreEdit extends Component {
       method: (item.id) ? 'PUT' : 'POST',
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer '+localStorage.getItem(ACCESS_TOKEN)
       },
       body: JSON.stringify(item),
-    });
+    }).then(response => response.json()).then(data => this.setState({auth: data}));
+    if(this.state.auth !== undefined && this.state.auth.status !== undefined && this.state.auth.status === 401){//redirect if not authorized!
+        this.props.history.push('/views/login');
+        return;
+    }
+    
     this.props.history.push('/views/genres');
   }
 

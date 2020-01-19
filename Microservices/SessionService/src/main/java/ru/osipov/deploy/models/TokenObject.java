@@ -6,10 +6,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TokenObject {
-    private String accessToken;
-    private String refreshToken;
-    private Long expiresIn;
-    private String tokenType;
+    protected String accessToken;
+    protected String refreshToken;
+    protected Long expiresIn;
+    protected String tokenType;
+
+    public TokenObject(){}
 
     public String getAccessToken() {
         return accessToken;

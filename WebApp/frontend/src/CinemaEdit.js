@@ -5,6 +5,7 @@ import AppNavbar from './AppNavbar';
 import { FormErrors } from './FormErrors';
 import './Error.css';
 import './CinemaEdit.css';
+import { API_BASE_URL, ACCESS_TOKEN } from './utils/AuthConfig';
 class CinemaEdit extends Component {
     constructor(props){
         super(props);
@@ -22,7 +23,8 @@ class CinemaEdit extends Component {
             cityValid: false,
             streetValid: false,
             seanceValid: true,
-            formValid: false
+            formValid: false,
+            auth: {}
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -52,7 +54,8 @@ class CinemaEdit extends Component {
                 cityValid: true,
                 streetValid: true,
                 seanceValid: true,
-                formValid: true
+                formValid: true,
+                auth: {}
             }, () => {for(let p in this.state){ this.validateField(p,this.state[p]);} });
         }
         else if (id !== 'new') {
@@ -71,7 +74,8 @@ class CinemaEdit extends Component {
                 cityValid: true,
                 streetValid: true,
                 seanceValid: true,
-                formValid: true
+                formValid: true,
+                auth:{}
             }, () => {for(let p in this.state){ this.validateField(p,this.state[p]);} });
         }
     }
@@ -194,10 +198,15 @@ class CinemaEdit extends Component {
             method: 'PATCH',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization':'Bearer '+localStorage.getItem(ACCESS_TOKEN)
             },
         body: JSON.stringify(item),
-        });
+        }).then(response => response.json()).then(data => this.setState({auth: data}));
+        if(this.state.auth !== undefined && this.state.auth.status !== undefined && this.state.auth.status === 401){//redirect if not authorized!
+            this.props.history.push('/views/login');
+            return;
+        };
     this.props.history.push('/v1/views/cinemas');
     }
     

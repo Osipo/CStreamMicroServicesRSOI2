@@ -17,6 +17,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import ru.osipov.deploy.WebConfig;
 import ru.osipov.deploy.errors.ApiException;
+import ru.osipov.deploy.errors.ServiceAccessException;
+import ru.osipov.deploy.errors.feign.ClientAuthenticationExceptionWrapper;
 import ru.osipov.deploy.models.CreateCinema;
 import ru.osipov.deploy.models.CreateSeance;
 import ru.osipov.deploy.models.SeanceInfo;
@@ -88,8 +90,22 @@ public class WebSeanceService {
         RestTemplate restTemplate = new RestTemplate();
 
         // Send request with GET method, and Headers.
-        ResponseEntity<SeanceInfo[]> response = restTemplate.exchange(serviceUrl+"/v1/seances",
-                HttpMethod.GET, entity, SeanceInfo[].class);
+        ResponseEntity<SeanceInfo[]> response;
+        try {
+            response = restTemplate.exchange(serviceUrl + "/v1/seances",
+                    HttpMethod.GET, entity, SeanceInfo[].class);
+        }
+        catch (ClientAuthenticationExceptionWrapper e){
+            seanceToken = getToken();
+            if(seanceToken != null){
+                headers.set("Authorization","Basic "+seanceToken);
+                entity = new HttpEntity<>(headers);
+                response = restTemplate.exchange(serviceUrl + "/v1/seances",
+                        HttpMethod.GET, entity, SeanceInfo[].class);
+            }
+            else
+                throw new ServiceAccessException("Seance Service unavailable");
+        }
         return response.getBody();
     }
 
@@ -114,6 +130,17 @@ public class WebSeanceService {
         try{
             response = restTemplate.exchange(serviceUrl+"/v1/seances/"+cid+"/"+fid,HttpMethod.GET,entity,SeanceInfo.class);
         }
+        catch (ClientAuthenticationExceptionWrapper e){
+            seanceToken = getToken();
+            if(seanceToken != null){
+                headers.set("Authorization","Basic "+seanceToken);
+                entity = new HttpEntity<>(headers);
+                response = restTemplate.exchange(serviceUrl + "/v1/seances/"+cid+"/"+fid,
+                        HttpMethod.GET, entity, SeanceInfo.class);
+            }
+            else
+                throw new ServiceAccessException("Seance Service unavailable");
+        }
         catch(HttpClientErrorException e){
             logger.info("Error message: '{}'",e.getMessage());
             logger.info("Error status: '{}'",e.getRawStatusCode());
@@ -137,6 +164,17 @@ public class WebSeanceService {
         ResponseEntity<SeanceInfo[]> response;
         try{
             response = restTemplate.exchange(serviceUrl+"/v1/seances/"+cid,HttpMethod.GET,entity,SeanceInfo[].class);
+        }
+        catch (ClientAuthenticationExceptionWrapper e){
+            seanceToken = getToken();
+            if(seanceToken != null){
+                headers.set("Authorization","Basic "+seanceToken);
+                entity = new HttpEntity<>(headers);
+                response = restTemplate.exchange(serviceUrl + "/v1/seances/"+cid,
+                        HttpMethod.GET, entity, SeanceInfo[].class);
+            }
+            else
+                throw new ServiceAccessException("Seance Service unavailable");
         }
         catch(HttpClientErrorException e){
             logger.info("Error message: '{}'",e.getMessage());
@@ -164,6 +202,17 @@ public class WebSeanceService {
         ResponseEntity<URI> response;
         try{
             response = restTemplate.exchange(serviceUrl+"/v1/seances/create",HttpMethod.POST,entity,URI.class);
+        }
+        catch (ClientAuthenticationExceptionWrapper e){
+            seanceToken = getToken();
+            if(seanceToken != null){
+                headers.set("Authorization","Basic "+seanceToken);
+                entity = new HttpEntity<>(gson.toJson(data),headers);
+                response = restTemplate.exchange(serviceUrl + "/v1/seances/create",
+                        HttpMethod.POST, entity, URI.class);
+            }
+            else
+                throw new ServiceAccessException("Seance Service unavailable");
         }
         catch(HttpClientErrorException e){
             logger.info("Error message: '{}'",e.getMessage());

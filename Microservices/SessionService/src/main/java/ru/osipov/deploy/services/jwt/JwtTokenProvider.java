@@ -184,7 +184,8 @@ public class JwtTokenProvider {
     public boolean validateAccessToken(String token) {
         try {
             Jws<Claims> claims = getJwsClaimsFromToken(token);
-            Long userId = Long.parseLong(claims.getBody().get("user_id", String.class));
+            logger.info("Claim_user_id: "+claims.getBody().get("user_id",String.class));
+            Long userId = Long.parseLong(claims.getBody().get("user_id", String.class));//error.
             Date date = claims.getBody().getExpiration();
             OAuthToken oAuthToken = oAuthTokenService.findByUserId(userId);
             if (oAuthToken == null || !oAuthToken.getAccessToken().equals(token))

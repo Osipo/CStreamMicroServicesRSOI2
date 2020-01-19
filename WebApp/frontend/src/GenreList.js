@@ -3,6 +3,7 @@ import { Button, ButtonGroup, Container, Table } from 'reactstrap';
 import AppNavbar from './AppNavbar';
 import { Link } from 'react-router-dom';
 import $ from 'jquery';
+import { API_BASE_URL, ACCESS_TOKEN } from './utils/AuthConfig';
 class GenreList extends Component {
 
   constructor(props) {
@@ -14,7 +15,8 @@ class GenreList extends Component {
               lowerPageBound: 0,
               isPrevBtnActive: 'disabled',
               isNextBtnActive: '',
-              pageBound: 3
+              pageBound: 3,
+              auth: {}
     };
     this.remove = this.remove.bind(this);
             this.handleClick = this.handleClick.bind(this);
@@ -31,9 +33,16 @@ class GenreList extends Component {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer '+localStorage.getItem(ACCESS_TOKEN)
       }
-    }).then(() => {
+    }).then(response => response.json()).then(data => this.setState({auth: data}));
+        if(this.state.auth !== undefined && this.state.auth.status !== undefined && this.state.auth.status === 401){//redirect if not authorized!
+            this.props.history.push('/views/login');
+            return;
+        };
+    
+    //.then(() => {
       let updated = [...this.state.genres].filter(i => i.id !== id);
       this.setState({genres: updated, isLoading: false,
               currentPage: this.state.currentPage,
@@ -44,7 +53,7 @@ class GenreList extends Component {
               isNextBtnActive: '',
               pageBound: 3
       });
-    });
+    //});
   }
   
   componentDidMount() {
