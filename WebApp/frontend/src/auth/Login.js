@@ -34,8 +34,9 @@ class LoginForm extends Component {
                 const loginRequest = Object.assign({}, values);
                 login(loginRequest)
                 .then(response => {
-                    localStorage.setItem(ACCESS_TOKEN, response.accessToken);
-                    this.props.onLogin();
+                    localStorage.setItem(ACCESS_TOKEN, response.json().access_token);
+                    this.history.push("/");
+                    //this.props.onLogin();
                 }).catch(error => {
                     if(error.status === 401) {
                         notification.error({

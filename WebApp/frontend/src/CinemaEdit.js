@@ -203,8 +203,21 @@ class CinemaEdit extends Component {
             },
         body: JSON.stringify(item),
         }).then(response => response.json()).then(data => this.setState({auth: data}));
-        if(this.state.auth !== undefined && this.state.auth.status !== undefined && this.state.auth.status === 401){//redirect if not authorized!
-            this.props.history.push('/views/login');
+        if(this.state.auth !== undefined && this.state.auth.status !== undefined && this.state.auth.status === 401){
+            //redirect if not authorized!
+            var ns = {
+                path: "/v1/api/cinemas"+this.props.match.params.id,
+                req: {
+                    method: 'PATCH',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(item)
+                },
+                rpath: '/v1/views/cinemas'
+            };
+            this.props.history.push('/views/login',{ns: ns});
             return;
         };
     this.props.history.push('/v1/views/cinemas');

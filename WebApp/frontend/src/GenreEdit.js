@@ -71,7 +71,19 @@ class GenreEdit extends Component {
       body: JSON.stringify(item),
     }).then(response => response.json()).then(data => this.setState({auth: data}));
     if(this.state.auth !== undefined && this.state.auth.status !== undefined && this.state.auth.status === 401){//redirect if not authorized!
-        this.props.history.push('/views/login');
+        var ns = {
+                path: "/v1/api/genres/create",
+                req: {
+                    method: (item.id) ? 'PUT' : 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(item)
+                }
+            };
+            this.props.history.push('/views/login',{ns: ns});
+        //this.props.history.push('/views/login');
         return;
     }
     
