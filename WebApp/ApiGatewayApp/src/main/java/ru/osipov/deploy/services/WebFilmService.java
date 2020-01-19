@@ -60,7 +60,7 @@ public class WebFilmService {
             throw new ApiException(e.getMessage(), e, e.getRawStatusCode(), e.getResponseHeaders(),
                     e.getResponseBodyAsString(), serviceUrl+"/v1/films/token/", null);
         }
-        logger.info("Get genre token: '{}'",response.getBody().get("access_token"));
+        logger.info("Get films token: '{}'",response.getBody().get("access_token"));
         return response.getBody().get("access_token");
     }
 

@@ -65,7 +65,7 @@ public class WebCinemaService {
             throw new ApiException(e.getMessage(), e, e.getRawStatusCode(), e.getResponseHeaders(),
                     e.getResponseBodyAsString(), serviceUrl+"/v1/cinemas/token/", null);
         }
-        logger.info("Get seance token: '{}'",response.getBody().get("access_token"));
+        logger.info("Get cinemas token: '{}'",response.getBody().get("access_token"));
         return response.getBody().get("access_token");
     }
 

@@ -14,6 +14,7 @@ import ru.osipov.deploy.services.WebCinemaService;
 import ru.osipov.deploy.services.WebFilmService;
 import ru.osipov.deploy.services.WebGenreService;
 import ru.osipov.deploy.services.WebSeanceService;
+import ru.osipov.deploy.services.jwt.JwtTokenProvider;
 import ru.osipov.deploy.utils.Paginator;
 import ru.osipov.deploy.utils.tasks.CheckQueueTask;
 
@@ -41,6 +42,8 @@ public class ApiController {
 
     protected WebSeanceService seanceService;
 
+    private JwtTokenProvider tokenProvider;
+
     private final ScheduledExecutorService scheduler;
     private ScheduledFuture<?> futureTask;
     private final Runnable checkQueue;
@@ -52,11 +55,12 @@ public class ApiController {
     private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
 
     @Autowired
-    public ApiController(WebFilmService fs, WebGenreService gs, WebCinemaService cs, WebSeanceService ss){
+    public ApiController(WebFilmService fs, WebGenreService gs, WebCinemaService cs, WebSeanceService ss, JwtTokenProvider tokenProvider){
         this.filmService = fs;
         this.genreService = gs;
         this.cinemaService = cs;
         this.seanceService = ss;
+        this.tokenProvider = tokenProvider;
         this.scheduler = Executors.newScheduledThreadPool(1);
         this.checkQueue = new CheckQueueTask(this);
         this.timeSpan = 10;
@@ -77,10 +81,6 @@ public class ApiController {
         }
     }
 
-//    @GetMapping(path = "/tttt", produces = APPLICATION_JSON_UTF8_VALUE)
-//    public ResponseEntity tok(){
-//        return ResponseEntity.ok("{\"tok\": \""+String.format("base64(%s:%s)", WebConfig.getAppKey(), WebConfig.getAppSecret())+"\"}");
-//    }
 
     //GET: /v1/api/films?r=number
     //GET: /v1/api/films?r=number&page=X&size=Y
@@ -164,6 +164,7 @@ public class ApiController {
         return ResponseEntity.ok(fg);
     }
     //PATCH: /v1/api/films/{film_id}
+    //PROTECTED.
     @PatchMapping(produces = APPLICATION_JSON_UTF8_VALUE, consumes = APPLICATION_JSON_UTF8_VALUE,path = {"/films/{id}"})
     public ResponseEntity updateFilm(@PathVariable(name = "id",required = true) Long id, @RequestBody @Valid CreateFilm data){
         GenreInfo g = genreService.getById(data.getGid());
@@ -208,6 +209,7 @@ public class ApiController {
     //POST: /v1/api/genres/delete/{genre_id}
     //This is also deletes old genre_id from films.
     //FIRST UPDATE.
+    //PROTECTED.
     @PostMapping(produces = APPLICATION_JSON_UTF8_VALUE,path = "/genres/delete/{id}")
     public ResponseEntity deleteGenre(@PathVariable(name = "id") Long genre){
         logger.info("DELETING....");
@@ -230,6 +232,7 @@ public class ApiController {
 
 
     //POST: /v1/api/genres/create
+    //PROTECTED.
     @PostMapping(consumes = APPLICATION_JSON_UTF8_VALUE,path = {"/genres/create"},produces = APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity createGenre(@RequestBody @Valid CreateGenreR data){
         URI url = genreService.createGenre(data);
@@ -239,6 +242,7 @@ public class ApiController {
 
 
     //POST: /v1/api/films/genre/{genre_id}
+    //PROTECTED.
     @PostMapping(consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE,path={"/films/genre/{ogid}"})
     public ResponseEntity updateFilmGenre(@PathVariable(required = true, name = "ogid") Long ogid, @RequestBody @Valid NewGenre ngid){
         FilmInfo[] f = filmService.changeGenre(ogid,ngid.getVal());
@@ -284,6 +288,7 @@ public class ApiController {
 
     //PATCH: /v1/api/cinemas/{cinema_id}
     //SECOND UPDATE.
+    //PROTECTED.
     @PatchMapping(consumes = APPLICATION_JSON_UTF8_VALUE, path = {"/cinemas/{cid}"})
     public ResponseEntity updateSeance(@PathVariable(required = true, name = "cid") Long id, @RequestBody @Valid CreateCinema request){
         final CinemaInfo c = cinemaService.updateCinema(id,request);//UPDATE

@@ -1,5 +1,6 @@
 package ru.osipov.deploy.jwtconf;
 
+import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
@@ -15,6 +16,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint, Se
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException {
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+        response.setHeader("Content-Type", MediaType.APPLICATION_JSON_UTF8_VALUE);
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized - error");
     }
 }
