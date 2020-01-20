@@ -14,6 +14,7 @@ import SeanceInformation from './SeanceInformation';
 import SeanceList from './SeanceList';
 import SeanceEdit from './SeanceEdit';
 import Login from './auth/Login';
+import Signup from './auth/Signup';
 const ReactDOM = require('react-dom');
 
 class App extends Component {
@@ -34,6 +35,7 @@ class App extends Component {
                 <Route path='/views/seances/:cid/:fid' exact={true} component={SeanceInformation} />
                 <Route path='/views/cinemas/:id/seances/add' exact={true} component={SeanceEdit} />
                 <Route path='/views/login' exact={true} component={Login} />
+                <Route path='/views/signup' exact={true} component={Signup} />
             </Switch>
         </Router>
       );
