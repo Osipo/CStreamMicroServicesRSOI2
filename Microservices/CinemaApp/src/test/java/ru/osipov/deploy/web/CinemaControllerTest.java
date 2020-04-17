@@ -4,7 +4,9 @@ package ru.osipov.deploy.web;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.hamcrest.core.IsNull;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -18,6 +20,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import ru.osipov.deploy.configuration.jwt.JwtTokenProvider;
+import ru.osipov.deploy.configuration.jwt.JwtTokenSupplier;
 import ru.osipov.deploy.models.CinemaInfo;
 import ru.osipov.deploy.models.CreateCinema;
 import ru.osipov.deploy.services.CinemaService;
@@ -36,6 +40,7 @@ import static ru.osipov.deploy.TestParams.*;
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(CinemaController.class)
 @AutoConfigureMockMvc
+//@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CinemaControllerTest {
 
     @Autowired
@@ -46,7 +51,16 @@ public class CinemaControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(CinemaControllerTest.class);
 
+
     private Gson gson = new GsonBuilder().serializeNulls().create();
+
+    private static String token;
+
+    @BeforeAll
+    static void initToken(){
+        token = getToken(new JwtTokenProvider());
+        assert token != null;
+    }
 
     @Test
     void testGetAll() throws Exception {
@@ -56,7 +70,7 @@ public class CinemaControllerTest {
         cinemas.add(new CinemaInfo(12l,PARAMS2[0],PARAMS2[1],PARAMS2[2],PARAMS2[3],PARAMS2[4]));
         when(serv.getAllCinemas()).thenReturn(cinemas);
 
-        mockMvc.perform(get("/v1/cinemas")
+        mockMvc.perform(get("/v1/cinemas").header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -84,7 +98,7 @@ public class CinemaControllerTest {
         doThrow(new IllegalStateException("Film not found.")).when(serv).getCinemaById(0L);
         List<CinemaInfo> emt = new ArrayList<>();
         when(serv.getAllCinemas()).thenReturn(emt);
-        mockMvc.perform(get("/v1/cinemas/10").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/cinemas/10").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").exists())
@@ -95,14 +109,14 @@ public class CinemaControllerTest {
                 .andExpect(jsonPath("$.region").value(IsNull.nullValue()))
                 .andExpect(jsonPath("$.street").value("S"));
 
-        mockMvc.perform(get("/v1/cinemas/0").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/cinemas/0").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isNotFound());
-        mockMvc.perform(get("/v1/cinemas/").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/cinemas/").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").exists())
                 .andExpect(jsonPath("$").isEmpty());
-        mockMvc.perform(get("/v1/cinemas").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/cinemas").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").exists())
@@ -120,7 +134,7 @@ public class CinemaControllerTest {
         when(serv.getByCity("Kazan")).thenReturn(cinemas);
         when(serv.getAllCinemas()).thenReturn(alls);
 
-        mockMvc.perform(get("/v1/cinemas/city/Kazan")
+        mockMvc.perform(get("/v1/cinemas/city/Kazan").header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -134,7 +148,7 @@ public class CinemaControllerTest {
 
         //then parameter is null return all
 
-        mockMvc.perform(get("/v1/cinemas/city/").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/cinemas/city/").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
@@ -160,7 +174,7 @@ public class CinemaControllerTest {
         when(serv.getByCountry("USA")).thenReturn(am);
         when(serv.getByCountry("The Russian Federation")).thenReturn(cinemas);
 
-        mockMvc.perform(get("/v1/cinemas/country/The Russian Federation").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/cinemas/country/The Russian Federation").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
@@ -171,7 +185,7 @@ public class CinemaControllerTest {
                 .andExpect(jsonPath("$[0].region").value(IsNull.nullValue()))
                 .andExpect(jsonPath("$[0].street").value(PARAMS2[4]));
 
-        mockMvc.perform(get("/v1/cinemas/country/USA").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/cinemas/country/USA").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
@@ -182,7 +196,7 @@ public class CinemaControllerTest {
                 .andExpect(jsonPath("$[0].region").value(IsNull.nullValue()))
                 .andExpect(jsonPath("$[0].street").value(PARAMS4[4]));
 
-        mockMvc.perform(get("/v1/cinemas/country/").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/cinemas/country/").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
@@ -202,7 +216,7 @@ public class CinemaControllerTest {
         when(serv.getByRegion(null)).thenReturn(an);//non null
         when(serv.getAllCinemas()).thenReturn(empt);
         when(serv.getByRegion("Moscovskyi")).thenReturn(reg);
-        mockMvc.perform(get("/v1/cinemas/region/").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/cinemas/region/").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
@@ -219,7 +233,7 @@ public class CinemaControllerTest {
                 .andExpect(jsonPath("$[1].region").value(IsNull.nullValue()))
                 .andExpect(jsonPath("$[1].street").value(PARAMS3[4]));
 
-        mockMvc.perform(get("/v1/cinemas/region/?all").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/cinemas/region/?all").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
@@ -236,7 +250,7 @@ public class CinemaControllerTest {
                 .andExpect(jsonPath("$[1].region").value(IsNull.nullValue()))
                 .andExpect(jsonPath("$[1].street").value(PARAMS3[4]));
 
-        mockMvc.perform(get("/v1/cinemas/region/?all=true").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/cinemas/region/?all=true").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
@@ -244,7 +258,7 @@ public class CinemaControllerTest {
 
 
 
-        mockMvc.perform(get("/v1/cinemas/region/Moscovskyi").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/cinemas/region/Moscovskyi").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
@@ -268,7 +282,7 @@ public class CinemaControllerTest {
         when(serv.getByStreet("Korolenko")).thenReturn(str);
         when(serv.getByStreet(any(String.class))).thenReturn(str);
         when(serv.getByStreet("null")).thenReturn(empt);
-        mockMvc.perform(get("/v1/cinemas/street/Korolenko").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/cinemas/street/Korolenko").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
@@ -279,12 +293,12 @@ public class CinemaControllerTest {
                 .andExpect(jsonPath("$[0].region").value(PARAMS1[3]))
                 .andExpect(jsonPath("$[0].street").value(PARAMS1[4]));
 
-        mockMvc.perform(get("/v1/cinemas/street/").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/cinemas/street/").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").isEmpty());
-        mockMvc.perform(get("/v1/cinemas/street/null").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/cinemas/street/null").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
@@ -305,7 +319,7 @@ public class CinemaControllerTest {
             }
         }).when(serv).getByName("AKA47");
 
-        mockMvc.perform(get("/v1/cinemas/name/CMax").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/cinemas/name/CMax").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
@@ -316,17 +330,17 @@ public class CinemaControllerTest {
                 .andExpect(jsonPath("$[0].region").value(PARAMS1[3]))
                 .andExpect(jsonPath("$[0].street").value(PARAMS1[4]));
 
-        mockMvc.perform(get("/v1/cinemas/").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/cinemas/").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").isEmpty());
-        mockMvc.perform(get("/v1/cinemas/name/").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/cinemas/name/").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isBadRequest());
-        mockMvc.perform(get("/v1/cinemas/name").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/cinemas/name").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isBadRequest());
 
-        mockMvc.perform(get("/v1/cinemas/name/AKA47").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/cinemas/name/AKA47").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().is(404))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").exists())
@@ -342,7 +356,7 @@ public class CinemaControllerTest {
         when(serv.updateCinema(1L,req)).thenReturn(res);
         doThrow(new IllegalStateException("not found.")).when(serv).updateCinema(-1L,req);
 
-        mockMvc.perform(patch("/v1/cinemas/1").accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(req)))
+        mockMvc.perform(patch("/v1/cinemas/1").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(req)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").exists())
@@ -353,9 +367,13 @@ public class CinemaControllerTest {
                 .andExpect(jsonPath("$.region").value(IsNull.nullValue()))
                 .andExpect(jsonPath("$.street").value("Street"));
 
-        mockMvc.perform(patch("/v1/cinemas/-1").accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(req)))
+        mockMvc.perform(patch("/v1/cinemas/-1").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(req)))
                 .andExpect(status().isNotFound());
-        mockMvc.perform(patch("/v1/cinemas/1").accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(badreq)))
+        mockMvc.perform(patch("/v1/cinemas/1").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(badreq)))
                 .andExpect(status().isBadRequest());
+    }
+
+    protected static String getToken(JwtTokenSupplier supplier) {
+        return supplier.getTokenForTests();
     }
 }

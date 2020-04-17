@@ -30,6 +30,7 @@ public class Cinema {
 
     @Column(name = "country", nullable = false)
     private String country;
+        
 
     @Override
     public boolean equals(Object o) {

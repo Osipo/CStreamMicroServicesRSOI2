@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 @Component
-public class JwtTokenProvider {
+public class JwtTokenProvider implements JwtTokenSupplier{
 
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
@@ -28,6 +28,15 @@ public class JwtTokenProvider {
 
     @Value("${jwt.token.expires}")
     private long validityTokenMilliseconds;
+
+    @Override
+    public String getTokenForTests(){
+        Claims claims = Jwts.claims().setSubject(WebConfig.getGatewayKey());
+        claims.put("date", new Date());
+        claims.put("app_id", WebConfig.getGatewayKey());
+        claims.put("name_service", "CinemaService");
+        return generationToken(claims);
+    }
 
     public TokenObject getToken(HttpServletRequest req) {
         String auth = req.getHeader("Authorization");
@@ -149,4 +158,6 @@ public class JwtTokenProvider {
         }
         throw new JwtAuthenticationException("Invalid authentication");
     }
+
+
 }
