@@ -35,6 +35,7 @@ public class WebGenreService {
     @Autowired
     @LoadBalanced
     protected RestTemplate restTemplate;
+    protected String token;
 
     @Value("${service.genre.url}")
     protected String serviceUrl;
@@ -42,20 +43,17 @@ public class WebGenreService {
     private static final Gson gson = new GsonBuilder().serializeNulls().create();
 
 
-    protected String genreToken;
+    //protected String genreToken;
 
     public WebGenreService(){
         if(serviceUrl == null)
-            serviceUrl = "http://localhost:4444";
-        this.genreToken = getToken();
+            serviceUrl = "http://localhost:3333";
+        this.token = getToken();
     }
 
-    public WebGenreService(String url){
-        if(url.contains("http"))
-            this.serviceUrl = url;
-        else
-            this.serviceUrl = "http://"+serviceUrl;
-    }
+//    public WebGenreService(String url){
+//       super(url);
+//    }
 
     @HystrixCommand(fallbackMethod = "getByName_fallback",  commandProperties = {
             @HystrixProperty(name = "execution.isolation.strategy", value = "SEMAPHORE"), @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "6000")})
@@ -68,8 +66,8 @@ public class WebGenreService {
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         headers.set("my_other_key", "my_other_value");
 
-        headers.set("Authorization","Basic "+genreToken);//token from service: type basic.
-        logger.info("token: "+genreToken);
+        headers.set("Authorization","Basic "+token);//token from service: type basic.
+        logger.info("token: "+token);
         // HttpEntity<String>: To get result as String.
         HttpEntity<String> entity = new HttpEntity<String>(headers);
 
@@ -109,8 +107,8 @@ public class WebGenreService {
             // Request to return JSON format
             headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
             headers.set("my_other_key", "my_other_value");
-            headers.set("Authorization","Basic "+genreToken);//token from service: type basic.
-            logger.info("token: "+genreToken);
+            headers.set("Authorization","Basic "+token);//token from service: type basic.
+            logger.info("token: "+token);
             // HttpEntity<String>: To get result as String.
             HttpEntity<String> entity = new HttpEntity<String>(headers);
 
@@ -139,8 +137,8 @@ public class WebGenreService {
         // Request to return JSON format
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         headers.set("my_other_key", "my_other_value");
-        headers.set("Authorization","Basic "+genreToken);//token from service: type basic.
-        logger.info("token: "+genreToken);
+        headers.set("Authorization","Basic "+token);//token from service: type basic.
+        logger.info("token: "+token);
         //HttpEntity<String>: To get result as String.
         HttpEntity<String> entity = new HttpEntity<String>(headers);
 
@@ -169,8 +167,8 @@ public class WebGenreService {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON_UTF8));
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        headers.set("Authorization","Basic "+genreToken);//token from service: type basic.
-        logger.info("token: "+genreToken);
+        headers.set("Authorization","Basic "+token);//token from service: type basic.
+        logger.info("token: "+token);
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<GenreInfo> response;
@@ -179,9 +177,9 @@ public class WebGenreService {
                     , HttpMethod.POST, entity, GenreInfo.class);
         }
         catch (ClientAuthenticationExceptionWrapper e){
-            genreToken = getToken();
-            if(genreToken != null){
-                headers.set("Authorization","Basic "+genreToken);
+            token = getToken();
+            if(token != null){
+                headers.set("Authorization","Basic "+token);
                 entity = new HttpEntity<>(headers);
                 response = restTemplate.exchange(serviceUrl + "/v1/genres/delete",
                         HttpMethod.POST, entity, GenreInfo.class);
@@ -213,8 +211,8 @@ public class WebGenreService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON_UTF8));
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         RestTemplate restTemplate = new RestTemplate();
-        headers.set("Authorization","Basic "+genreToken);//token from service: type basic.
-        logger.info("token: "+genreToken);
+        headers.set("Authorization","Basic "+token);//token from service: type basic.
+        logger.info("token: "+token);
         HttpEntity<String> entity = new HttpEntity<>(gson.toJson(genre),headers);
         ResponseEntity<Void> response = restTemplate.exchange(serviceUrl+"/v1/genres/restore",
                 HttpMethod.POST,entity,Void.class);
@@ -231,11 +229,11 @@ public class WebGenreService {
         HttpEntity<String> entity = new HttpEntity<>(headers);
         ResponseEntity<Map<String, String>> response;
         try{
-            response = restTemplate.exchange(serviceUrl + "/v1/genres/token", HttpMethod.GET, entity, new ParameterizedTypeReference<Map<String, String>>() {});
+            response = restTemplate.exchange(serviceUrl + "/v1/films/token", HttpMethod.GET, entity, new ParameterizedTypeReference<Map<String, String>>() {});
         }
         catch (HttpClientErrorException e){
             throw new ApiException(e.getMessage(), e, e.getRawStatusCode(), e.getResponseHeaders(),
-                    e.getResponseBodyAsString(), serviceUrl+"/v1/genres/token/", null);
+                    e.getResponseBodyAsString(), serviceUrl+"/v1/films/token/", null);
         }
         logger.info("Get genre token: '{}'",response.getBody().get("access_token"));
         return response.getBody().get("access_token");
@@ -246,17 +244,17 @@ public class WebGenreService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON_UTF8));
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         RestTemplate restTemplate = new RestTemplate();
-        headers.set("Authorization","Basic "+genreToken);//token from service: type basic.
-        logger.info("token: "+genreToken);
+        headers.set("Authorization","Basic "+token);//token from service: type basic.
+        logger.info("token: "+token);
         HttpEntity<String> entity = new HttpEntity<>(gson.toJson(data),headers);
         ResponseEntity<Void> response;
         try {
             response = restTemplate.exchange(serviceUrl + "/v1/genres/create",
                     HttpMethod.POST, entity, Void.class);
         }catch (ClientAuthenticationExceptionWrapper e){
-            genreToken = getToken();
-            if(genreToken != null){
-                headers.set("Authorization","Basic "+genreToken);
+            token = getToken();
+            if(token != null){
+                headers.set("Authorization","Basic "+token);
                 entity = new HttpEntity<>(gson.toJson(data),headers);
                 response = restTemplate.exchange(serviceUrl + "/v1/genres/create",
                         HttpMethod.POST, entity, Void.class);

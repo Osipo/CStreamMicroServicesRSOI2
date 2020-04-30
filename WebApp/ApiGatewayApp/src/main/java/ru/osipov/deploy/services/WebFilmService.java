@@ -39,7 +39,7 @@ public class WebFilmService {
     private static final Logger logger = LoggerFactory.getLogger(WebFilmService.class);
     private static final Gson gson = new GsonBuilder().create();
 
-    private String filmToken;
+    protected String filmToken;
 
     public WebFilmService(){
         if(serviceUrl == null)

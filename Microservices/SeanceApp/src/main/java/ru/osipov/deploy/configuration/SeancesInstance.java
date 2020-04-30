@@ -14,6 +14,7 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import ru.osipov.deploy.entities.Seance;
+import ru.osipov.deploy.entities.Ticket;
 
 import javax.sql.DataSource;
 
@@ -44,7 +45,7 @@ public class SeancesInstance {
             EntityManagerFactoryBuilder builder) {
         return builder
                 .dataSource(seancesDataSource())
-                .packages(Seance.class)
+                .packages(Seance.class, Ticket.class)
                 .build();
     }
 

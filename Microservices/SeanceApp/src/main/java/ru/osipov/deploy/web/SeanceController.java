@@ -2,6 +2,7 @@ package ru.osipov.deploy.web;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,7 +26,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 @RestController
 @RequestMapping("/v1/seances")
 public class SeanceController {
+
+
     private final SeanceService seanceService;
+
+    @Autowired @Qualifier("jwtTokenProvider")
     private JwtTokenProvider tokenProvider;
 
     private static final Logger logger = getLogger(SeanceController.class);

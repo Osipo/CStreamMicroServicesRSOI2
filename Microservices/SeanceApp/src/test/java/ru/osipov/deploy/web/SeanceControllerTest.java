@@ -30,6 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static ru.osipov.deploy.TestParams.*;
 import static ru.osipov.deploy.TestParams.PARAMS1;
 
+//All tests are failed due authorization.
+//TODO: Make a request to get token before all tests.
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(SeanceController.class)
 @AutoConfigureMockMvc
@@ -54,7 +56,6 @@ public class SeanceControllerTest {
         seances.add(new SeanceInfo(Long.parseLong(PARAMS2[0]),Long.parseLong(PARAMS2[1]), LocalDate.parse(PARAMS2[2])));
         seances.add(new SeanceInfo(Long.parseLong(PARAMS3[0]),Long.parseLong(PARAMS2[1]), LocalDate.parse(PARAMS3[2])));
         when(serv.getAllSeances()).thenReturn(seances);
-
         mockMvc.perform(get("/v1/seances")
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())

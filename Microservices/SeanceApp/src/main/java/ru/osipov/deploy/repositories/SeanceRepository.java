@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.osipov.deploy.entities.Seance;
 import ru.osipov.deploy.entities.SeancePK;
+import ru.osipov.deploy.entities.Ticket;
 
 import java.time.LocalDate;
 import java.util.Calendar;
@@ -16,6 +17,7 @@ public interface SeanceRepository extends JpaRepository<Seance, SeancePK> {
     List<Seance> findByFid(Long fid);
     List<Seance> findByCid(Long cid);
     Optional<Seance> findByFidAndCid(Long fid, Long cid);
+    Optional<Ticket> findByTid(Long tid);
 
     List<Seance> findAllByDate(LocalDate begining);
     List<Seance> findAllByDateBetween(LocalDate beginingStart, LocalDate beginingEnd);
