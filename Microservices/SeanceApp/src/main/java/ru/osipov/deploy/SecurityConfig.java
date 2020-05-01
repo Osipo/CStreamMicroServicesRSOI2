@@ -19,16 +19,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String TOKEN_ENDPOINT = "/v1/seances/token";
 
 
-//    public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
-//        this.jwtTokenProvider = jwtTokenProvider;
-//    }
-
-    public SecurityConfig(){this.jwtTokenProvider = new JwtTokenProvider();}
-
-//    @Bean
-//    public JwtTokenProvider jwtTokenProvider(){
-//        return new JwtTokenProvider();
-//    }
+    @Autowired
+    public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
 
     @Bean
     @Override

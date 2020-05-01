@@ -1,6 +1,7 @@
 package ru.osipov.deploy;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,9 +15,12 @@ import ru.osipov.deploy.configuration.jwt.JwtTokenProvider;
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+
+
     private final JwtTokenProvider jwtTokenProvider;
 
     private static final String TOKEN_ENDPOINT = "/v1/genres/token";
+
 
     @Autowired
     public SecurityConfig(JwtTokenProvider jwtTokenProvider) {

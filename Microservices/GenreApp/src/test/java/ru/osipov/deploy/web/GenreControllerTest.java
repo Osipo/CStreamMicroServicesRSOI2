@@ -2,6 +2,7 @@ package ru.osipov.deploy.web;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.invocation.InvocationOnMock;
@@ -16,6 +17,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.osipov.deploy.TestParams;
+import ru.osipov.deploy.configuration.jwt.JwtTokenProvider;
+import ru.osipov.deploy.configuration.jwt.JwtTokenSupplier;
 import ru.osipov.deploy.models.CreateGenreR;
 import ru.osipov.deploy.models.GenreInfo;
 import ru.osipov.deploy.services.GenreService;
@@ -42,6 +45,14 @@ public class GenreControllerTest {
     private Gson gson = new GsonBuilder().create();
     private static final Logger logger = LoggerFactory.getLogger(GenreControllerTest.class);
 
+    private static String token;
+
+    @BeforeAll
+    private static void initToken(){
+        token = getToken(new JwtTokenProvider());
+        assert token != null;
+    }
+
     @MockBean
     GenreService gs;
 
@@ -56,7 +67,7 @@ public class GenreControllerTest {
         when(gs.getAllGenres())
                 .thenReturn(l);
 
-        mockMvc.perform(get("/v1/genres")
+        mockMvc.perform(get("/v1/genres").header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -77,7 +88,7 @@ public class GenreControllerTest {
         doThrow(new IllegalStateException("Genre not found.")).when(gs).getGenreById(0L);
         final List<GenreInfo> emt = new ArrayList<>();
         when(gs.getAllGenres()).thenReturn(emt);
-        mockMvc.perform(get("/v1/genres/23").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/genres/23").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").exists())
@@ -85,14 +96,14 @@ public class GenreControllerTest {
                 .andExpect(jsonPath("$.name").value("Horror"))
                 .andExpect(jsonPath("$.remarks").value("Scary story."));
 
-        mockMvc.perform(get("/v1/genres/0").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/genres/0").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isNotFound());
-        mockMvc.perform(get("/v1/genres/").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/genres/").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").exists())
                 .andExpect(jsonPath("$").isEmpty());
-        mockMvc.perform(get("/v1/genres").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/genres").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").exists())
@@ -106,7 +117,7 @@ public class GenreControllerTest {
         final GenreInfo g = new GenreInfo(11L,PARAMS1[0],PARAMS1[1]);
         when(gs.getAllGenres()).thenReturn(emt);
         when(gs.getByName(PARAMS1[0])).thenReturn(g);
-        mockMvc.perform(get("/v1/genres?name="+PARAMS1[0])
+        mockMvc.perform(get("/v1/genres?name="+PARAMS1[0]).header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -115,13 +126,13 @@ public class GenreControllerTest {
                 .andExpect(jsonPath("$[0].name").value(PARAMS1[0]))
                 .andExpect(jsonPath("$[0].remarks").value(PARAMS1[1]));
 
-        mockMvc.perform(get("/v1/genres/")
+        mockMvc.perform(get("/v1/genres/").header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").isEmpty());
-        mockMvc.perform(get("/v1/genres")
+        mockMvc.perform(get("/v1/genres").header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -134,7 +145,7 @@ public class GenreControllerTest {
             }
         }).when(gs).getByName("AKBAR!!!");
 
-        mockMvc.perform(get("/v1/genres?name=AKBAR!!!").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/genres?name=AKBAR!!!").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().is(404))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").exists())
@@ -154,7 +165,7 @@ public class GenreControllerTest {
         when(gs.getByRemarks(null)).thenReturn(an);
         when(gs.getByRemarks(PARAMS3[1])).thenReturn(an2);
 
-        mockMvc.perform(get("/v1/genres/remarks?r="+PARAMS3[1])
+        mockMvc.perform(get("/v1/genres/remarks?r="+PARAMS3[1]).header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -163,7 +174,7 @@ public class GenreControllerTest {
                 .andExpect(jsonPath("$[0].name").value(PARAMS3[0]))
                 .andExpect(jsonPath("$[0].remarks").value(PARAMS3[1]));
 
-        mockMvc.perform(get("/v1/genres/remarks?r=&&all=")
+        mockMvc.perform(get("/v1/genres/remarks?r=&&all=").header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -172,19 +183,19 @@ public class GenreControllerTest {
                 .andExpect(jsonPath("$[0].name").value(PARAMS2[0]))
                 .andExpect(jsonPath("$[0].remarks").value(PARAMS2[1]));
 
-        mockMvc.perform(get("/v1/genres/remarks?all=true")
+        mockMvc.perform(get("/v1/genres/remarks?all=true").header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").isEmpty());
-        mockMvc.perform(get("/v1/genres/remarks?r=&&all=true")
+        mockMvc.perform(get("/v1/genres/remarks?r=&&all=true").header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").isEmpty());
-        mockMvc.perform(get("/v1/genres/remarks?r=")
+        mockMvc.perform(get("/v1/genres/remarks?r=").header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -192,7 +203,7 @@ public class GenreControllerTest {
                 .andExpect(jsonPath("$[0].id").value(11L))
                 .andExpect(jsonPath("$[0].name").value(PARAMS2[0]))
                 .andExpect(jsonPath("$[0].remarks").value(PARAMS2[1]));
-        mockMvc.perform(get("/v1/genres/remarks?all=")
+        mockMvc.perform(get("/v1/genres/remarks?all=").header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -200,7 +211,7 @@ public class GenreControllerTest {
                 .andExpect(jsonPath("$[0].id").value(11L))
                 .andExpect(jsonPath("$[0].name").value(PARAMS2[0]))
                 .andExpect(jsonPath("$[0].remarks").value(PARAMS2[1]));
-        mockMvc.perform(get("/v1/genres/remarks?all")
+        mockMvc.perform(get("/v1/genres/remarks?all").header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -208,7 +219,7 @@ public class GenreControllerTest {
                 .andExpect(jsonPath("$[0].id").value(11L))
                 .andExpect(jsonPath("$[0].name").value(PARAMS2[0]))
                 .andExpect(jsonPath("$[0].remarks").value(PARAMS2[1]));
-        mockMvc.perform(get("/v1/genres/remarks")
+        mockMvc.perform(get("/v1/genres/remarks").header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -227,7 +238,7 @@ public class GenreControllerTest {
         doThrow(new IllegalStateException("Already have this name: "+PARAMS1[0])).when(gs).updateGenre(PARAMS1[0],PARAMS1[0]);
 
         //successful update
-        mockMvc.perform(post("/v1/genres/update/"+PARAMS1[0]+"?newName=Scary").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(post("/v1/genres/update/"+PARAMS1[0]+"?newName=Scary").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").exists())
@@ -236,23 +247,23 @@ public class GenreControllerTest {
                 .andExpect(jsonPath("$.remarks").value(PARAMS1[1]));
 
         //bad paths.
-        mockMvc.perform(post("/v1/genres/update/").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(post("/v1/genres/update/").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().is(405));
-        mockMvc.perform(post("/v1/genres/update/Horror").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(post("/v1/genres/update/Horror").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isBadRequest());
-        mockMvc.perform(post("/v1/genres/update/Horror?newName=").accept(MediaType.APPLICATION_JSON_UTF8))//CHECK
+        mockMvc.perform(post("/v1/genres/update/Horror?newName=").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))//CHECK
                 .andExpect(status().isBadRequest());
-        mockMvc.perform(post("/v1/genres/update/Horror?newName").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(post("/v1/genres/update/Horror?newName").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isBadRequest());
 
 
         //Bad operations (exceptions)
         //Update  genre that does not exist.
-        mockMvc.perform(post("/v1/genres/update/"+PARAMS3[0]+"?newName=Action").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(post("/v1/genres/update/"+PARAMS3[0]+"?newName=Action").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isNotFound());
 
         //Update genre wtih non-unique name. (Names must be UNIQUE!!!)
-        mockMvc.perform(post("/v1/genres/update/"+PARAMS1[0]+"?newName="+PARAMS1[0]).accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(post("/v1/genres/update/"+PARAMS1[0]+"?newName="+PARAMS1[0]).header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isBadRequest());
     }
 
@@ -264,7 +275,7 @@ public class GenreControllerTest {
         GenreInfo g = new GenreInfo(1L,"scary","some");
         when(gs.updateGenre(1l,req)).thenReturn(g);
         doThrow(new IllegalStateException("not found.")).when(gs).updateGenre(-1l,req);
-        mockMvc.perform(patch("/v1/genres/1").accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(req)))
+        mockMvc.perform(patch("/v1/genres/1").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(req)))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(jsonPath("$").exists())
@@ -272,10 +283,10 @@ public class GenreControllerTest {
             .andExpect(jsonPath("$.name").value("scary"))
             .andExpect(jsonPath("$.remarks").value("some"));
 
-        mockMvc.perform(patch("/v1/genres/1").accept(MediaType.APPLICATION_JSON_UTF8)
+        mockMvc.perform(patch("/v1/genres/1").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8)
                 .contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(badreq)))
             .andExpect(status().isBadRequest());
-        mockMvc.perform(patch("/v1/genres/-1").accept(MediaType.APPLICATION_JSON_UTF8)
+        mockMvc.perform(patch("/v1/genres/-1").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8)
                 .contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(req)))
                 .andExpect(status().isNotFound());
     }
@@ -287,7 +298,7 @@ public class GenreControllerTest {
         doReturn(g).when(gs).deleteGenre(11L);
         doThrow(new IllegalStateException("NOT FOUND: "+32L)).when(gs).deleteGenre(32L);
 
-        mockMvc.perform(post("/v1/genres/delete/"+11).accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(post("/v1/genres/delete/"+11).header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").exists())
@@ -295,10 +306,10 @@ public class GenreControllerTest {
                 .andExpect(jsonPath("$.name").value("Scary"))
                 .andExpect(jsonPath("$.remarks").value(PARAMS1[1]));
 
-        mockMvc.perform(post("/v1/genres/delete/"+32).accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(post("/v1/genres/delete/"+32).header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().is(404));
 
-        mockMvc.perform(post("/v1/genres/delete/").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(post("/v1/genres/delete/").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().is(500));
 
     }
@@ -308,12 +319,16 @@ public class GenreControllerTest {
         CreateGenreR created = new CreateGenreR("Comedy","Funny story.");
         final URI url = URI.create("/v1/genres/5");
         when(gs.createGenre(eq(created))).thenReturn(url);
-        mockMvc.perform(post("/v1/genres/create")
+        mockMvc.perform(post("/v1/genres/create").header("Authorization","Basic "+token)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .accept(MediaType.APPLICATION_JSON_UTF8)
                 .content(gson.toJson(created)))
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"))
                 .andExpect(header().string("Location",url.toString()));
+    }
+
+    protected static String getToken(JwtTokenSupplier supplier) {
+        return supplier.getTokenForTests();
     }
 }

@@ -4,6 +4,7 @@ import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,8 +20,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-@Component
-public class JwtTokenProvider {
+@Component("jwtTokenProvider")
+public class JwtTokenProvider implements JwtTokenSupplier {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
@@ -148,5 +149,14 @@ public class JwtTokenProvider {
             return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
         }
         throw new JwtAuthenticationException("Invalid authentication");
+    }
+
+    @Override
+    public String getTokenForTests(){
+        Claims claims = Jwts.claims().setSubject(WebConfig.getGatewayKey());
+        claims.put("date", new Date());
+        claims.put("app_id", WebConfig.getGatewayKey());
+        claims.put("name_service", "GenreService");
+        return generationToken(claims);
     }
 }

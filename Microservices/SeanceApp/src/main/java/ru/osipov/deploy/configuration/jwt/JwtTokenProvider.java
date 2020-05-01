@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 @Component("jwtTokenProvider")
-public class JwtTokenProvider {
+public class JwtTokenProvider implements JwtTokenSupplier {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
@@ -148,5 +148,14 @@ public class JwtTokenProvider {
             return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
         }
         throw new JwtAuthenticationException("Invalid authentication");
+    }
+
+    @Override
+    public String getTokenForTests(){
+        Claims claims = Jwts.claims().setSubject(WebConfig.getGatewayKey());
+        claims.put("date", new Date());
+        claims.put("app_id", WebConfig.getGatewayKey());
+        claims.put("name_service", "SeanceService");
+        return generationToken(claims);
     }
 }

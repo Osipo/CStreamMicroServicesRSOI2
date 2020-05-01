@@ -30,7 +30,6 @@ public class SeanceController {
 
     private final SeanceService seanceService;
 
-    @Autowired @Qualifier("jwtTokenProvider")
     private JwtTokenProvider tokenProvider;
 
     private static final Logger logger = getLogger(SeanceController.class);

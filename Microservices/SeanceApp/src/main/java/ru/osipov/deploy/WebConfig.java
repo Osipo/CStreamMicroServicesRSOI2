@@ -30,10 +30,6 @@ public class WebConfig implements WebMvcConfigurer {
     private final static String gatewayKey = "cc57102f-39e2-11ea-9f1f-02004c4f4f50";
     private final static String gatewaySecret = "fd151366-29a7-95ff-5b2d-12404b1a1a51";
 
-    @Bean
-    public JwtTokenProvider jwtTokenProvider(){
-        return new JwtTokenProvider();
-    }
 
     @Bean
     public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {

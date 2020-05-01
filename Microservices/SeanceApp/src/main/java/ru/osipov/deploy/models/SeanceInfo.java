@@ -5,7 +5,6 @@ import com.google.common.base.Objects;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import ru.osipov.deploy.entities.Seance;
 
 import java.time.LocalDate;
 

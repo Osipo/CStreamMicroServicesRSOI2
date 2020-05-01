@@ -1,6 +1,7 @@
 package ru.osipov.deploy.web;
 
 import com.google.gson.*;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -11,6 +12,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.osipov.deploy.configuration.jwt.JwtTokenProvider;
+import ru.osipov.deploy.configuration.jwt.JwtTokenSupplier;
 import ru.osipov.deploy.models.CreateSeance;
 import ru.osipov.deploy.models.SeanceInfo;
 import ru.osipov.deploy.services.SeanceService;
@@ -47,6 +50,13 @@ public class SeanceControllerTest {
 
     private static final Logger logger = getLogger(SeanceControllerTest.class);
 
+    private static String token;
+
+    @BeforeAll
+    private static void initToken(){
+        token = getToken(new JwtTokenProvider());
+        assert token != null;
+    }
 
     @Test
     void testGetAll() throws Exception {
@@ -56,7 +66,7 @@ public class SeanceControllerTest {
         seances.add(new SeanceInfo(Long.parseLong(PARAMS2[0]),Long.parseLong(PARAMS2[1]), LocalDate.parse(PARAMS2[2])));
         seances.add(new SeanceInfo(Long.parseLong(PARAMS3[0]),Long.parseLong(PARAMS2[1]), LocalDate.parse(PARAMS3[2])));
         when(serv.getAllSeances()).thenReturn(seances);
-        mockMvc.perform(get("/v1/seances")
+        mockMvc.perform(get("/v1/seances").header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -84,7 +94,7 @@ public class SeanceControllerTest {
         when(serv.getAllSeances()).thenReturn(emt);
         when(serv.getSeancesInCinema(Long.parseLong(PARAMS1[0]))).thenReturn(seances);
 
-        mockMvc.perform(get("/v1/seances/"+PARAMS1[0])
+        mockMvc.perform(get("/v1/seances/"+PARAMS1[0]).header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -98,7 +108,7 @@ public class SeanceControllerTest {
                 .andExpect(jsonPath("$[2].cid").value(Long.parseLong(PARAMS1[0])))
                 .andExpect(jsonPath("$[2].fid").value(Long.parseLong(PARAMS2[1])))
                 .andExpect(jsonPath("$[2].date").value(PARAMS3[2]));
-        mockMvc.perform(get("/v1/seances/").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/seances/").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").exists())
@@ -116,7 +126,7 @@ public class SeanceControllerTest {
         when(serv.getSeancesByDate(PARAMS1[2])).thenReturn(seances);
         when(serv.getAllSeances()).thenReturn(alls);
 
-        mockMvc.perform(get("/v1/seances?date="+PARAMS1[2])
+        mockMvc.perform(get("/v1/seances?date="+PARAMS1[2]).header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -127,7 +137,7 @@ public class SeanceControllerTest {
 
         //then parameter is null return all
 
-        mockMvc.perform(get("/v1/seances?date=").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/seances?date=").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
@@ -135,7 +145,7 @@ public class SeanceControllerTest {
                 .andExpect(jsonPath("$[0].fid").value(Long.parseLong(PARAMS2[1])))
                 .andExpect(jsonPath("$[0].date").value(PARAMS2[2]));
 
-        mockMvc.perform(get("/v1/seances").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(get("/v1/seances").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
@@ -158,7 +168,7 @@ public class SeanceControllerTest {
           when(serv.getSeancesByDate(PARAMS2[2])).thenReturn(ond);
           when(serv.getSeancesByDateBefore(PARAMS1[2])).thenReturn(an);
 
-          mockMvc.perform(get("/v1/seances/date?d1="+PARAMS2[2]+"&&d2="+PARAMS1[2])
+          mockMvc.perform(get("/v1/seances/date?d1="+PARAMS2[2]+"&&d2="+PARAMS1[2]).header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -173,20 +183,20 @@ public class SeanceControllerTest {
                 .andExpect(jsonPath("$[2].fid").value(77L))
                 .andExpect(jsonPath("$[2].date").value(PARAMS1[2]));
 
-        mockMvc.perform(get("/v1/seances/date?d1=&&d2=")
+        mockMvc.perform(get("/v1/seances/date?d1=&&d2=").header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").isEmpty());
-        mockMvc.perform(get("/v1/seances/date")
+        mockMvc.perform(get("/v1/seances/date").header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").isEmpty());
 
-        mockMvc.perform(get("/v1/seances/date?d1="+PARAMS2[2])
+        mockMvc.perform(get("/v1/seances/date?d1="+PARAMS2[2]).header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -195,7 +205,7 @@ public class SeanceControllerTest {
                 .andExpect(jsonPath("$[0].fid").value(Long.parseLong(PARAMS3[1])))
                 .andExpect(jsonPath("$[0].date").value(PARAMS2[2]));
 
-        mockMvc.perform(get("/v1/seances/date?d2="+PARAMS1[2])
+        mockMvc.perform(get("/v1/seances/date?d2="+PARAMS1[2]).header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -218,14 +228,14 @@ public class SeanceControllerTest {
         SeanceInfo r = new SeanceInfo(2L,10L,LocalDate.parse("2019-12-13"));
         when(serv.updateSeance(2L,10L,req)).thenReturn(r);
         doThrow(new IllegalStateException("NOT FOUND.")).when(serv).updateSeance(0L,2L,req);
-        mockMvc.perform(patch("/v1/seances/2/10").accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(req)))
+        mockMvc.perform(patch("/v1/seances/2/10").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(req)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").exists())
                 .andExpect(jsonPath("$.cid").value(2L))
                 .andExpect(jsonPath("$.fid").value(10L))
                 .andExpect(jsonPath("$.date").value("2019-12-13"));
-        mockMvc.perform(patch("/v1/seances/0/2").accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(req)))
+        mockMvc.perform(patch("/v1/seances/0/2").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(req)))
                 .andExpect(status().isNotFound());
 
     }
@@ -236,15 +246,15 @@ public class SeanceControllerTest {
         doNothing().when(serv).deleteSeancesWithFilm(12L);
         doThrow(new IllegalStateException("NOT FOUND")).when(serv).deleteSeancesWithFilm(-1L);
 
-        mockMvc.perform(post("/v1/seances/delete?fid=").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(post("/v1/seances/delete?fid=").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isNotFound());
-        mockMvc.perform(post("/v1/seances/delete?fid").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(post("/v1/seances/delete?fid").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isNotFound());
-        mockMvc.perform(post("/v1/seances/delete").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(post("/v1/seances/delete").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isNotFound());
-        mockMvc.perform(post("/v1/seances/delete?").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(post("/v1/seances/delete?").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isNotFound());
-        mockMvc.perform(post("/v1/seances/delete?fid=12").accept(MediaType.APPLICATION_JSON_UTF8))
+        mockMvc.perform(post("/v1/seances/delete?fid=12").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk());
     }
 
@@ -254,12 +264,16 @@ public class SeanceControllerTest {
         CreateSeance created = new CreateSeance(2L,2L,LocalDate.now());
         final URI url = URI.create("/v1/genres/5");
         when(serv.createSeance(eq(created))).thenReturn(url);
-        mockMvc.perform(post("/v1/seances/create")
+        mockMvc.perform(post("/v1/seances/create").header("Authorization","Basic "+token)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .accept(MediaType.APPLICATION_JSON_UTF8)
                 .content(gson.toJson(created)))
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"))
                 .andExpect(header().string("Location",url.toString()));
+    }
+
+    protected static String getToken(JwtTokenSupplier supplier) {
+        return supplier.getTokenForTests();
     }
 }
