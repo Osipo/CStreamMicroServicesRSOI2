@@ -28,7 +28,7 @@ public class Seance {
     @Column(name = "begining", nullable = false)
     private LocalDate date;
 
-    @Column(name = "tid",nullable = false)
+    @Column(name = "tid",nullable = false, insertable = false, updatable = false)
     private Long tid;
 
     @OneToOne

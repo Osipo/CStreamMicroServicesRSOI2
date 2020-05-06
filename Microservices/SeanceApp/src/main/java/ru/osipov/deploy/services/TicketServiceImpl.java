@@ -2,6 +2,7 @@ package ru.osipov.deploy.services;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import ru.osipov.deploy.configuration.SeancesInstance;
 import ru.osipov.deploy.entities.Seance;
 import ru.osipov.deploy.entities.Ticket;
 import ru.osipov.deploy.models.SeanceInfo;
@@ -16,8 +17,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class TicketServiceImpl implements TicketService {
 
-    private final TicketRepository trep;
-    private final SeanceRepository srep;
+    protected final TicketRepository trep;
+    protected final SeanceRepository srep;
 
     private static final Logger logger = getLogger(TicketServiceImpl.class);
 

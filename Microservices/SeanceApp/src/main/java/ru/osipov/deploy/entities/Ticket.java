@@ -11,6 +11,14 @@ import javax.persistence.*;
 @Data
 @Accessors(chain = true)
 @Entity
+@NamedStoredProcedureQuery(
+        name="Ticket.GetTicketsByPrice",
+        procedureName="GetTicketsByPrice",
+        resultClasses = { Ticket.class },
+        parameters={
+                @StoredProcedureParameter(name="pr", type=Double.class, mode=ParameterMode.IN)
+        }
+)
 @Table(name = "ticket")
 @NoArgsConstructor
 public class Ticket {

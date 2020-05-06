@@ -5,3 +5,9 @@ CREATE TABLE IF NOT EXISTS seance(
     CONSTRAINT seance_PK PRIMARY KEY(cid,fid),
     CONSTRAINT date_check CHECK( begining > CURDATE())
 );
+GO
+CREATE TABLE IF NOT EXISTS ticket(
+    tid BIGINT NOT NULL,
+    price DECIMAL(20,13) NOT NULL,
+    CONSTRAINT ticket_PK PRIMARY KEY(tid)
+);

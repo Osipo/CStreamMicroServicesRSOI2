@@ -17,6 +17,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtTokenProvider jwtTokenProvider;
 
     private static final String TOKEN_ENDPOINT = "/v1/seances/token";
+    private static final String TICKET_ENDPOINT = "/v1/tickets/**";
 
 
     @Autowired
@@ -38,7 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers(TOKEN_ENDPOINT).permitAll()
+                .antMatchers(TOKEN_ENDPOINT,TICKET_ENDPOINT).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .apply(new JwtConfigurer(jwtTokenProvider))
