@@ -52,9 +52,19 @@ public class RoomServiceImpl implements RoomService {
         return rep.findBySeats(seats).stream().map(ModelBuilder::buildRoomInfo).collect(Collectors.toList());
     }
 
-//    @Nonnull
-//    private RoomInfo buildModel(@Nonnull Room ri) {
-//        logger.info("Room: '{}'",ri);
-//        return new RoomInfo(ri.getRid(),ri.getCinema().getCid(), ri.getCategory(),ri.getSeats());
-//    }
+    @Nonnull
+    @Override
+    @Transactional(readOnly = true)
+    public List<RoomInfo> getByCid(long cid){
+        logger.info("Get rooms by cinema id = '{}'",cid);
+        return rep.findByCid(cid).stream().map(ModelBuilder::buildRoomInfo).collect(Collectors.toList());
+    }
+
+    @Nonnull
+    @Override
+    @Transactional(readOnly = true)
+    public List<RoomInfo> getByCinemaName(String name) {
+        logger.info("Get rooms by cinema name = '{}'",name);
+        return rep.findByCinemaName(name).stream().map(ModelBuilder::buildRoomInfo).collect(Collectors.toList());
+    }
 }

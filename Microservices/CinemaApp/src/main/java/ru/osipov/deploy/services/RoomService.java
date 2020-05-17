@@ -15,4 +15,9 @@ public interface RoomService {
     List<RoomInfo> getByCategory(String cat);
     @NonNull
     List<RoomInfo> getBySeats(int seats);
+
+    @NonNull
+    List<RoomInfo> getByCid(long cid);
+    @NonNull
+    List<RoomInfo> getByCinemaName(String name);
 }

@@ -14,4 +14,6 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
 
     @Query("select r from Cinema c join c.rooms r where c.cid = ?1")
     List<Room> findByCid(long cid);
+    @Query("select r from Cinema c join c.rooms r where c.cname = ?1")
+    List<Room> findByCinemaName(String name);
 }
