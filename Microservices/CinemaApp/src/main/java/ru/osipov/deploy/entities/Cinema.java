@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Data
 @Accessors(chain = true)
@@ -30,7 +31,9 @@ public class Cinema {
 
     @Column(name = "country", nullable = false)
     private String country;
-        
+
+    @OneToMany(mappedBy = "cinema")
+    private Set<Room> rooms;
 
     @Override
     public boolean equals(Object o) {
@@ -40,12 +43,13 @@ public class Cinema {
         return Objects.equal(cid, c.cid) && Objects.equal(cname, c.cname) &&
                 Objects.equal(city,c.city) && Objects.equal(street, c.street) &&
                 (region == null) ? c.region == null : Objects.equal(region, c.region) &&
-                Objects.equal(country, c.country);
+                Objects.equal(country, c.country) &&
+                Objects.equal(rooms,c.rooms);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(cid, cname,city,street, region != null ? region : 0,country);
+        return Objects.hashCode(cid, cname,city,street, region != null ? region : 0,country,rooms);
     }
 
     @Override
@@ -56,6 +60,7 @@ public class Cinema {
                 .add("city",city)
                 .add("region",region)
                 .add("street",street)
+                .add("rooms",rooms.toString())
                 .toString();
     }
 

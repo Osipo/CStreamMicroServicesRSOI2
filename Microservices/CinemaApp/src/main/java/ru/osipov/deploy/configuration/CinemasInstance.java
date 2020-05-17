@@ -14,6 +14,7 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import ru.osipov.deploy.entities.Cinema;
+import ru.osipov.deploy.entities.Room;
 
 import javax.sql.DataSource;
 
@@ -44,7 +45,7 @@ public class CinemasInstance {
             EntityManagerFactoryBuilder builder) {
         return builder
                 .dataSource(cinemasDataSource())
-                .packages(Cinema.class)
+                .packages(Cinema.class, Room.class)
                 .build();
     }
 
