@@ -15,6 +15,7 @@ import ru.osipov.deploy.repositories.RoomRepository;
 
 import javax.persistence.EntityManager;
 import javax.sql.DataSource;
+import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
@@ -42,5 +43,11 @@ public class RoomRepoTest {
         assert o1.isPresent();
         assert o2.isPresent();
         assert o1.get().equals(o2.get());
+    }
+
+    @Test
+    void getExistsingByCid(){
+        List<Room> r = rRep.findByCid(2l);
+        assert r.size() == 2;
     }
 }

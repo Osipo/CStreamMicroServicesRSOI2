@@ -24,6 +24,7 @@ import ru.osipov.deploy.configuration.jwt.JwtTokenProvider;
 import ru.osipov.deploy.configuration.jwt.JwtTokenSupplier;
 import ru.osipov.deploy.models.CinemaInfo;
 import ru.osipov.deploy.models.CreateCinema;
+import ru.osipov.deploy.models.RoomInfo;
 import ru.osipov.deploy.services.CinemaService;
 
 import java.util.ArrayList;
@@ -66,8 +67,11 @@ public class CinemaControllerTest {
     void testGetAll() throws Exception {
         logger.info("testGetAll");
         final List<CinemaInfo> cinemas = new ArrayList<>();
-        cinemas.add(new CinemaInfo(11l,PARAMS1[0],PARAMS1[1],PARAMS1[2],PARAMS1[3],PARAMS1[4]));
-        cinemas.add(new CinemaInfo(12l,PARAMS2[0],PARAMS2[1],PARAMS2[2],PARAMS2[3],PARAMS2[4]));
+        final List<RoomInfo> rooms = new ArrayList<>();
+        rooms.add(new RoomInfo(1l,11l,"Standard",100));
+        rooms.add(new RoomInfo(2l,11l,"VIP",125));
+        cinemas.add(new CinemaInfo(11l,PARAMS1[0],PARAMS1[1],PARAMS1[2],PARAMS1[3],PARAMS1[4],rooms));
+        cinemas.add(new CinemaInfo(12l,PARAMS2[0],PARAMS2[1],PARAMS2[2],PARAMS2[3],PARAMS2[4], new ArrayList<>()));
         when(serv.getAllCinemas()).thenReturn(cinemas);
 
         mockMvc.perform(get("/v1/cinemas").header("Authorization","Basic "+token)
@@ -81,19 +85,25 @@ public class CinemaControllerTest {
                 .andExpect(jsonPath("$[0].city").value(PARAMS1[2]))
                 .andExpect(jsonPath("$[0].region").value(PARAMS1[3]))
                 .andExpect(jsonPath("$[0].street").value(PARAMS1[4]))
+                .andExpect(jsonPath("$[0].rooms[0].cid").value(11l))
+                .andExpect(jsonPath("$[0].rooms[1].cid").value(11l))
+                .andExpect(jsonPath("$[0].rooms[0].category").value("Standard"))
+                .andExpect(jsonPath("$[0].rooms[1].category").value("VIP"))
                 .andExpect(jsonPath("$[1].id").value(12l))
                 .andExpect(jsonPath("$[1].name").value(PARAMS2[0]))
                 .andExpect(jsonPath("$[1].country").value(PARAMS2[1]))
                 .andExpect(jsonPath("$[1].city").value(PARAMS2[2]))
                 .andExpect(jsonPath("$[1].region").value(IsNull.nullValue()))
-                .andExpect(jsonPath("$[1].street").value(PARAMS2[4]));
+                .andExpect(jsonPath("$[1].street").value(PARAMS2[4]))
+                .andExpect(jsonPath("$[1].rooms").isArray())
+                .andExpect(jsonPath("$[1].rooms").isEmpty());
         //cinemas.add(new CinemaInfo(13l,PARAMS1[0],PARAMS1[1],PARAMS1[2],PARAMS1[3],PARAMS1[4]));
     }
 
     @Test
     void getById() throws Exception {
         logger.info("testById");
-        CinemaInfo c = new CinemaInfo(10L,"MAX","USA","New York",null,"S");
+        CinemaInfo c = new CinemaInfo(10L,"MAX","USA","New York",null,"S",new ArrayList<>());
         when(serv.getCinemaById(10L)).thenReturn(c);
         doThrow(new IllegalStateException("Film not found.")).when(serv).getCinemaById(0L);
         List<CinemaInfo> emt = new ArrayList<>();
@@ -107,7 +117,9 @@ public class CinemaControllerTest {
                 .andExpect(jsonPath("$.country").value("USA"))
                 .andExpect(jsonPath("$.city").value("New York"))
                 .andExpect(jsonPath("$.region").value(IsNull.nullValue()))
-                .andExpect(jsonPath("$.street").value("S"));
+                .andExpect(jsonPath("$.street").value("S"))
+                .andExpect(jsonPath("$.rooms").isArray())
+                .andExpect(jsonPath("$.rooms").isEmpty());
 
         mockMvc.perform(get("/v1/cinemas/0").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isNotFound());
@@ -127,9 +139,9 @@ public class CinemaControllerTest {
     void getByCity() throws Exception {
         logger.info("testByCity");
         final List<CinemaInfo> cinemas = new ArrayList<>();
-        cinemas.add(new CinemaInfo(11l,PARAMS1[0],PARAMS1[1],PARAMS1[2],PARAMS1[3],PARAMS1[4]));
+        cinemas.add(new CinemaInfo(11l,PARAMS1[0],PARAMS1[1],PARAMS1[2],PARAMS1[3],PARAMS1[4],new ArrayList<>()));
         final List<CinemaInfo> alls = new ArrayList<>();
-        alls.add(new CinemaInfo(22l,PARAMS2[0],PARAMS2[1],PARAMS2[2],PARAMS2[3],PARAMS2[4]));
+        alls.add(new CinemaInfo(22l,PARAMS2[0],PARAMS2[1],PARAMS2[2],PARAMS2[3],PARAMS2[4],new ArrayList<>()));
 
         when(serv.getByCity("Kazan")).thenReturn(cinemas);
         when(serv.getAllCinemas()).thenReturn(alls);
@@ -164,10 +176,10 @@ public class CinemaControllerTest {
     void getByCountry() throws Exception {
         logger.info("testByCountry");
         final List<CinemaInfo> cinemas = new ArrayList<>();
-        cinemas.add(new CinemaInfo(12l,PARAMS2[0],PARAMS2[1],PARAMS2[2],PARAMS2[3],PARAMS2[4]));
+        cinemas.add(new CinemaInfo(12l,PARAMS2[0],PARAMS2[1],PARAMS2[2],PARAMS2[3],PARAMS2[4],new ArrayList<>()));
 
         final List<CinemaInfo> am = new ArrayList<>();
-        am.add(new CinemaInfo(99l,PARAMS4[0],PARAMS4[1],PARAMS4[2],PARAMS4[3],PARAMS4[4]));
+        am.add(new CinemaInfo(99l,PARAMS4[0],PARAMS4[1],PARAMS4[2],PARAMS4[3],PARAMS4[4], new ArrayList<>()));
 
         final List<CinemaInfo> alls = new ArrayList<>();
         when(serv.getAllCinemas()).thenReturn(alls);
@@ -207,11 +219,11 @@ public class CinemaControllerTest {
     void getByRegion() throws Exception {
         logger.info("testByRegion");
         final List<CinemaInfo> an = new ArrayList<>();
-        an.add(new CinemaInfo(99l,PARAMS4[0],PARAMS4[1],PARAMS4[2],PARAMS4[3],PARAMS4[4]));
-        an.add(new CinemaInfo(999l,PARAMS3[0],PARAMS3[1],PARAMS3[2],PARAMS3[3],PARAMS3[4]));
+        an.add(new CinemaInfo(99l,PARAMS4[0],PARAMS4[1],PARAMS4[2],PARAMS4[3],PARAMS4[4],new ArrayList<>()));
+        an.add(new CinemaInfo(999l,PARAMS3[0],PARAMS3[1],PARAMS3[2],PARAMS3[3],PARAMS3[4],new ArrayList<>()));
         final List<CinemaInfo> empt = new ArrayList<>();
         final List<CinemaInfo> reg = new ArrayList<>();
-        reg.add(new CinemaInfo(1l,PARAMS1[0],PARAMS1[1],PARAMS1[2],PARAMS1[3],PARAMS1[4]));
+        reg.add(new CinemaInfo(1l,PARAMS1[0],PARAMS1[1],PARAMS1[2],PARAMS1[3],PARAMS1[4],new ArrayList<>()));
 
         when(serv.getByRegion(null)).thenReturn(an);//non null
         when(serv.getAllCinemas()).thenReturn(empt);
@@ -277,7 +289,7 @@ public class CinemaControllerTest {
         logger.info("testByStreet");
         final List<CinemaInfo> empt = new ArrayList<>();
         final List<CinemaInfo> str = new ArrayList<>();
-        str.add(new CinemaInfo(1l,PARAMS1[0],PARAMS1[1],PARAMS1[2],PARAMS1[3],PARAMS1[4]));
+        str.add(new CinemaInfo(1l,PARAMS1[0],PARAMS1[1],PARAMS1[2],PARAMS1[3],PARAMS1[4],new ArrayList<>()));
         when(serv.getAllCinemas()).thenReturn(empt);
         when(serv.getByStreet("Korolenko")).thenReturn(str);
         when(serv.getByStreet(any(String.class))).thenReturn(str);
@@ -309,13 +321,13 @@ public class CinemaControllerTest {
     void getByName() throws Exception {
         logger.info("testByName");
         final List<CinemaInfo> empt = new ArrayList<>();
-        CinemaInfo ans = new CinemaInfo(1l,PARAMS1[0],PARAMS1[1],PARAMS1[2],PARAMS1[3],PARAMS1[4]);
+        CinemaInfo ans = new CinemaInfo(1l,PARAMS1[0],PARAMS1[1],PARAMS1[2],PARAMS1[3],PARAMS1[4],new ArrayList<>());
         when(serv.getAllCinemas()).thenReturn(empt);
         when(serv.getByName("CMax")).thenReturn(ans);
         doAnswer(new Answer<CinemaInfo>() {
             @Override
             public CinemaInfo answer(InvocationOnMock invocation) throws Throwable {
-                return new CinemaInfo(-2l,"","","","","");
+                return new CinemaInfo(-2l,"","","","","",new ArrayList<>());
             }
         }).when(serv).getByName("AKA47");
 
@@ -350,7 +362,7 @@ public class CinemaControllerTest {
     @Test
     void testUpdate() throws Exception {
         logger.info("testUpdate");
-        CinemaInfo res = new CinemaInfo(1L,"Max","USA","LOS",null,"Street");
+        CinemaInfo res = new CinemaInfo(1L,"Max","USA","LOS",null,"Street",new ArrayList<>());
         CreateCinema req = new CreateCinema("Max","USA","LOS",null,"Street");
         CreateCinema badreq = new CreateCinema("Max","USA","LS",null,"");
         when(serv.updateCinema(1L,req)).thenReturn(res);

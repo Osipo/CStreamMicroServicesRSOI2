@@ -33,7 +33,7 @@ public class RoomServiceImpl implements RoomService {
     @Transactional(readOnly = true)
     public List<RoomInfo> getAllRooms() {
         logger.info("Get all rooms");
-        return rep.findAll().stream().map(this::buildModel).collect(Collectors.toList());
+        return rep.findAll().stream().map(ModelBuilder::buildRoomInfo).collect(Collectors.toList());
     }
 
     @Nonnull
@@ -41,7 +41,7 @@ public class RoomServiceImpl implements RoomService {
     @Transactional(readOnly = true)
     public List<RoomInfo> getByCategory(String cat) {
         logger.info("Get rooms by category = '{}'",cat);
-        return rep.findByCategory(cat).stream().map(this::buildModel).collect(Collectors.toList());
+        return rep.findByCategory(cat).stream().map(ModelBuilder::buildRoomInfo).collect(Collectors.toList());
     }
 
     @Nonnull
@@ -49,12 +49,12 @@ public class RoomServiceImpl implements RoomService {
     @Transactional(readOnly = true)
     public List<RoomInfo> getBySeats(int seats) {
         logger.info("Get rooms by available seats = '{}'",seats);
-        return rep.findBySeats(seats).stream().map(this::buildModel).collect(Collectors.toList());
+        return rep.findBySeats(seats).stream().map(ModelBuilder::buildRoomInfo).collect(Collectors.toList());
     }
 
-    @Nonnull
-    private RoomInfo buildModel(@Nonnull Room ri) {
-        logger.info("Room: '{}'",ri);
-        return new RoomInfo(ri.getRid(),ri.getCinema().getCid(), ri.getCategory(),ri.getSeats());
-    }
+//    @Nonnull
+//    private RoomInfo buildModel(@Nonnull Room ri) {
+//        logger.info("Room: '{}'",ri);
+//        return new RoomInfo(ri.getRid(),ri.getCinema().getCid(), ri.getCategory(),ri.getSeats());
+//    }
 }
