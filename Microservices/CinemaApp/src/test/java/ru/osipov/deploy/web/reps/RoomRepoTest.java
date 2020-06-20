@@ -50,4 +50,11 @@ public class RoomRepoTest {
         List<Room> r = rRep.findByCid(2l);
         assert r.size() == 2;
     }
+
+    @Test
+    void getExistingBySnum(){
+        List<Room> r = rRep.findBySeatNumber(2l);
+        System.out.println(r.size());
+        assert r.size() > 0;
+    }
 }

@@ -6,6 +6,7 @@ import ru.osipov.deploy.models.CinemaInfo;
 import ru.osipov.deploy.models.CreateCinema;
 
 import javax.annotation.Nonnull;
+import java.net.URI;
 import java.util.List;
 
 @Transactional
@@ -32,4 +33,8 @@ public interface CinemaService {
     List<CinemaInfo> getByStreet(String street);
 
     CinemaInfo updateCinema(Long id, CreateCinema data);
+
+    URI createCinema(CreateCinema data);
+
+    CinemaInfo deleteCinema(Long id);
 }

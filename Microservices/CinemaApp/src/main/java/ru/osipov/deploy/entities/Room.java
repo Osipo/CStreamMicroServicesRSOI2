@@ -6,6 +6,8 @@ import lombok.experimental.Accessors;
 import javax.persistence.*;
 import com.google.common.base.Objects;
 
+import java.util.Set;
+
 @Data
 @Accessors(chain = true)
 @Entity
@@ -21,15 +23,18 @@ public class Room {
     private String category;
 
     @Column(name = "seats", nullable = false)
-    private Integer seats;
+    private Integer size;
 
     @ManyToOne
     @JoinColumn(name="cid",nullable = false)
     private Cinema cinema;
 
+    @OneToMany(mappedBy = "room")
+    private Set<Seat> seats;
+
     @Override
     public int hashCode(){
-        return Objects.hashCode(rid,category,seats,cinema);
+        return Objects.hashCode(rid,category,size,cinema,seats);
     }
 
     @Override
@@ -38,6 +43,7 @@ public class Room {
         if (o == null || getClass() != o.getClass()) return false;
         Room r = (Room) o;
         return Objects.equal(rid, r.rid) && Objects.equal(category,r.category) &&
+                Objects.equal(size,r.size) &&
                 Objects.equal(seats,r.seats) && Objects.equal(cinema, r.cinema);
     }
 
@@ -46,8 +52,9 @@ public class Room {
         return com.google.common.base.MoreObjects.toStringHelper(this)
                 .add("rid", rid)
                 .add("category", category)
-                .add("seats",seats)
+                .add("size",size)
                 .add("cinema",cinema.getCid())
+                .add("seats",seats.toString())
                 .toString();
     }
 }

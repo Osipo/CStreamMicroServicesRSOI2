@@ -27,14 +27,14 @@ import ru.osipov.deploy.models.CreateCinema;
 import ru.osipov.deploy.models.RoomInfo;
 import ru.osipov.deploy.services.CinemaService;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.longThat;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static ru.osipov.deploy.TestParams.*;
@@ -68,8 +68,8 @@ public class CinemaControllerTest {
         logger.info("testGetAll");
         final List<CinemaInfo> cinemas = new ArrayList<>();
         final List<RoomInfo> rooms = new ArrayList<>();
-        rooms.add(new RoomInfo(1l,11l,"Standard",100));
-        rooms.add(new RoomInfo(2l,11l,"VIP",125));
+        rooms.add(new RoomInfo(1l,11l,"Standard",100,null));
+        rooms.add(new RoomInfo(2l,11l,"VIP",125,null));
         cinemas.add(new CinemaInfo(11l,PARAMS1[0],PARAMS1[1],PARAMS1[2],PARAMS1[3],PARAMS1[4],rooms));
         cinemas.add(new CinemaInfo(12l,PARAMS2[0],PARAMS2[1],PARAMS2[2],PARAMS2[3],PARAMS2[4], new ArrayList<>()));
         when(serv.getAllCinemas()).thenReturn(cinemas);
@@ -383,6 +383,48 @@ public class CinemaControllerTest {
                 .andExpect(status().isNotFound());
         mockMvc.perform(patch("/v1/cinemas/1").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(badreq)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testCreate() throws Exception{
+        logger.info("testCreate");
+        CreateCinema req = new CreateCinema("Max","USA","LOS",null,"Street");
+        CreateCinema badreq = new CreateCinema("Max","USA","LS",null,"");
+        URI url = URI.create("/v1/cinemas/" + 1L);
+        when(serv.createCinema(req)).thenReturn(url);
+        doThrow(new IllegalStateException("not found.")).when(serv).createCinema(badreq);
+
+        mockMvc.perform(post("/v1/cinemas/create").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(gson.toJson(req)))
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
+                .andExpect(header().string("Location",url.toString()));
+
+        mockMvc.perform(post("/v1/cinemas/create").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(badreq)))
+                .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    public void testDelete() throws Exception{
+        logger.info("testDelete");
+        CinemaInfo res = new CinemaInfo(1L,"Max","USA","LOS",null,"Street",new ArrayList<>());
+        when(serv.deleteCinema(1L)).thenReturn(res);
+        doThrow(new IllegalStateException("not found.")).when(serv).deleteCinema(-1L);
+
+
+        mockMvc.perform(post("/v1/cinemas/delete/1").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.name").value("Max"))
+                .andExpect(jsonPath("$.country").value("USA"))
+                .andExpect(jsonPath("$.city").value("LOS"))
+                .andExpect(jsonPath("$.region").value(IsNull.nullValue()))
+                .andExpect(jsonPath("$.street").value("Street"));
+
+        mockMvc.perform(post("/v1/cinemas/delete/-1").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isNotFound());
     }
 
     protected static String getToken(JwtTokenSupplier supplier) {

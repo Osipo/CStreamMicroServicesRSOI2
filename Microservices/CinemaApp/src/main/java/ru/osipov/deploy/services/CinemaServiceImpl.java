@@ -1,5 +1,6 @@
 package ru.osipov.deploy.services;
 
+import lombok.NonNull;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import ru.osipov.deploy.models.CreateCinema;
 import ru.osipov.deploy.repositories.CinemaRepository;
 
 import javax.annotation.Nonnull;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +21,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 @Service
 public class CinemaServiceImpl implements CinemaService {
+
     protected final CinemaRepository rep;
 
     private static final Logger logger = getLogger(CinemaServiceImpl.class);
@@ -113,6 +116,42 @@ public class CinemaServiceImpl implements CinemaService {
         else{
             logger.info("Cinema with id '{}' was not found.",id);
             throw new IllegalStateException("Cinema with id"+id+" was not found.");
+        }
+    }
+
+    @Override
+    @Nonnull
+    @Transactional
+    public URI createCinema(@Nonnull CreateCinema data){
+        logger.info("Creating cinema...");
+        logger.info("Gathered data from form:");
+        logger.info("'{}'", data.toString());
+        Cinema c = new Cinema()
+                    .setCname(data.getName())
+                    .setCountry(data.getCountry())
+                    .setCity(data.getCity())
+                    .setRegion(data.getRegion())
+                    .setStreet(data.getStreet());
+        c = rep.save(c);
+        logger.info("Successful created.");
+        return URI.create("/v1/cinemas/" + c.getCid());
+    }
+
+    @Transactional
+    @Override
+    public CinemaInfo deleteCinema(@NonNull Long id) throws IllegalStateException{
+        logger.info("Delete cinema by id =  '{}'",id);
+        Optional<Cinema> o = rep.findByCid(id);
+        if(o.isPresent()){
+            logger.info("Cinema was found");
+            CinemaInfo c = ModelBuilder.buildCinemaInfo(o.get());
+            rep.delete(o.get());
+            logger.info("Deleted successful!");
+            return c;
+        }
+        else{
+            logger.info("Cinema was not found.");
+            throw new IllegalStateException("Cinema with id "+id+" was not found.");
         }
     }
 

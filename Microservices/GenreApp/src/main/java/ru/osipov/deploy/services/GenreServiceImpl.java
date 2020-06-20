@@ -107,8 +107,8 @@ public class GenreServiceImpl implements GenreService {
     public URI createGenre(@Nonnull CreateGenreR request) {
         logger.info("Creating genre...");
         logger.info("Vals:\n\t name = '{}'\n\t remarks = '{}'",request.getGname(),request.getRemarks());
-        Genre g = new Genre()
-                .setName(request.getGname())
+        Genre g = new Genre().
+                setName(request.getGname())
                 .setRemarks(request.getRemarks());
         g = gRepository.save(g);
         //GenreInfo ng = getById(g.getGid());

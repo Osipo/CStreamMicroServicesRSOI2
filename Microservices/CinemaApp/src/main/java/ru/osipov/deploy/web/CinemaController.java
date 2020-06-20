@@ -15,6 +15,7 @@ import ru.osipov.deploy.services.CinemaService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -170,7 +171,34 @@ public class CinemaController {
         return ResponseEntity.ok(c);
     }
 
-    //PROTECTED.
+    //POST: /v1/cinemas/create
+    //PROTECTED [only for Admin and Cinema_Admin]
+    @PostMapping(consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE, path = "/create")
+    public ResponseEntity createCinema(@Valid @RequestBody CreateCinema request, @RequestHeader HttpHeaders headers) {
+        logger.info("/v1/cinemas/create");
+        final URI location = cinemaService.createCinema(request);
+        return ResponseEntity.created(location).build();
+    }
+
+    //POST: /v1/cinemas/delete/{cinema_id}
+    //PROTECTED [only for Admin and Cinema_Admin]
+    @PostMapping(produces = APPLICATION_JSON_UTF8_VALUE, path={"/delete/{cid}","/delete/"})
+    public ResponseEntity deleteCinema(@PathVariable(name = "cid")Long id, @RequestHeader HttpHeaders headers){
+        logger.info("/v1/cinemas/delete/'{}'",id);
+        CinemaInfo g = null;
+        try{
+            g = cinemaService.deleteCinema(id);
+        }
+        catch (IllegalStateException e){
+            logger.info("Return not found 404");
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+        return ResponseEntity.ok(g);
+    }
+
+
+    //PATCH: /v1/cinemas/{id}
+    //PROTECTED [only for Admin and Cinema_Admin]
     @PatchMapping(consumes = APPLICATION_JSON_UTF8_VALUE,produces = APPLICATION_JSON_UTF8_VALUE, path = {"/{id}"})
     public ResponseEntity updateCinema(@PathVariable(required = true, name = "id") Long id, @RequestBody @Valid CreateCinema request, @RequestHeader HttpHeaders headers){
         CinemaInfo c;
