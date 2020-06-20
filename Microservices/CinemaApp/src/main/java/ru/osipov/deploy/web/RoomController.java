@@ -26,7 +26,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 //Access to the rooms in specified cinema set with its cinema_id (cid)
 //If that cinema does not exsits then only empty list will be returned.
 @RestController
-@RequestMapping("/v1/cinemas/{cid}/rooms/")
+@RequestMapping("/v1/cinemas/{cid}/rooms")
 public class RoomController {
     private static final Logger logger = LoggerFactory.getLogger(RoomController.class);
     private final CUDRoomService roomService;
@@ -41,9 +41,9 @@ public class RoomController {
 
     //GET: /v1/cinemas/{cinema_id}/rooms
     //GET: /v1/cinemas/{cinema_id}/rooms/
-    @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE)
-    public List<RoomInfo> getAll(){
-        long cid = cid();//cinema id is specified in path.
+    @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE, path="/")
+    public List<RoomInfo> getAll(@PathVariable(name = "cid", required = true) Long cid){
+        //long cid = cid();//cinema id is specified in path.
         logger.info("/v1/cinemas/'{}'/rooms/",cid);
         logger.info("Get all rooms in cinema with id =  '{}'",cid);
         return roomService.getByCid(cid);
@@ -51,8 +51,8 @@ public class RoomController {
 
     //GET: /v1/cinemas/{cinema_id}/rooms/{room_id}
     @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE, path = "/{rid}")
-    public ResponseEntity getById(@PathVariable(name = "rid",required = true) Long id){
-        long cid = cid();
+    public ResponseEntity getById(@PathVariable(name = "cid", required = true) Long cid,@PathVariable(name = "rid",required = true) Long id){
+        //long cid = cid();
         logger.info("getById");
         logger.info("/v1/cinemas/'{}'/rooms/'{}'",cid,id);
         RoomInfo r = null;
@@ -66,10 +66,10 @@ public class RoomController {
         return ResponseEntity.ok(r);
     }
 
-    //GET: /v1/cinemas/{cinema_id}/rooms/?category=''
-    @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE, path= "")
-    public List<RoomInfo> getByCategory(@RequestParam(name = "category",required = true) String category){
-        long cid = cid();//cinema id is specified in path.
+    //GET: /v1/cinemas/{cinema_id}/rooms/category/{cat}
+    @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE, path= "/category/{cat}")
+    public List<RoomInfo> getByCategory(@PathVariable(name = "cid", required = true) Long cid,@PathVariable(name = "cat",required = false) String category){
+        //long cid = cid();//cinema id is specified in path.
         logger.info("/v1/cinemas/'{}'/rooms/?category='{}'",cid,category);
         if(category == null || category.equals("")) {
             logger.info("No category was specified. Return all!");
@@ -83,8 +83,8 @@ public class RoomController {
     //POST: /v1/cinemas/{cid}/rooms/create
     //PROTECTED [only for Admin and Cinema_Admin]
     @PostMapping(consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE, path = "/create")
-    public ResponseEntity createRoom(@Valid @RequestBody CreateRoom request, @RequestHeader HttpHeaders headers) {
-        long cid = cid();
+    public ResponseEntity createRoom(@PathVariable(name = "cid", required = true) Long cid,@Valid @RequestBody CreateRoom request, @RequestHeader HttpHeaders headers) {
+        //long cid = cid();
         logger.info("/v1/cinemas/'{}'/rooms/create",cid);
         final URI location = roomService.createRoom(cid,request);
         return ResponseEntity.created(location).build();
@@ -94,8 +94,8 @@ public class RoomController {
     //POST: /v1/cinemas/{cinema_id}/rooms/delete/
     //PROTECTED [only for Admin and Cinema_Admin]
     @PostMapping(produces = APPLICATION_JSON_UTF8_VALUE, path={"/delete/{rid}","/delete/"})
-    public ResponseEntity deleteRoom(@PathVariable(name = "rid")Long id, @RequestHeader HttpHeaders headers){
-        long cid = cid();
+    public ResponseEntity deleteRoom(@PathVariable(name = "cid", required = true) Long cid,@PathVariable(name = "rid")Long id, @RequestHeader HttpHeaders headers){
+        //long cid = cid();
         logger.info("/v1/cinemas/'{}'/rooms/delete/'{}'",cid,id);
         RoomInfo g = null;
         try{
@@ -112,9 +112,9 @@ public class RoomController {
     //PATCH: /v1/cinemas/{cinema_id}/rooms/{room_id}
     //PROTECTED [only for Admin and Cinema_Admin]
     @PatchMapping(consumes = APPLICATION_JSON_UTF8_VALUE,produces = APPLICATION_JSON_UTF8_VALUE, path = {"/{rid}"})
-    public ResponseEntity updateRoom(@PathVariable(required = true, name = "rid") Long id, @RequestBody @Valid CreateRoom request, @RequestHeader HttpHeaders headers){
+    public ResponseEntity updateRoom(@PathVariable(name = "cid", required = true) Long cid,@PathVariable(required = true, name = "rid") Long id, @RequestBody @Valid CreateRoom request, @RequestHeader HttpHeaders headers){
         RoomInfo c;
-        long cid = cid();
+        //long cid = cid();
         logger.info("updateRoom");
         logger.info("/v1/cinemas/'{}'/rooms/'{}'",cid,id);
         try{
@@ -128,8 +128,9 @@ public class RoomController {
         return ResponseEntity.ok(c);
     }
 
+    /*
     private Long cid() {
         Map<String, Long> variables = (Map<String, Long>) req.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         return variables.get("cid");
-    }
+    }*/
 }
