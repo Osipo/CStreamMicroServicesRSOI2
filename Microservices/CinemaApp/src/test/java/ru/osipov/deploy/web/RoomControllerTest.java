@@ -16,11 +16,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import ru.osipov.deploy.configuration.jwt.JwtTokenProvider;
 import ru.osipov.deploy.configuration.jwt.JwtTokenSupplier;
 import ru.osipov.deploy.models.RoomInfo;
 import ru.osipov.deploy.models.SeatInfo;
 import ru.osipov.deploy.services.CUDRoomService;
+import ru.osipov.deploy.services.CUDSeatService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +44,9 @@ public class RoomControllerTest {
 
     @MockBean
     private CUDRoomService serv;
+
+    @MockBean
+    private CUDSeatService seatServ;
 
     private static final Logger logger = LoggerFactory.getLogger(RoomControllerTest.class);
 
@@ -84,6 +89,11 @@ public class RoomControllerTest {
                 .andExpect(jsonPath("$[1].seats[0].rid").value(2l))
                 .andExpect(jsonPath("$[1].seats[0].num").value(10l))
                 .andExpect(jsonPath("$[1].seats[0].state").value("NA"));
+    }
+
+    @Test
+    public void testById(){
+
     }
 
     protected static String getToken(JwtTokenSupplier supplier) {
