@@ -70,20 +70,30 @@ public class FilmController {
 
     //GET: /v1/films/genre/{genre_id}
     //If no genre_id was specified -> empty list.
-    @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE,path = {"/genre/{gid}"})
-    public List<FilmInfo> getByGid(@PathVariable(required = true, name = "gid") Long gid){
-        return fService.getFilmsByGid(gid);
+    @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE,path = {"/genre/{gname}"})
+    public List<FilmInfo> getByGid(@PathVariable(required = true, name = "gname") String gid){
+        return fService.getFilmsByGName(gid);
     }
 
-    //POST: /v1/films/genre/{genre_id}
+    //POST: /v1/films/{film_id}/genre/add/{genre_id}
     //if no ngid was specified then -> badRequest()
-    //PROTECTED.
-    @PostMapping(produces = APPLICATION_JSON_UTF8_VALUE, path = {"/genre/{gid}"}, consumes = {TEXT_PLAIN_VALUE})
-    public ResponseEntity updateGenre(@PathVariable(required = true, name = "gid") Long oldgid, @Valid @RequestBody String ngid, @RequestHeader HttpHeaders headers){
-        if(ngid == null || ngid.equals("")){
+    //PROTECTED [only user with CINEMA_ROLE or ADMIN_ROLE has permission]
+    @PostMapping(produces = APPLICATION_JSON_UTF8_VALUE, path = {"/{fid}/genre/add/{gid}"})
+    public ResponseEntity addGenreToFilm(@PathVariable(required = true, name = "fid") Long fid,@PathVariable(required = true, name = "gid") String gname, @RequestHeader HttpHeaders headers){
+        if(gname == null || gname.equals("")){
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(fService.updateGenre(oldgid,Long.parseLong(ngid)));
+        logger.info("/v1/films/'{}'/genre/add/'{}'",fid,gname);
+        return ResponseEntity.ok(fService.updateGenre(fid,gname));
+    }
+
+    @PostMapping(produces = APPLICATION_JSON_UTF8_VALUE, path = {"/{fid}/genre/delete/{gid}"})
+    public ResponseEntity deleteGenreFromFilm(@PathVariable(required = true, name = "fid") Long fid, @PathVariable(required = true, name = "gid") String gname, @RequestHeader HttpHeaders headers){
+        if(gname == null || gname.equals("")){
+            return ResponseEntity.badRequest().build();
+        }
+        logger.info("/v1/films/'{}'/genre/add/'{}'",fid,gname);
+        return ResponseEntity.ok(fService.updateGenre(fid,gname));
     }
 
 

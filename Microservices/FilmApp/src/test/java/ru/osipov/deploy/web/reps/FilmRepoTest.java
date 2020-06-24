@@ -52,6 +52,8 @@ public class FilmRepoTest {
         List<Film> f = fRep.findByRating((short)22);
         assert f.size() != 0;
         assert f.get(0).getFname().equals("MYST");
+        assert f.get(0).getGenres().size() == 1;
+        assert f.get(0).getGenres().get(0).getName().equals("Cartoon");
     }
 
     @Test

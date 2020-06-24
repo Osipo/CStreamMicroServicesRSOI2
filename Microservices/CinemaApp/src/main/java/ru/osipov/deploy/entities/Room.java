@@ -25,6 +25,10 @@ public class Room {
     @Column(name = "seats", nullable = false)
     private Integer size;
 
+    @Column(name = "room_number", nullable = false)
+    private Integer roomNum;
+
+
     @ManyToOne
     @JoinColumn(name="cid",nullable = false)
     private Cinema cinema;
@@ -44,6 +48,7 @@ public class Room {
         Room r = (Room) o;
         return Objects.equal(rid, r.rid) && Objects.equal(category,r.category) &&
                 Objects.equal(size,r.size) &&
+                Objects.equal(roomNum,r.roomNum) &&
                 Objects.equal(seats,r.seats) && Objects.equal(cinema, r.cinema);
     }
 
@@ -53,6 +58,7 @@ public class Room {
                 .add("rid", rid)
                 .add("category", category)
                 .add("size",size)
+                .add("roomNum",roomNum)
                 .add("cinema",cinema.getCid())
                 .add("seats",seats.toString())
                 .toString();

@@ -27,11 +27,14 @@ public class CreateRoom {
     @Min(value = 0)
     private Integer seats;
 
+    @Min(value = 0)
+    private Integer roomNum;
 
     @Override
     public String toString(){
         return com.google.common.base.MoreObjects.toStringHelper(this)
                 .add("category", category)
+                .add("number",roomNum)
                 .add("seats", seats).toString();
     }
 }

@@ -20,7 +20,7 @@ public interface FilmService {
     FilmInfo getFilmById(Long fid);
 
     @Nonnull
-    List<FilmInfo> getFilmsByGid(Long gid);
+    List<FilmInfo> getFilmsByGName(String gname);
 
 
     @Nonnull
@@ -29,7 +29,7 @@ public interface FilmService {
     FilmInfo updateFilmRating(String fname, Short rating);
 
     @Nonnull
-    List<FilmInfo> updateGenre(Long oldgid, Long ngid);
+    List<FilmInfo> updateGenre(Long fid, String gname);
 
     FilmInfo deleteFilm(String name);
 

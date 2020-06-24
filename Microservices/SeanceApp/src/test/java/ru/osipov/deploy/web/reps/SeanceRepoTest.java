@@ -39,21 +39,21 @@ public class SeanceRepoTest {
 
     @Test
     void findByDate() {
-        List<Seance> r = sRep.findAllByDate(LocalDate.parse("2020-12-05"));//CHECK
+        List<Seance> r = sRep.findAllByDate(LocalDate.parse("2030-12-05"));//CHECK
         assert r != null;
         assert r.size() > 0;
     }
 
     @Test
     void findByDateBetween(){
-        List<Seance> r = sRep.findAllByDateBetween(LocalDate.parse("2020-12-01"),LocalDate.parse("2020-12-05"));
+        List<Seance> r = sRep.findAllByDateBetween(LocalDate.parse("2030-12-01"),LocalDate.parse("2030-12-05"));
         assert r != null;
         assert r.size() == 2;
     }
 
     @Test
     void findByDateBefore(){
-        List<Seance> r = sRep.findAllByDateBefore(LocalDate.parse("2020-12-01"));
+        List<Seance> r = sRep.findAllByDateBefore(LocalDate.parse("2030-12-01"));
         assert r != null;
         assert r.size() == 2;
     }

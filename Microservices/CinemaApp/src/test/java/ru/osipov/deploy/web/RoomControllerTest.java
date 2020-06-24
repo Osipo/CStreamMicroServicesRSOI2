@@ -67,8 +67,8 @@ public class RoomControllerTest {
         List<RoomInfo> res = new ArrayList<>();
         List<SeatInfo> st = new ArrayList<>();
         st.add(new SeatInfo(1l,10l,"NA",2l));
-        res.add(new RoomInfo(1l,1l,"Standard",100,null));
-        res.add(new RoomInfo(2l,1l,"V.I.P.",250,st));
+        res.add(new RoomInfo(1l,1l,"Standard",100,1,null));
+        res.add(new RoomInfo(2l,1l,"V.I.P.",250,2,st));
         when(serv.getByCid(1l)).thenReturn(res);
         mockMvc.perform(get("/v1/cinemas/1/rooms/").header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
@@ -79,10 +79,12 @@ public class RoomControllerTest {
                 .andExpect(jsonPath("$[0].cid").value(1l))
                 .andExpect(jsonPath("$[0].category").value("Standard"))
                 .andExpect(jsonPath("$[0].size").value(100))
+                .andExpect(jsonPath("$[0].roomNum").value(1))
                 .andExpect(jsonPath("$[1].rid").value(2l))
                 .andExpect(jsonPath("$[1].cid").value(1l))
                 .andExpect(jsonPath("$[1].category").value("V.I.P."))
                 .andExpect(jsonPath("$[1].size").value(250))
+                .andExpect(jsonPath("$[1].roomNum").value(2))
                 .andExpect(jsonPath("$[0].seats").value(IsNull.nullValue()))
                 .andExpect(jsonPath("$[1].seats").isArray())
                 .andExpect(jsonPath("$[1].seats[0].sid").value(1l))

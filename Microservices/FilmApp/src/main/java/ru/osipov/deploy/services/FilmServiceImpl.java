@@ -5,9 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.osipov.deploy.entities.Film;
+import ru.osipov.deploy.entities.Genre;
 import ru.osipov.deploy.models.CreateFilm;
 import ru.osipov.deploy.models.FilmInfo;
+import ru.osipov.deploy.models.GenreInfo;
 import ru.osipov.deploy.repositories.FilmRepository;
+import ru.osipov.deploy.repositories.GenreRepository;
 
 import javax.annotation.Nonnull;
 import javax.persistence.EntityNotFoundException;
@@ -25,11 +28,13 @@ public class FilmServiceImpl implements FilmService {
 
     private final FilmRepository rep;
 
+    private final GenreRepository grep;
+
     private static final Logger logger = getLogger(FilmServiceImpl.class);
 
     @Autowired
-    public FilmServiceImpl(FilmRepository r){
-        this.rep = r;
+    public FilmServiceImpl(FilmRepository r, GenreRepository r2){
+        this.rep = r; this.grep = r2;
     }
 
     @Nonnull
@@ -45,7 +50,7 @@ public class FilmServiceImpl implements FilmService {
     public FilmInfo getByName(@Nonnull String name) {
         logger.info("Get film by name = '{}'",name);
         Optional<FilmInfo> o =  rep.findByFname(name).map(this::buildModel);
-        return o.orElseGet(() -> new FilmInfo(-2l, "", (short)-1,-1l));
+        return o.orElseGet(() -> new FilmInfo(-2l, "", (short)-1,null));
     }
 
     @Nonnull
@@ -67,9 +72,17 @@ public class FilmServiceImpl implements FilmService {
     @Nonnull
     @Override
     @Transactional(readOnly = true)
-    public List<FilmInfo> getFilmsByGid(Long gid) {
-        logger.info("Get films by genre_id = '{}'",gid);
-        return rep.findByGid(gid).stream().map(this::buildModel).collect(Collectors.toList());
+    public List<FilmInfo> getFilmsByGName(String gname) {
+        logger.info("Get films by genre name = '{}'",gname);
+        Optional<Genre> g = grep.findByName(gname);
+        if(g.isPresent()){
+            logger.info("Genre was found.");
+            return rep.findAll().stream().filter(x -> x.getGenres().contains(g.get())).map(this::buildModel).collect(Collectors.toList());
+        }
+        else {
+            logger.info("Genre was not found! Return all.");
+            return rep.findAll().stream().map(this::buildModel).collect(Collectors.toList());
+        }
     }
 
     @Nonnull
@@ -105,24 +118,33 @@ public class FilmServiceImpl implements FilmService {
 
     @Nonnull
     @Override
+    public List<FilmInfo> updateGenre(Long fid, String gname) {
+        List<FilmInfo> res = new ArrayList<>();
+        return res;
+    }
+
+
+    /*
+    @Nonnull
+    @Override
     @Transactional
     public List<FilmInfo> updateGenre(Long oldgid, Long ngid) {
         logger.info("Change genre in all films with specified = '{}'",oldgid);
 
-        List<Film> l = rep.findByGid(oldgid);
+        List<Film> l = rep.fi(oldgid);
         List<FilmInfo> res = new ArrayList<>();
         logger.info("Films: "+l.size());
         if(l.size() > 0){
             logger.info("Updating...");
             for(int i = 0; i < l.size(); i++){
                 Film f = l.get(i);
-                f.setGid(ngid);
+                f.setGenres(ngid);
                 rep.save(f);
                 res.add(buildModel(f));
             }
         }
         return res;
-    }
+    }*/
 
     @Override
     @Transactional
@@ -147,12 +169,19 @@ public class FilmServiceImpl implements FilmService {
     public FilmInfo updateFilm(Long id,@Nonnull CreateFilm request) {
         logger.info("updating film...");
         Optional<Film> o = rep.findByFid(id);
+        List<Genre> gs = new ArrayList<>();
         if(o.isPresent()){
+            for(GenreInfo gi : request.getGenres()){
+                Optional<Genre> og = grep.findByName(gi.getName());
+                if(og.isEmpty())
+                    og = grep.findByGid(gi.getId());
+                gs.add(og.get());
+            }
             Film f = o.get();
             logger.info("Film was found.");
             f.setFname(request.getName());
             f.setRating(request.getRating());
-            f.setGid(request.getGid());
+            f.setGenres(gs);
             logger.info("New values are set.");
             rep.save(f);
             logger.info("Successful saved.");
@@ -167,6 +196,6 @@ public class FilmServiceImpl implements FilmService {
     @Nonnull
     private FilmInfo buildModel(@Nonnull Film fi) {
         logger.info("Cinema: '{}'",fi);
-        return new FilmInfo(fi.getFid(),fi.getFname(), fi.getRating(),fi.getGid());
+        return new FilmInfo(fi.getFid(),fi.getFname(), fi.getRating(),fi.getGenres().stream().map(ModelBuilder::buildModel).collect(Collectors.toList()));
     }
 }

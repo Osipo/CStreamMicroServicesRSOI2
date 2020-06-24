@@ -44,6 +44,7 @@ public class CUDRoomServiceImpl extends RoomServiceImpl implements CUDRoomServic
         Room r = new Room()
                 .setCategory(req.getCategory())
                 .setSize(req.getSeats())
+                .setRoomNum(req.getRoomNum())
                 .setCinema(c);
         r = rep.save(r);
         logger.info("Successful created.");
@@ -59,6 +60,7 @@ public class CUDRoomServiceImpl extends RoomServiceImpl implements CUDRoomServic
             logger.info("Found successful.");
             r.setCategory(data.getCategory());
             r.setSize(data.getSeats());
+            r.setRoomNum(data.getRoomNum());
             logger.info("New data was set.");
             rep.save(r);
             logger.info("Successful saved.");

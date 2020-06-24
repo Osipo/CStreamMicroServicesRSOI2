@@ -68,8 +68,8 @@ public class CinemaControllerTest {
         logger.info("testGetAll");
         final List<CinemaInfo> cinemas = new ArrayList<>();
         final List<RoomInfo> rooms = new ArrayList<>();
-        rooms.add(new RoomInfo(1l,11l,"Standard",100,null));
-        rooms.add(new RoomInfo(2l,11l,"VIP",125,null));
+        rooms.add(new RoomInfo(1l,11l,"Standard",100,1,null));
+        rooms.add(new RoomInfo(2l,11l,"VIP",125,2,null));
         cinemas.add(new CinemaInfo(11l,PARAMS1[0],PARAMS1[1],PARAMS1[2],PARAMS1[3],PARAMS1[4],rooms));
         cinemas.add(new CinemaInfo(12l,PARAMS2[0],PARAMS2[1],PARAMS2[2],PARAMS2[3],PARAMS2[4], new ArrayList<>()));
         when(serv.getAllCinemas()).thenReturn(cinemas);

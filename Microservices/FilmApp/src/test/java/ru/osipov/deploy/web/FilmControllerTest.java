@@ -2,9 +2,12 @@ package ru.osipov.deploy.web;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.hamcrest.core.Is;
+import org.hamcrest.core.IsNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.internal.matchers.Null;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
@@ -23,6 +26,7 @@ import ru.osipov.deploy.configuration.jwt.JwtTokenProvider;
 import ru.osipov.deploy.configuration.jwt.JwtTokenSupplier;
 import ru.osipov.deploy.models.CreateFilm;
 import ru.osipov.deploy.models.FilmInfo;
+import ru.osipov.deploy.models.GenreInfo;
 import ru.osipov.deploy.services.FilmService;
 
 import java.util.ArrayList;
@@ -58,9 +62,11 @@ public class FilmControllerTest {
     void testAll() throws Exception {
         logger.info("testAll");
         List<FilmInfo> l = new ArrayList<>();
-        l.add(new FilmInfo(1L,PARAMS1[0],Short.parseShort(PARAMS1[1]),2L));
-        l.add(new FilmInfo(2L,PARAMS2[0],Short.parseShort(PARAMS2[1]),1L));
-        l.add(new FilmInfo(3L,PARAMS3[0],Short.parseShort(PARAMS3[1]),-1L));
+        List<GenreInfo> gs = new ArrayList<>();
+        gs.add(new GenreInfo(2L,"Action",null));
+        l.add(new FilmInfo(1L,PARAMS1[0],Short.parseShort(PARAMS1[1]),gs));
+        l.add(new FilmInfo(2L,PARAMS2[0],Short.parseShort(PARAMS2[1]),null));
+        l.add(new FilmInfo(3L,PARAMS3[0],Short.parseShort(PARAMS3[1]),null));
         when(fs.getAllFilms()).thenReturn(l);
 
         mockMvc.perform(get("/v1/films/").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
@@ -70,15 +76,18 @@ public class FilmControllerTest {
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].name").value(PARAMS1[0]))
                 .andExpect(jsonPath("$[0].rating").value(25))
-                .andExpect(jsonPath("$[0].gid").value(2L))
+                .andExpect(jsonPath("$[0].genres").isArray())
+                .andExpect(jsonPath("$[0].genres[0].id").value(2L))
+                .andExpect(jsonPath("$[0].genres[0].name").value("Action"))
+                .andExpect(jsonPath("$[0].genres[0].remarks").value(IsNull.nullValue()))
                 .andExpect(jsonPath("$[1].id").value(2L))
                 .andExpect(jsonPath("$[1].name").value(PARAMS2[0]))
                 .andExpect(jsonPath("$[1].rating").value(18))
-                .andExpect(jsonPath("$[1].gid").value(1L))
+                .andExpect(jsonPath("$[1].genres").value(IsNull.nullValue()))
                 .andExpect(jsonPath("$[2].id").value(3L))
                 .andExpect(jsonPath("$[2].name").value(PARAMS3[0]))
                 .andExpect(jsonPath("$[2].rating").value(16))
-                .andExpect(jsonPath("$[2].gid").value(-1L));
+                .andExpect(jsonPath("$[2].genres").value(IsNull.nullValue()));
     }
 
 
@@ -86,8 +95,8 @@ public class FilmControllerTest {
     void testByGid() throws Exception{
         logger.info("testByGid");
         List<FilmInfo> e = new ArrayList<>();
-        when(fs.getFilmsByGid(-1L)).thenReturn(e);
-        mockMvc.perform(get("/v1/films/genre/-1").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
+        when(fs.getFilmsByGName("Thriller")).thenReturn(e);
+        mockMvc.perform(get("/v1/films/genre/Thriller").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").exists())
@@ -103,12 +112,10 @@ public class FilmControllerTest {
         logger.info("testUpdateGenre");
         List<FilmInfo> e = new ArrayList<>();
         List<FilmInfo> e2 = new ArrayList<>();
-        e.add(new FilmInfo(12L,"IT",(short)23,-1L));
-        when(fs.updateGenre(1L,-1L)).thenReturn(e);
+        e.add(new FilmInfo(12L,"IT",(short)23,null));
+        when(fs.updateGenre(1L,"Null")).thenReturn(e);
         when(fs.getAllFilms()).thenReturn(e2);
-        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post("/v1/films/genre/1").header("Authorization","Basic "+token)
-                .contentType(MediaType.TEXT_PLAIN)
-                .content("-1");
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post("/v1/films/1/genre/add/Null").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8);
         mockMvc.perform(builder)
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -116,19 +123,13 @@ public class FilmControllerTest {
                 .andExpect(jsonPath("$[0].id").value(12L))
                 .andExpect(jsonPath("$[0].name").value("IT"))
                 .andExpect(jsonPath("$[0].rating").value(23))
-                .andExpect(jsonPath("$[0].gid").value(-1L));
-        mockMvc.perform(post("/v1/films/genre/12").header("Authorization","Basic "+token).contentType(MediaType.TEXT_PLAIN).content(""))
-                .andExpect(status().isBadRequest());
-        mockMvc.perform(post("/v1/films/genre/21").header("Authorization","Basic "+token).contentType(MediaType.TEXT_PLAIN))
-                .andExpect(status().isBadRequest());
-        mockMvc.perform(post("/v1/films/genre").header("Authorization","Basic "+token).contentType(MediaType.TEXT_PLAIN))
-                .andExpect(status().is(405));
+                .andExpect(jsonPath("$[0].genres").value(IsNull.nullValue()));
     }
 
     @Test
     void testById() throws Exception {
         logger.info("testById");
-        FilmInfo f = new FilmInfo(100L,"MYST",(short)16,-1L);
+        FilmInfo f = new FilmInfo(100L,"MYST",(short)16,null);
         when(fs.getFilmById(100L)).thenReturn(f);
         doThrow(new IllegalStateException("Film not found.")).when(fs).getFilmById(0L);
         List<FilmInfo> e = new ArrayList<>();
@@ -140,7 +141,7 @@ public class FilmControllerTest {
                 .andExpect(jsonPath("$.id").value(100L))
                 .andExpect(jsonPath("$.name").value("MYST"))
                 .andExpect(jsonPath("$.rating").value(16))
-                .andExpect(jsonPath("$.gid").value(-1L));
+                .andExpect(jsonPath("$.genres").value(IsNull.nullValue()));
         mockMvc.perform(get("/v1/films/0").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isNotFound());
         mockMvc.perform(get("/v1/films").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
@@ -160,13 +161,13 @@ public class FilmControllerTest {
     void testByName() throws Exception {
         logger.info("testByName");
         final List<FilmInfo> emt = new ArrayList<>();
-        final FilmInfo f = new FilmInfo(111L,"MYST",(short)100,-1L);
+        final FilmInfo f = new FilmInfo(111L,"MYST",(short)100,null);
         when(fs.getAllFilms()).thenReturn(emt);
         when(fs.getByName("MYST")).thenReturn(f);
         doAnswer(new Answer<FilmInfo>() {
             @Override
             public FilmInfo answer(InvocationOnMock invocation) throws Throwable {
-                return new FilmInfo(-2l,"IT",(short)-1,-1l);
+                return new FilmInfo(-2l,"IT",(short)-1,null);
             }
         }).when(fs).getByName("IT");
 
@@ -177,7 +178,7 @@ public class FilmControllerTest {
                 .andExpect(jsonPath("$[0].id").value(111L))
                 .andExpect(jsonPath("$[0].name").value("MYST"))
                 .andExpect(jsonPath("$[0].rating").value(100))
-                .andExpect(jsonPath("$[0].gid").value(-1L));
+                .andExpect(jsonPath("$[0].genres").value(IsNull.nullValue()));
 
         mockMvc.perform(get("/v1/films/").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
@@ -201,7 +202,9 @@ public class FilmControllerTest {
         logger.info("testByRating");
         final List<FilmInfo> emt = new ArrayList<>();
         final List<FilmInfo> r = new ArrayList<>();
-        r.add(new FilmInfo(55L,PARAMS1[0],Short.parseShort(PARAMS1[1]),12L));
+        final List<GenreInfo> gs = new ArrayList<>();
+        gs.add(new GenreInfo(24L,"Cartoon","Drawn."));
+        r.add(new FilmInfo(55L,PARAMS1[0],Short.parseShort(PARAMS1[1]),gs));
         when(fs.getAllFilms()).thenReturn(emt);
         when(fs.getByRating((short)25)).thenReturn(r);
 
@@ -212,7 +215,10 @@ public class FilmControllerTest {
                 .andExpect(jsonPath("$[0].id").value(55L))
                 .andExpect(jsonPath("$[0].name").value(PARAMS1[0]))
                 .andExpect(jsonPath("$[0].rating").value(25))
-                .andExpect(jsonPath("$[0].gid").value(12L));
+                .andExpect(jsonPath("$[0].genres").isArray())
+                .andExpect(jsonPath("$[0].genres[0].id").value(24L))
+                .andExpect(jsonPath("$[0].genres[0].name").value("Cartoon"))
+                .andExpect(jsonPath("$[0].genres[0].remarks").value("Drawn."));
         mockMvc.perform(get("/v1/films?r").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -229,7 +235,7 @@ public class FilmControllerTest {
     @Test
     void testUpdateRating() throws Exception {
         logger.info("testUpdateRating");
-        FilmInfo r = new FilmInfo(555L,PARAMS1[0],(short)50,2L);
+        FilmInfo r = new FilmInfo(555L,PARAMS1[0],(short)50,null);
         doReturn(r).when(fs).updateFilmRating(PARAMS1[0],(short)50);
         doThrow(new IllegalStateException("not exist : "+PARAMS3[0])).when(fs).updateFilmRating(PARAMS3[0],(short)25);
         doThrow(new IllegalStateException("Illegal rating value. Must be[0..100]: ")).when(fs).updateFilmRating(PARAMS1[0],(short)-23);
@@ -243,7 +249,7 @@ public class FilmControllerTest {
                 .andExpect(jsonPath("$.id").value(555L))
                 .andExpect(jsonPath("$.name").value(PARAMS1[0]))
                 .andExpect(jsonPath("$.rating").value(50))
-                .andExpect(jsonPath("$.gid").value(2L));
+                .andExpect(jsonPath("$.genres").value(IsNull.nullValue()));
 
         mockMvc.perform(post("/v1/films/update/"+PARAMS1[0]+"?r=101").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isBadRequest());
@@ -265,12 +271,16 @@ public class FilmControllerTest {
     @Test
     void testUpdate() throws Exception {
         logger.info("testUpdate");
-        CreateFilm req = new CreateFilm("IT 2",(short)33,1L);
-        CreateFilm badreq = new CreateFilm("   ",(short)33,1L);
-        CreateFilm badreq2 = new CreateFilm("Hell",(short)123,1L);
-        CreateFilm badreq3 = new CreateFilm("Racer",(short)33,-2L);
+        ArrayList<GenreInfo> genres = new ArrayList<>();
+        GenreInfo g = new GenreInfo(2L,"Horror",null);
+        genres.add(g);
+        CreateFilm req = new CreateFilm("IT 2",(short)33,genres);
+        CreateFilm badreq = new CreateFilm("   ",(short)33,genres);
+        CreateFilm badreq2 = new CreateFilm("Hell",(short)123,genres);
+        CreateFilm badreq3 = new CreateFilm("Racer",(short)33,genres);
 
-        FilmInfo f = new FilmInfo(333L,"IT",(short)25,2L);
+
+        FilmInfo f = new FilmInfo(333L,"IT",(short)25,genres);
         doReturn(f).when(fs).updateFilm(333L,req);
         doThrow(new IllegalStateException("Film was not found.")).when(fs).updateFilm(-1L,req);
         mockMvc.perform(patch("/v1/films/333").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(req)))
@@ -279,22 +289,25 @@ public class FilmControllerTest {
                 .andExpect(jsonPath("$.id").value(333L))
                 .andExpect(jsonPath("$.name").value("IT"))
                 .andExpect(jsonPath("$.rating").value(25))
-                .andExpect(jsonPath("$.gid").value(2L));
+                .andExpect(jsonPath("$.genres").isArray())
+                .andExpect(jsonPath("$.genres[0].id").value(2L))
+                .andExpect(jsonPath("$.genres[0].name").value("Horror"))
+                .andExpect(jsonPath("$.genres[0].remarks").value(IsNull.nullValue()));
         mockMvc.perform(patch("/v1/films/-1").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(req)))
                 .andExpect(status().isNotFound());
         mockMvc.perform(patch("/v1/films/23").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(badreq)))
                 .andExpect(status().isBadRequest());
         mockMvc.perform(patch("/v1/films/24").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(badreq2)))
                 .andExpect(status().isBadRequest());
-        mockMvc.perform(patch("/v1/films/333").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(badreq3)))
-                .andExpect(status().isBadRequest());
+//        mockMvc.perform(patch("/v1/films/333").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(badreq3)))
+//                .andExpect(status().isBadRequest());
 
     }
 
     @Test
     void testDelete() throws Exception {
         logger.info("testDelete");
-        FilmInfo r = new FilmInfo(333L,"IT",(short)25,2L);
+        FilmInfo r = new FilmInfo(333L,"IT",(short)25,null);
         doReturn(r).when(fs).deleteFilm(PARAMS1[0]);
         doThrow(new IllegalStateException("Film with name"+PARAMS3[0]+"was not found.")).when(fs).deleteFilm(PARAMS3[0]);
 
@@ -306,7 +319,7 @@ public class FilmControllerTest {
                 .andExpect(jsonPath("$.id").value(333L))
                 .andExpect(jsonPath("$.name").value(PARAMS1[0]))
                 .andExpect(jsonPath("$.rating").value(25))
-                .andExpect(jsonPath("$.gid").value(2L));
+                .andExpect(jsonPath("$.genres").value(IsNull.nullValue()));
 
         mockMvc.perform(post("/v1/films/delete/"+PARAMS3[0]).header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isNotFound());

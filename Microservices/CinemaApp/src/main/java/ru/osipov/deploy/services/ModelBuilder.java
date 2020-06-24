@@ -20,7 +20,7 @@ public class ModelBuilder {
     @Nonnull
     public static RoomInfo buildRoomInfo(@Nonnull Room ri) {
         logger.info("Room: '{}'",ri);
-        return new RoomInfo(ri.getRid(),ri.getCinema().getCid(), ri.getCategory(),ri.getSize(),ri.getSeats().stream().map(ModelBuilder::buildSeatInfo).collect(Collectors.toList()));
+        return new RoomInfo(ri.getRid(),ri.getCinema().getCid(), ri.getCategory(),ri.getSize(),ri.getRoomNum(),ri.getSeats().stream().map(ModelBuilder::buildSeatInfo).collect(Collectors.toList()));
     }
 
     @Nonnull
