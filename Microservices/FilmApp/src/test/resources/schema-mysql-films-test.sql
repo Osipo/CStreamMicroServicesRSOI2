@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS film(fid BIGINT NOT NULL auto_increment,
     CONSTRAINT film_rating_CH CHECK( (rating >= 0) AND (rating <= 100))
 );
 
-CREATE TABLE IF NOT EXISTS genre(gid BIGINT NOT NULL auto_increment,
+CREATE TABLE IF NOT EXISTS genres(gid BIGINT NOT NULL auto_increment,
     gname VARCHAR(100) NOT NULL,
     remarks TEXT null,
     CONSTRAINT genre_PK PRIMARY KEY(gid)

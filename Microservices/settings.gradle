@@ -1,6 +1,6 @@
 rootProject.name = 'Microservices'
 include 'DiscoveryService'
-include 'GenreApp'
+include 'OrderApp'
 include 'FilmApp'
 include 'SeanceApp'
 include 'CinemaApp'
