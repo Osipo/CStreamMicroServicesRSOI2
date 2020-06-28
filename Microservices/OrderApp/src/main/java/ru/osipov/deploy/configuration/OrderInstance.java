@@ -13,7 +13,8 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import ru.osipov.deploy.entities.Genre;
+import ru.osipov.deploy.entities.Order;
+import ru.osipov.deploy.entities.OrderItem;
 
 import javax.sql.DataSource;
 
@@ -21,38 +22,38 @@ import javax.sql.DataSource;
 @Primary
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages = "ru.osipov.deploy.repositories",
-        entityManagerFactoryRef = "genresEntityManagerFactory",
-        transactionManagerRef= "genresTransactionManager"
+        entityManagerFactoryRef = "ordersEntityManagerFactory",
+        transactionManagerRef= "ordersTransactionManager"
 )
 public class OrderInstance {
     @Bean
     @Primary
-    @ConfigurationProperties("app.datasource.genres")
-    public DataSourceProperties genresDataSourceProperties() {
+    @ConfigurationProperties("app.datasource.orders")
+    public DataSourceProperties ordersDataSourceProperties() {
         return new DataSourceProperties();
     }
     @Bean
     @Primary
-    @ConfigurationProperties("app.datasource.genres.configuration")
-    public DataSource genresDataSource() {
-        return genresDataSourceProperties().initializeDataSourceBuilder()
+    @ConfigurationProperties("app.datasource.orders.configuration")
+    public DataSource ordersDataSource() {
+        return ordersDataSourceProperties().initializeDataSourceBuilder()
                 .type(HikariDataSource.class).build();
     }
 
 
     @Primary
-    @Bean(name = "genresEntityManagerFactory")
-    public LocalContainerEntityManagerFactoryBean genresEntityManagerFactory(EntityManagerFactoryBuilder builder) {
+    @Bean(name = "ordersEntityManagerFactory")
+    public LocalContainerEntityManagerFactoryBean ordersEntityManagerFactory(EntityManagerFactoryBuilder builder) {
         return builder
-                .dataSource(genresDataSource())
-                .packages(Order.class)
+                .dataSource(ordersDataSource())
+                .packages(Order.class, OrderItem.class)
                 .build();
     }
 
     @Primary
     @Bean
-    public PlatformTransactionManager genresTransactionManager(
-            final @Qualifier("genresEntityManagerFactory") LocalContainerEntityManagerFactoryBean genresEntityManagerFactory) {
-        return new JpaTransactionManager(genresEntityManagerFactory.getObject());
+    public PlatformTransactionManager ordersTransactionManager(
+            final @Qualifier("ordersEntityManagerFactory") LocalContainerEntityManagerFactoryBean ordersEntityManagerFactory) {
+        return new JpaTransactionManager(ordersEntityManagerFactory.getObject());
     }
 }

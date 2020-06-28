@@ -31,7 +31,7 @@ public class OrderController {
     private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
     @Autowired
-    public GenreController(OrderService os, JwtTokenProvider tokenProvider){
+    public OrderController(OrderService os, JwtTokenProvider tokenProvider){
         this.oService = os;
         this.tokenProvider = tokenProvider;
     }

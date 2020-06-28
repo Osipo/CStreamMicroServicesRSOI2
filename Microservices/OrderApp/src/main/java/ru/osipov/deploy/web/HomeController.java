@@ -16,7 +16,7 @@ public class HomeController {
     @RequestMapping(value = "/",produces = APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity home() {
         logger.info("Home path: /v1/");
-        return ResponseEntity.ok("{\"serviceName\": \"GenreService\"}");
+        return ResponseEntity.ok("{\"serviceName\": \"OrderService\"}");
         //return "index";
     }
 }
