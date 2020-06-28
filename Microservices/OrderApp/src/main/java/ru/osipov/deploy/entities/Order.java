@@ -42,7 +42,7 @@ public class Order {
 
     @Override
     public int hashCode(){
-        return Objects.hashCode(oid,sum,createdAt,createdTime,updatedAt,status,uid,items);
+        return Objects.hashCode(oid,sum,createdAt,createdTime,uid,items);
     }
 
     @Override

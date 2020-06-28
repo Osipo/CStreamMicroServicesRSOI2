@@ -36,7 +36,7 @@ public class OrderItem {
 
     @Override
     public int hashCode(){
-        return Objects.hashCode(id,price,discount,sid,seatId,order);
+        return Objects.hashCode(id,sid,seatId);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class OrderItem {
         return Objects.equal(id, oi.id) && Objects.equal(price,oi.price) &&
                 Objects.equal(discount,oi.discount) &&
                 Objects.equal(sid,oi.sid) &&
-                Objects.equal(seatId,oi.seatId) && Objects.equal(order, oi.order);
+                Objects.equal(seatId,oi.seatId);
     }
 
     @Override
