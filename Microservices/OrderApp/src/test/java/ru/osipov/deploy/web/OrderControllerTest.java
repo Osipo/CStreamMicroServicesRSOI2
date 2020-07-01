@@ -23,6 +23,7 @@ import org.hamcrest.core.IsNull;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,5 +65,23 @@ public class OrderControllerTest {
         when(serv.getByUpdatedDate(d)).thenReturn(res);
         mockMvc.perform(get("/v1/orders/?udate="+d.toString()).header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testGetByCTime() throws Exception {
+        LocalTime t = LocalTime.now();
+        LocalDate d = LocalDate.now();
+        List<OrderInfo> res = new ArrayList<>();
+        res.add(new OrderInfo(1l,1l,1000.0,"SELECTED",d,t,d,null));
+        System.out.println(t.toString());
+        when(serv.getByCreationTime(t)).thenReturn(res);
+        mockMvc.perform(get("/v1/orders/?ctime="+t.toString()).header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8_VALUE).contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].oid").value(1l))
+                .andExpect(jsonPath("$[0].status").value("SELECTED"))
+                .andExpect(jsonPath("$[0].created").value("2020-07-01"));
+        mockMvc.perform(get("/v1/orders/?ctime=undef").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8_VALUE).contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(status().isBadRequest());
     }
 }

@@ -1,5 +1,6 @@
 package ru.osipov.deploy.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.google.common.base.Objects;
 import lombok.Getter;
 import lombok.ToString;
@@ -26,10 +27,13 @@ public class OrderInfo {
     @Getter
     private final String status;
     @Getter
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private final LocalDate created;
     @Getter
+    @JsonFormat(pattern = "HH:mm:ss.SS")
     private final LocalTime ctime;
     @Getter
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private final LocalDate updated;
 
     @Getter

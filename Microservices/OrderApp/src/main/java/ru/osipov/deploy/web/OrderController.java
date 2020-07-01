@@ -85,7 +85,7 @@ public class OrderController {
 
 
     @GetMapping(path = "/",produces = APPLICATION_JSON_UTF8_VALUE, params = "cdate")
-    public ResponseEntity getByCDate(@RequestParam(name = "cdate") LocalDate date){
+    public ResponseEntity getByCDate(@RequestParam(name = "cdate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date){
         logger.info("GET /v1/orders/?cdate={}'",date);
         List<OrderInfo> res = oService.getByCreationDate(date);
         if(res.size() == 0){
@@ -96,7 +96,7 @@ public class OrderController {
     }
 
     @GetMapping(path = "/", produces = APPLICATION_JSON_UTF8_VALUE, params = "ctime")
-    public ResponseEntity getByCTime(@RequestParam(name = "ctime") LocalTime time){
+    public ResponseEntity getByCTime(@RequestParam(name = "ctime") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime time){
         logger.info("GET /v1/orders/?ctime={}'",time);
         List<OrderInfo> res = oService.getByCreationTime(time);
         if(res.size() == 0){
