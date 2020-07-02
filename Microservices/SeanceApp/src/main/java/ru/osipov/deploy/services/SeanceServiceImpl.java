@@ -5,10 +5,12 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.osipov.deploy.entities.RoomsCinema;
 import ru.osipov.deploy.entities.Seance;
 import ru.osipov.deploy.entities.SeancePK;
 import ru.osipov.deploy.models.CreateSeance;
 import ru.osipov.deploy.models.SeanceInfo;
+import ru.osipov.deploy.repositories.RoomsCinemaRepository;
 import ru.osipov.deploy.repositories.SeanceRepository;
 
 import javax.annotation.Nonnull;
@@ -25,11 +27,13 @@ public class SeanceServiceImpl implements SeanceService{
 
     private final SeanceRepository rep;
 
+    private final RoomsCinemaRepository r2;
+
     private static final Logger logger = getLogger(SeanceServiceImpl.class);
 
     @Autowired
-    public SeanceServiceImpl(SeanceRepository r){
-        this.rep = r;
+    public SeanceServiceImpl(SeanceRepository r, RoomsCinemaRepository r2){
+        this.rep = r; this.r2 = r2;
     }
 
     @Override
@@ -60,7 +64,7 @@ public class SeanceServiceImpl implements SeanceService{
     @Transactional(readOnly = true)
     public SeanceInfo getSeanceByFilmAndCinema(Long fid, Long cid) {
         logger.info("Get seance of film = '{}' from cinema = '{}'",fid,cid);
-        return rep.findByFidAndCid(fid,cid).map(this::buildModel).orElse(new SeanceInfo(-1l,-1l, LocalDate.now()));
+        return rep.findByFidAndCid(fid,cid).map(this::buildModel).orElse(new SeanceInfo(-1l,-1l,-1l,-1l, LocalDate.now(),LocalTime.now()));
     }
 
     @NonNull
@@ -111,7 +115,7 @@ public class SeanceServiceImpl implements SeanceService{
         if(o.isPresent()){
             logger.info("Seance was found.");
             Seance s = o.get();
-            s.setCid(data.getCid());
+            s.getRid().setCid(data.getCid());
             s.setFid(data.getFid());
             s.setDate(data.getDate());
             logger.info("New values are set.");
@@ -131,14 +135,32 @@ public class SeanceServiceImpl implements SeanceService{
         logger.info("Creating seance...");
         logger.info("Vals:\n\t cid = '{}'\n\t fid = '{}' \n\tdate = '{}'",request.getCid(),
                 request.getFid(),request.getDate().toString());
-        Seance c = new Seance(request.getCid(),request.getFid());
-        c.setDate(request.getDate());
-        c = rep.save(c);
-        logger.info("Successful created.");
-        return URI.create("/v1/seances/"+c.getCid()+"/"+c.getFid());
+
+        logger.info("Try to get Room with Cinema by their ids: '{}', '{}'",request.getCid(),request.getRid());
+        Optional<RoomsCinema> o = r2.findByRid(request.getRid());
+        if(o.isPresent()){
+            RoomsCinema rc = o.get();
+            if(rc.getCid() == request.getCid()){
+                //sid, rid, fid, date, time, tickets
+                Seance c = new Seance()
+                        .setRid(rc)
+                        .setFid(request.getFid())
+                        .setDate(request.getDate())
+                        .setTime(request.getTime());
+
+                c = rep.save(c);
+                logger.info("Successful created.");
+                return URI.create("/v1/seances/"+c.getRid().getCid()+"/"+c.getFid());
+            }
+            logger.info("Cannot create seance. The cinema with id '{}' does not exist!",request.getCid());
+        }
+        else{
+            logger.info("Cannot create seance. The room with id '{}' does not exist!",request.getRid());
+        }
+        return null;
     }
 
     private SeanceInfo buildModel(Seance s){
-        return new SeanceInfo(s.getCid(),s.getFid(),s.getDate());
+        return new SeanceInfo(s.getSid(),s.getRid().getCid(),s.getRid().getRid(),s.getFid(),s.getDate(),s.getTime());
     }
 }

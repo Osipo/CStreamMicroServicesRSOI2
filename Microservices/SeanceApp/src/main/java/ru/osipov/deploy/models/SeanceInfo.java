@@ -7,12 +7,17 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Accessors(chain = true)
 @ToString
 public class SeanceInfo {
     @Getter
+    private final Long sid;
+    @Getter
     private final Long cid;
+    @Getter
+    private final Long rid;
     @Getter
     private final Long fid;
     @Getter
@@ -20,17 +25,17 @@ public class SeanceInfo {
     private final LocalDate date;
 
     @Getter
-    private final Long tid;
+    @JsonFormat(pattern = "HH:mm:ss")
+    private final LocalTime time;
 
-    public SeanceInfo(Long cid,Long fid,LocalDate ld, Long tid){
+
+    public SeanceInfo(Long sid,Long cid,Long rid, Long fid,LocalDate ld,LocalTime lt){
+        this.sid = sid;
         this.cid = cid;
+        this.rid = rid;
         this.fid = fid;
         this.date = ld;
-        this.tid = tid;
-    }
-
-    public SeanceInfo(Long cid, Long fid,LocalDate ld){
-        this(cid,fid,ld,1l);
+        this.time = lt;
     }
 
     @Override
@@ -38,11 +43,11 @@ public class SeanceInfo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SeanceInfo si = (SeanceInfo) o;
-        return  Objects.equal(cid,si.cid) && Objects.equal(fid,si.fid) && Objects.equal(tid,si.tid);
+        return  Objects.equal(sid,si.sid) && Objects.equal(cid,si.cid) && Objects.equal(rid,si.rid) && Objects.equal(fid,si.fid) && Objects.equal(date,si.date);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(cid,fid,tid);
+        return Objects.hashCode(sid,cid,rid,fid,date);
     }
 }

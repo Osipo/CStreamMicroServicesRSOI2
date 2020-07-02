@@ -22,6 +22,7 @@ import ru.osipov.deploy.web.utils.LocalDateAdapter;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,24 +63,24 @@ public class SeanceControllerTest {
     void testGetAll() throws Exception {
         logger.info("testAll");
         final List<SeanceInfo> seances = new ArrayList<>();
-        seances.add(new SeanceInfo(Long.parseLong(PARAMS1[0]),Long.parseLong(PARAMS1[1]), LocalDate.parse(PARAMS1[2])));
-        seances.add(new SeanceInfo(Long.parseLong(PARAMS2[0]),Long.parseLong(PARAMS2[1]), LocalDate.parse(PARAMS2[2])));
-        seances.add(new SeanceInfo(Long.parseLong(PARAMS3[0]),Long.parseLong(PARAMS2[1]), LocalDate.parse(PARAMS3[2])));
+        seances.add(new SeanceInfo(Long.parseLong(PARAMS1[0]),Long.parseLong(PARAMS1[1]),Long.parseLong(PARAMS1[2]),Long.parseLong(PARAMS1[3]), LocalDate.parse(PARAMS1[4]), null));
+        seances.add(new SeanceInfo(Long.parseLong(PARAMS2[0]),Long.parseLong(PARAMS2[1]),Long.parseLong(PARAMS2[2]),Long.parseLong(PARAMS2[3]), LocalDate.parse(PARAMS2[4]), null));
+        seances.add(new SeanceInfo(Long.parseLong(PARAMS3[0]),Long.parseLong(PARAMS3[1]),Long.parseLong(PARAMS3[2]),Long.parseLong(PARAMS2[3]), LocalDate.parse(PARAMS3[4]), null));
         when(serv.getAllSeances()).thenReturn(seances);
         mockMvc.perform(get("/v1/seances").header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].cid").value(Long.parseLong(PARAMS1[0])))
-                .andExpect(jsonPath("$[0].fid").value(Long.parseLong(PARAMS1[1])))
-                .andExpect(jsonPath("$[0].date").value(PARAMS1[2]))
-                .andExpect(jsonPath("$[1].cid").value(Long.parseLong(PARAMS2[0])))
-                .andExpect(jsonPath("$[1].fid").value(Long.parseLong(PARAMS2[1])))
-                .andExpect(jsonPath("$[1].date").value(PARAMS2[2]))
-                .andExpect(jsonPath("$[2].cid").value(Long.parseLong(PARAMS3[0])))
-                .andExpect(jsonPath("$[2].fid").value(Long.parseLong(PARAMS2[1])))
-                .andExpect(jsonPath("$[2].date").value(PARAMS3[2]));
+                .andExpect(jsonPath("$[0].cid").value(Long.parseLong(PARAMS1[1])))
+                .andExpect(jsonPath("$[0].fid").value(Long.parseLong(PARAMS1[3])))
+                .andExpect(jsonPath("$[0].date").value(PARAMS1[4]))
+                .andExpect(jsonPath("$[1].cid").value(Long.parseLong(PARAMS2[1])))
+                .andExpect(jsonPath("$[1].fid").value(Long.parseLong(PARAMS2[3])))
+                .andExpect(jsonPath("$[1].date").value(PARAMS2[4]))
+                .andExpect(jsonPath("$[2].cid").value(Long.parseLong(PARAMS3[1])))
+                .andExpect(jsonPath("$[2].fid").value(Long.parseLong(PARAMS2[3])))
+                .andExpect(jsonPath("$[2].date").value(PARAMS3[4]));
     }
 
     @Test
@@ -88,26 +89,26 @@ public class SeanceControllerTest {
         List<SeanceInfo> emt = new ArrayList<>();
 
         final List<SeanceInfo> seances = new ArrayList<>();
-        seances.add(new SeanceInfo(Long.parseLong(PARAMS1[0]),Long.parseLong(PARAMS1[1]), LocalDate.parse(PARAMS1[2])));
-        seances.add(new SeanceInfo(Long.parseLong(PARAMS1[0]),Long.parseLong(PARAMS2[1]), LocalDate.parse(PARAMS2[2])));
-        seances.add(new SeanceInfo(Long.parseLong(PARAMS1[0]),Long.parseLong(PARAMS2[1]), LocalDate.parse(PARAMS3[2])));
+        seances.add(new SeanceInfo(Long.parseLong(PARAMS1[0]),Long.parseLong(PARAMS1[1]),Long.parseLong(PARAMS1[2]),Long.parseLong(PARAMS1[3]), LocalDate.parse(PARAMS1[4]), null));
+        seances.add(new SeanceInfo(Long.parseLong(PARAMS2[0]),Long.parseLong(PARAMS2[1]),Long.parseLong(PARAMS2[2]),Long.parseLong(PARAMS2[3]), LocalDate.parse(PARAMS2[4]), null));
+        seances.add(new SeanceInfo(Long.parseLong(PARAMS3[0]),Long.parseLong(PARAMS3[1]),Long.parseLong(PARAMS3[2]),Long.parseLong(PARAMS2[3]), LocalDate.parse(PARAMS3[4]), null));
         when(serv.getAllSeances()).thenReturn(emt);
-        when(serv.getSeancesInCinema(Long.parseLong(PARAMS1[0]))).thenReturn(seances);
+        when(serv.getSeancesInCinema(Long.parseLong(PARAMS1[1]))).thenReturn(seances);
 
-        mockMvc.perform(get("/v1/seances/"+PARAMS1[0]).header("Authorization","Basic "+token)
+        mockMvc.perform(get("/v1/seances/"+PARAMS1[1]).header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].cid").value(Long.parseLong(PARAMS1[0])))
-                .andExpect(jsonPath("$[0].fid").value(Long.parseLong(PARAMS1[1])))
-                .andExpect(jsonPath("$[0].date").value(PARAMS1[2]))
-                .andExpect(jsonPath("$[1].cid").value(Long.parseLong(PARAMS1[0])))
-                .andExpect(jsonPath("$[1].fid").value(Long.parseLong(PARAMS2[1])))
-                .andExpect(jsonPath("$[1].date").value(PARAMS2[2]))
-                .andExpect(jsonPath("$[2].cid").value(Long.parseLong(PARAMS1[0])))
-                .andExpect(jsonPath("$[2].fid").value(Long.parseLong(PARAMS2[1])))
-                .andExpect(jsonPath("$[2].date").value(PARAMS3[2]));
+                .andExpect(jsonPath("$[0].cid").value(Long.parseLong(PARAMS1[1])))
+                .andExpect(jsonPath("$[0].fid").value(Long.parseLong(PARAMS1[3])))
+                .andExpect(jsonPath("$[0].date").value(PARAMS1[4]))
+                .andExpect(jsonPath("$[1].cid").value(Long.parseLong(PARAMS1[1])))
+                .andExpect(jsonPath("$[1].fid").value(Long.parseLong(PARAMS2[3])))
+                .andExpect(jsonPath("$[1].date").value(PARAMS2[4]))
+                .andExpect(jsonPath("$[2].cid").value(Long.parseLong(PARAMS1[1])))
+                .andExpect(jsonPath("$[2].fid").value(Long.parseLong(PARAMS2[3])))
+                .andExpect(jsonPath("$[2].date").value(PARAMS3[4]));
         mockMvc.perform(get("/v1/seances/").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -119,21 +120,21 @@ public class SeanceControllerTest {
     void getByDate() throws Exception {
         logger.info("testByDate");
         final List<SeanceInfo> seances = new ArrayList<>();
-        seances.add(new SeanceInfo(Long.parseLong(PARAMS1[0]),Long.parseLong(PARAMS1[1]),LocalDate.parse(PARAMS1[2])));
+        seances.add(new SeanceInfo(Long.parseLong(PARAMS1[0]),Long.parseLong(PARAMS1[1]),Long.parseLong(PARAMS1[2]),Long.parseLong(PARAMS1[3]), LocalDate.parse(PARAMS1[4]), null));
         final List<SeanceInfo> alls = new ArrayList<>();
-        alls.add(new SeanceInfo(Long.parseLong(PARAMS2[0]),Long.parseLong(PARAMS2[1]),LocalDate.parse(PARAMS2[2])));
+        alls.add(new SeanceInfo(Long.parseLong(PARAMS2[0]),Long.parseLong(PARAMS2[1]),Long.parseLong(PARAMS2[2]),Long.parseLong(PARAMS2[3]), LocalDate.parse(PARAMS2[4]), null));
 
-        when(serv.getSeancesByDate(PARAMS1[2])).thenReturn(seances);
+        when(serv.getSeancesByDate(PARAMS1[4])).thenReturn(seances);
         when(serv.getAllSeances()).thenReturn(alls);
 
-        mockMvc.perform(get("/v1/seances?date="+PARAMS1[2]).header("Authorization","Basic "+token)
+        mockMvc.perform(get("/v1/seances?date="+PARAMS1[4]).header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].cid").value(Long.parseLong(PARAMS1[0])))
-                .andExpect(jsonPath("$[0].fid").value(Long.parseLong(PARAMS1[1])))
-                .andExpect(jsonPath("$[0].date").value(PARAMS1[2]));
+                .andExpect(jsonPath("$[0].cid").value(Long.parseLong(PARAMS1[1])))
+                .andExpect(jsonPath("$[0].fid").value(Long.parseLong(PARAMS1[3])))
+                .andExpect(jsonPath("$[0].date").value(PARAMS1[4]));
 
         //then parameter is null return all
 
@@ -141,47 +142,47 @@ public class SeanceControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].cid").value(Long.parseLong(PARAMS2[0])))
-                .andExpect(jsonPath("$[0].fid").value(Long.parseLong(PARAMS2[1])))
-                .andExpect(jsonPath("$[0].date").value(PARAMS2[2]));
+                .andExpect(jsonPath("$[0].cid").value(Long.parseLong(PARAMS2[1])))
+                .andExpect(jsonPath("$[0].fid").value(Long.parseLong(PARAMS2[3])))
+                .andExpect(jsonPath("$[0].date").value(PARAMS2[4]));
 
         mockMvc.perform(get("/v1/seances").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].cid").value(Long.parseLong(PARAMS2[0])))
-                .andExpect(jsonPath("$[0].fid").value(Long.parseLong(PARAMS2[1])))
-                .andExpect(jsonPath("$[0].date").value(PARAMS2[2]));
+                .andExpect(jsonPath("$[0].cid").value(Long.parseLong(PARAMS2[1])))
+                .andExpect(jsonPath("$[0].fid").value(Long.parseLong(PARAMS2[3])))
+                .andExpect(jsonPath("$[0].date").value(PARAMS2[4]));
     }
     @Test
     void getByDateBetween() throws Exception {
           logger.info("testByDateBetween");
           final List<SeanceInfo> an = new ArrayList<>();
-          an.add(new SeanceInfo(99l,99L,LocalDate.parse(PARAMS2[2])));
-          an.add(new SeanceInfo(88L,88L,LocalDate.parse(PARAMS3[2])));
-          an.add(new SeanceInfo(99l,77L,LocalDate.parse(PARAMS1[2])));
+            an.add(new SeanceInfo(Long.parseLong(PARAMS1[0]),99L,Long.parseLong(PARAMS1[2]),99L, LocalDate.parse(PARAMS2[4]), null));
+            an.add(new SeanceInfo(Long.parseLong(PARAMS2[0]),88L,Long.parseLong(PARAMS2[2]),88L, LocalDate.parse(PARAMS3[4]), null));
+            an.add(new SeanceInfo(Long.parseLong(PARAMS3[0]),99L,Long.parseLong(PARAMS3[2]),77L, LocalDate.parse(PARAMS1[4]), null));
           final List<SeanceInfo> empt = new ArrayList<>();
           final List<SeanceInfo> ond = new ArrayList<>();
-          ond.add(new SeanceInfo(Long.parseLong(PARAMS3[0]),Long.parseLong(PARAMS3[1]),LocalDate.parse(PARAMS2[2])));
-          when(serv.getSeancesByDateBetween(PARAMS2[2],PARAMS1[2])).thenReturn(an);//BETWEEN
+          ond.add(new SeanceInfo(Long.parseLong(PARAMS1[0]),Long.parseLong(PARAMS3[1]),Long.parseLong(PARAMS1[2]),Long.parseLong(PARAMS3[3]), LocalDate.parse(PARAMS2[4]), null));
+          when(serv.getSeancesByDateBetween(PARAMS2[4],PARAMS1[4])).thenReturn(an);//BETWEEN
           when(serv.getAllSeances()).thenReturn(empt);
-          when(serv.getSeancesByDate(PARAMS2[2])).thenReturn(ond);
-          when(serv.getSeancesByDateBefore(PARAMS1[2])).thenReturn(an);
+          when(serv.getSeancesByDate(PARAMS2[4])).thenReturn(ond);
+          when(serv.getSeancesByDateBefore(PARAMS1[4])).thenReturn(an);
 
-          mockMvc.perform(get("/v1/seances/date?d1="+PARAMS2[2]+"&&d2="+PARAMS1[2]).header("Authorization","Basic "+token)
+          mockMvc.perform(get("/v1/seances/date?d1="+PARAMS2[4]+"&&d2="+PARAMS1[4]).header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].cid").value(99L))
                 .andExpect(jsonPath("$[0].fid").value(99L))
-                .andExpect(jsonPath("$[0].date").value(PARAMS2[2]))
+                .andExpect(jsonPath("$[0].date").value(PARAMS2[4]))
                 .andExpect(jsonPath("$[1].cid").value(88L))
                 .andExpect(jsonPath("$[1].fid").value(88L))
-                .andExpect(jsonPath("$[1].date").value(PARAMS3[2]))
+                .andExpect(jsonPath("$[1].date").value(PARAMS3[4]))
                 .andExpect(jsonPath("$[2].cid").value(99L))
                 .andExpect(jsonPath("$[2].fid").value(77L))
-                .andExpect(jsonPath("$[2].date").value(PARAMS1[2]));
+                .andExpect(jsonPath("$[2].date").value(PARAMS1[4]));
 
         mockMvc.perform(get("/v1/seances/date?d1=&&d2=").header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
@@ -196,36 +197,37 @@ public class SeanceControllerTest {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").isEmpty());
 
-        mockMvc.perform(get("/v1/seances/date?d1="+PARAMS2[2]).header("Authorization","Basic "+token)
+        mockMvc.perform(get("/v1/seances/date?d1="+PARAMS2[4]).header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].cid").value(Long.parseLong(PARAMS3[0])))
-                .andExpect(jsonPath("$[0].fid").value(Long.parseLong(PARAMS3[1])))
-                .andExpect(jsonPath("$[0].date").value(PARAMS2[2]));
+                .andExpect(jsonPath("$[0].cid").value(Long.parseLong(PARAMS3[1])))
+                .andExpect(jsonPath("$[0].fid").value(Long.parseLong(PARAMS3[3])))
+                .andExpect(jsonPath("$[0].date").value(PARAMS2[4]));
 
-        mockMvc.perform(get("/v1/seances/date?d2="+PARAMS1[2]).header("Authorization","Basic "+token)
+        mockMvc.perform(get("/v1/seances/date?d2="+PARAMS1[4]).header("Authorization","Basic "+token)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].cid").value(99L))
                 .andExpect(jsonPath("$[0].fid").value(99L))
-                .andExpect(jsonPath("$[0].date").value(PARAMS2[2]))
+                .andExpect(jsonPath("$[0].date").value(PARAMS2[4]))
                 .andExpect(jsonPath("$[1].cid").value(88L))
                 .andExpect(jsonPath("$[1].fid").value(88L))
-                .andExpect(jsonPath("$[1].date").value(PARAMS3[2]))
+                .andExpect(jsonPath("$[1].date").value(PARAMS3[4]))
                 .andExpect(jsonPath("$[2].cid").value(99L))
                 .andExpect(jsonPath("$[2].fid").value(77L))
-                .andExpect(jsonPath("$[2].date").value(PARAMS1[2]));
+                .andExpect(jsonPath("$[2].date").value(PARAMS1[4]));
     }
 
     @Test
     void testUpdate() throws Exception {
         logger.info("testUpdate");
-        CreateSeance req = new CreateSeance(2L,10L,LocalDate.parse("2019-12-13"));
-        SeanceInfo r = new SeanceInfo(2L,10L,LocalDate.parse("2019-12-13"));
+        LocalTime lt = LocalTime.now();
+        CreateSeance req = new CreateSeance(2L,10L,1L,LocalDate.parse("2019-12-13"),lt);
+        SeanceInfo r = new SeanceInfo(2L,2L,1L,10L,LocalDate.parse("2019-12-13"),lt);
         when(serv.updateSeance(2L,10L,req)).thenReturn(r);
         doThrow(new IllegalStateException("NOT FOUND.")).when(serv).updateSeance(0L,2L,req);
         mockMvc.perform(patch("/v1/seances/2/10").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8).contentType(MediaType.APPLICATION_JSON_UTF8).content(gson.toJson(req)))
@@ -261,7 +263,7 @@ public class SeanceControllerTest {
     @Test
     void testCreate() throws Exception {
         logger.info("testCreate");
-        CreateSeance created = new CreateSeance(2L,2L,LocalDate.now());
+        CreateSeance created = new CreateSeance(2L,2L,1L,LocalDate.now(),LocalTime.now());
         final URI url = URI.create("/v1/genres/5");
         when(serv.createSeance(eq(created))).thenReturn(url);
         mockMvc.perform(post("/v1/seances/create").header("Authorization","Basic "+token)

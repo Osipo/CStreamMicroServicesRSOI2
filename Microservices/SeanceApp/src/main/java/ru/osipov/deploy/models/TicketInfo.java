@@ -11,19 +11,28 @@ import lombok.experimental.Accessors;
 public class TicketInfo {
 
     @Getter
-    private long tid;
+    private long seanceId;
     @Getter
     private long fid;
     @Getter
     private long cid;
     @Getter
+    private long rid;
+    @Getter
+    private long seatId;
+    @Getter
     private double price;
+    @Getter
+    private String ptype;
 
-    public TicketInfo(long tid, long fid, long cid, double price){
-        this.tid = tid;
+    public TicketInfo(long seanceId, long fid, long cid, long rid, long seatId, double price, String ptype){
+        this.seanceId = seanceId;
         this.fid = fid;
         this.cid = cid;
+        this.rid = rid;
+        this.seatId = seatId;
         this.price = price;
+        this.ptype = ptype;
     }
 
 
@@ -32,12 +41,12 @@ public class TicketInfo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TicketInfo ti = (TicketInfo) o;
-        return  Objects.equal(cid,ti.cid) && Objects.equal(fid,ti.fid) && Objects.equal(tid,ti.tid) &&
+        return  Objects.equal(seanceId,ti.seanceId) && Objects.equal(seatId,ti.seatId) &&
                 Objects.equal(price,ti.price);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(cid,fid,tid,price);
+        return Objects.hashCode(seanceId,seatId,price);
     }
 }

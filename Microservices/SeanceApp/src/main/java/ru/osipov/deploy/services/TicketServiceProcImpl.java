@@ -35,11 +35,13 @@ public class TicketServiceProcImpl extends TicketServiceImpl implements TicketSe
     @Override
     public List<TicketInfo> getAllTicketsByPrice(double price) {
         logger.info("Get all tickets by price proc call:: "+price);
-        List<Seance> seances = srep.findAll();
         List<Ticket> tickets = trep.findByPrice(price);
         List<TicketInfo> ticketsinfo = new ArrayList<>();
         for(Ticket t : tickets){
-            ticketsinfo.add(new TicketInfo(t.getTid(),-1L,-1L,t.getPrice()));
+            ticketsinfo.add(
+                    new TicketInfo(t.getSeance().getSid(),t.getSeance().getFid(),
+                            t.getSeance().getRid().getCid(),t.getSeance().getRid().getRid(),
+                            t.getSeatId(),t.getPrice(),t.getPtype()));
         }
         return ticketsinfo;
     }

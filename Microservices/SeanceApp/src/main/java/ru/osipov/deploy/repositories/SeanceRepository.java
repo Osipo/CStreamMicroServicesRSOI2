@@ -15,13 +15,18 @@ import java.util.Optional;
 
 public interface SeanceRepository extends JpaRepository<Seance, SeancePK> {
     List<Seance> findByFid(Long fid);
+
+    @Query("select r from RoomsCinema c join Seance r where c.cid = ?1")
     List<Seance> findByCid(Long cid);
+
+    @Query("select r from RoomsCinema c join Seance r where c.cid = ?1 AND r.fid = ?2")
     Optional<Seance> findByFidAndCid(Long fid, Long cid);
-    Optional<Ticket> findByTid(Long tid);
 
     List<Seance> findAllByDate(LocalDate begining);
-    List<Seance> findAllByDateBetween(LocalDate beginingStart, LocalDate beginingEnd);
 
-    @Query(value = "select * from Seance a where a.begining <= :start",nativeQuery = true)
+    @Query(value = "select * from Seance a where a.begining_date >= :beginingStart AND a.begining_date <= :beginingEnd", nativeQuery = true)
+    List<Seance> findAllByDateBetween(@Param("beginingStart") LocalDate beginingStart,@Param("beginingEnd") LocalDate beginingEnd);
+
+    @Query(value = "select * from Seance a where a.begining_date <= :start",nativeQuery = true)
     List<Seance> findAllByDateBefore(@Param("start") LocalDate start);
 }

@@ -12,6 +12,7 @@ import ru.osipov.deploy.repositories.TicketRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -34,8 +35,9 @@ public class TicketServiceImpl implements TicketService {
         List<Seance> seances = srep.findAll();
         List<TicketInfo> tickets = new ArrayList<>();
         for(Seance s : seances){
-            Ticket t = trep.getOne(s.getTid());
-            tickets.add(buildModel(t,s.getFid(),s.getCid()));
+            Set<Ticket> ts = s.getTickets();
+            for(Ticket t : ts)
+                 tickets.add(buildModel(s,t));
         }
         return tickets;
     }
@@ -46,14 +48,15 @@ public class TicketServiceImpl implements TicketService {
         List<Seance> seances = srep.findAll();
         List<TicketInfo> tickets = new ArrayList<>();
         for(Seance s : seances){
-            Ticket t = trep.getOne(s.getTid());
-            if(t.getPrice().equals(price))
-                tickets.add(buildModel(t,s.getFid(),s.getCid()));
+            Set<Ticket> ts = s.getTickets();
+            for(Ticket t : ts)
+                if(t.getPrice().equals(price))
+                    tickets.add(buildModel(s,t));
         }
         return tickets;
     }
 
-    private TicketInfo buildModel(Ticket t,Long fid, Long cid){
-        return new TicketInfo(t.getTid(),fid,cid,t.getPrice());
+    private TicketInfo buildModel(Seance s,Ticket t){
+        return new TicketInfo(s.getSid(),s.getFid(),s.getRid().getCid(),s.getRid().getRid(),t.getSeatId(),t.getPrice(),t.getPtype());
     }
 }

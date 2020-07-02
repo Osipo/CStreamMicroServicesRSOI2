@@ -3,7 +3,6 @@ CREATE TABLE IF NOT EXISTS rooms_cinema(
   cid bigint not null,
   CONSTRAINT rooms_cinema_PK PRIMARY KEY(room_id)
 );
-GO
 CREATE TABLE IF NOT EXISTS seance(
     sid bigint not null,
     room_id bigint not null,
@@ -15,8 +14,6 @@ CREATE TABLE IF NOT EXISTS seance(
     REFERENCES rooms_cinema(room_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-
-GO
 CREATE TABLE IF NOT EXISTS ticket(
      sid bigint not null,
      room_id bigint not null,

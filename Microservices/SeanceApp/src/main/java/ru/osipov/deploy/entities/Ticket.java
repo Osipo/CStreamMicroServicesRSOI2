@@ -20,40 +20,54 @@ import javax.persistence.*;
         }
 )
 @Table(name = "ticket")
+@IdClass(TicketPK.class)
+@AllArgsConstructor
 @NoArgsConstructor
 public class Ticket {
 
+
     @Id
-    @Column(name = "tid", nullable = false)
-    private Long tid;
+    @Column(name = "seat_id",nullable = false)
+    private Long seatId;
 
     @Column(name = "price",nullable = false)
     private Double price;
 
-    public Ticket(Long tid, Double price){
-        this.tid = tid;
-        this.price = price;
-    }
+    @Column(name = "payment_type",nullable = false)
+    private String ptype;
 
+    @Id
+    @ManyToOne
+    @JoinColumns ({
+            @JoinColumn(name="sid", referencedColumnName = "sid"),
+            @JoinColumn(name="rid", referencedColumnName = "room_id")
+    })
+    private Seance sid;
+
+
+    public Seance getSeance(){
+        return sid;
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Ticket t = (Ticket) o;
-        return  Objects.equal(tid, t.tid) &&
-                Objects.equal(price,t.price);
+        return  Objects.equal(seatId, t.seatId) && Objects.equal(sid,t.sid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(tid,price);
+        return Objects.hashCode(seatId,sid);
     }
 
     @Override
     public String toString() {
         return com.google.common.base.MoreObjects.toStringHelper(this)
-                .add("tid",tid)
+                .add("seatId",seatId)
                 .add("price",price)
+                .add("payment",ptype)
+                .add("seance",sid)
                 .toString();
     }
 }

@@ -3,13 +3,13 @@ package ru.osipov.deploy.entities;
 import java.io.Serializable;
 
 public class SeancePK implements Serializable {
-    protected Long cid;
-    protected Long fid;
+    protected Long sid;
+    protected Long rid;
 
     public SeancePK(){}
 
-    public SeancePK(Long cid, Long fid){
-        this.cid = cid;
-        this.fid = fid;
+    public SeancePK(Long sid, RoomsCinema rid){
+        this.sid = sid;
+        this.rid = rid.getRid();
     }
 }

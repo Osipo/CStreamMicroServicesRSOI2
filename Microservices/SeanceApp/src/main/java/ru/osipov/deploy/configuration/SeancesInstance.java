@@ -13,6 +13,7 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import ru.osipov.deploy.entities.RoomsCinema;
 import ru.osipov.deploy.entities.Seance;
 import ru.osipov.deploy.entities.Ticket;
 
@@ -45,7 +46,7 @@ public class SeancesInstance {
             EntityManagerFactoryBuilder builder) {
         return builder
                 .dataSource(seancesDataSource())
-                .packages(Seance.class, Ticket.class)
+                .packages(RoomsCinema.class,Seance.class,Ticket.class)
                 .build();
     }
 

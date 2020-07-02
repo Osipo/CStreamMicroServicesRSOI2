@@ -69,6 +69,7 @@ dependencies {
 
     //compile 'mysql:mysql-connector-java'
     compile group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
+    compile('org.javassist:javassist:3.23.1-GA') {force = true}
 
     //Coveralls plugin
     //compile group: 'org.eluder.coveralls', name: 'coveralls-maven-plugin', version: '4.3.0'
