@@ -56,6 +56,11 @@ public class SeanceRepoTest {
         List<Seance> r = sRep.findAllByDateBefore(LocalDate.parse("2030-12-03"));
         assert r != null;
         assert r.size() == 3;
+        System.out.println(r.get(0).getDate().toString());
+        assert r.get(0).getDate().toString().equals("2030-12-03");
+        assert r.get(0).getRid() != null && r.get(0).getRid().getRid() == 1L
+                && r.get(0).getRid().getCid() == 2L;
+        assert r.get(0).getTickets() != null && r.get(0).getTickets().size() == 1;
     }
 
     @Test

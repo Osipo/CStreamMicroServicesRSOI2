@@ -40,7 +40,7 @@ public class Ticket {
     @ManyToOne
     @JoinColumns ({
             @JoinColumn(name="sid", referencedColumnName = "sid"),
-            @JoinColumn(name="rid", referencedColumnName = "room_id")
+            @JoinColumn(name="room_id", referencedColumnName = "room_id")
     })
     private Seance sid;
 
