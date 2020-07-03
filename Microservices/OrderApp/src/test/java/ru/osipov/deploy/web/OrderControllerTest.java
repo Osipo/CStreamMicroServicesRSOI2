@@ -22,6 +22,10 @@ import ru.osipov.deploy.services.OrderService;
 import org.hamcrest.core.IsNull;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import ru.osipov.deploy.utils.LocalTimeAdapter;
+import ru.osipov.deploy.web.utils.LocalDateAdapter;
+import ru.osipov.deploy.web.utils.LocalTimeAdapter;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -38,8 +42,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class OrderControllerTest {
     @Autowired
     private MockMvc mockMvc;
+    private Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(LocalDate.class,new LocalDateAdapter())
+            .registerTypeAdapter(LocalTime.class,new LocalTimeAdapter()).create();
 
-    private Gson gson = new GsonBuilder().create();
     private static final Logger logger = LoggerFactory.getLogger(OrderControllerTest.class);
 
     private static String token;
@@ -80,7 +85,7 @@ public class OrderControllerTest {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].oid").value(1l))
                 .andExpect(jsonPath("$[0].status").value("SELECTED"))
-                .andExpect(jsonPath("$[0].created").value("2020-07-01"));
+                .andExpect(jsonPath("$[0].created").value(d.toString()));
         mockMvc.perform(get("/v1/orders/?ctime=undef").header("Authorization","Basic "+token).accept(MediaType.APPLICATION_JSON_UTF8_VALUE).contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isBadRequest());
     }

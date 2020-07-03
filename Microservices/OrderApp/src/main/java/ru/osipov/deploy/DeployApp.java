@@ -17,4 +17,5 @@ public class DeployApp {
     public JwtTokenProvider jwtTokenProvider(){
         return new JwtTokenProvider();
     }
+
 }

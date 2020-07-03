@@ -17,6 +17,7 @@ import javax.sql.DataSource;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -61,6 +62,7 @@ public class SeanceRepoTest {
         assert r.get(0).getRid() != null && r.get(0).getRid().getRid() == 1L
                 && r.get(0).getRid().getCid() == 2L;
         assert r.get(0).getTickets() != null && r.get(0).getTickets().size() == 1;
+        assert r.get(0).getTickets().stream().collect(Collectors.toList()).get(0).getPrice() == 150.25D;
     }
 
     @Test

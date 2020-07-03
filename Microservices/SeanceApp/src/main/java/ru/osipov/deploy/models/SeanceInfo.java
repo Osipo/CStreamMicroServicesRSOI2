@@ -25,7 +25,7 @@ public class SeanceInfo {
     private final LocalDate date;
 
     @Getter
-    @JsonFormat(pattern = "HH:mm:ss")
+    @JsonFormat(pattern = "HH:mm:ss.SS")
     private final LocalTime time;
 
 

@@ -1,2 +1,5 @@
-SET @rows = (SELECT 1 from seance LIMIT 1);
-SET @rows = ch1(@rows);
+INSERT INTO rooms_cinema (room_id, cid) VALUES (1,2), (2,2), (3,1), (4,1);
+INSERT INTO seance (sid, room_id, fid, begining_date, begining_time)
+VALUES (1,1,10,'2030-12-19','15:00:00'), (2,1,11,'2030-12-03','16:00:00'), (2,2,12,'2030-12-05','17:00:00'),
+(2,3,10,'2030-11-25','14:00:00'), (3,3,11,'2030-11-24','16:00:00');
+INSERT INTO ticket(seat_id, sid, room_id, price, payment_type) VALUES (100,2,1,150.25,'SELECTED');

@@ -146,10 +146,12 @@ public class SeanceController {
 
     //POST: /v1/seances/create
     //PROTECTED
-    @PostMapping(consumes = APPLICATION_JSON_UTF8_VALUE, path = "/create")
-    public ResponseEntity createSeance(@RequestBody @Valid CreateSeance data, @RequestHeader HttpHeaders headers){
+    @PostMapping(consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE, path = "/create")
+    public ResponseEntity createSeance(@Valid @RequestBody CreateSeance data, @RequestHeader HttpHeaders headers){
         logger.info("/v1/seances/create");
-        final URI url = seanceService.createSeance(data);
-        return ResponseEntity.created(url).build();
+        System.out.println("Data: "+data.toString());
+        final URI location = seanceService.createSeance(data);
+        System.out.println(location);
+        return ResponseEntity.created(location).build();
     }
 }
