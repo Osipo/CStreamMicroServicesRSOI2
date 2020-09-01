@@ -1,6 +1,7 @@
 package ru.osipov.deploy.services;
 
 import org.slf4j.Logger;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.osipov.deploy.models.CinemaInfo;
@@ -12,7 +13,8 @@ import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-@Service
+@Service("CinemaWithRoomsSeviceImpl")
+@Component
 public class CinemaWithRoomsSeviceImpl extends CinemaServiceImpl implements CinemaWithRoomsService {
 
     private static final Logger logger = getLogger(CinemaWithRoomsSeviceImpl.class);

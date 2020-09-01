@@ -12,7 +12,7 @@ import ru.osipov.deploy.errors.ApiException;
 import ru.osipov.deploy.models.*;
 import ru.osipov.deploy.services.WebCinemaService;
 import ru.osipov.deploy.services.WebFilmService;
-import ru.osipov.deploy.services.WebGenreService;
+import ru.osipov.deploy.services.WebOrderService;
 import ru.osipov.deploy.services.WebSeanceService;
 import ru.osipov.deploy.services.jwt.JwtTokenProvider;
 import ru.osipov.deploy.utils.Paginator;
@@ -36,7 +36,7 @@ public class ApiController {
 
     protected WebFilmService filmService;
 
-    protected WebGenreService genreService;
+    protected WebOrderService genreService;
 
     protected WebCinemaService cinemaService;
 
@@ -55,7 +55,7 @@ public class ApiController {
     private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
 
     @Autowired
-    public ApiController(WebFilmService fs, WebGenreService gs, WebCinemaService cs, WebSeanceService ss, JwtTokenProvider tokenProvider){
+    public ApiController(WebFilmService fs, WebOrderService gs, WebCinemaService cs, WebSeanceService ss, JwtTokenProvider tokenProvider){
         this.filmService = fs;
         this.genreService = gs;
         this.cinemaService = cs;

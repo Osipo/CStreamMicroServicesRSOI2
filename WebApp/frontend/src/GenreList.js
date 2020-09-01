@@ -70,6 +70,7 @@ class GenreList extends Component {
   componentDidMount() {
     this.setState({isLoading: true});
 
+    //After mounting request data from GenreService.
     fetch('/v1/api/genres')
       .then(response => response.json())
       .then(data => this.setState({genres: data, isLoading: false

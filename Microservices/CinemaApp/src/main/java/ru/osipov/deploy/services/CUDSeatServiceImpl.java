@@ -19,7 +19,7 @@ import java.util.Optional;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-@Service
+@Service("CUDSeatServiceImpl")
 public class CUDSeatServiceImpl extends SeatServiceImpl implements CUDSeatService {
 
     private static final Logger logger = getLogger(CUDSeatServiceImpl.class);

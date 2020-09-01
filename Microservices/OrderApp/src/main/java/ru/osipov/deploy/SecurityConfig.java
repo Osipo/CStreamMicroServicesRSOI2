@@ -3,6 +3,7 @@ package ru.osipov.deploy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,6 +14,7 @@ import ru.osipov.deploy.configuration.jwt.JwtConfigurer;
 import ru.osipov.deploy.configuration.jwt.JwtTokenProvider;
 
 @Configuration
+@ComponentScan("ru.osipov.deploy.configuration.jwt")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 

@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-@Service
+
 public class CinemaServiceImpl implements CinemaService {
 
     protected final CinemaRepository rep;

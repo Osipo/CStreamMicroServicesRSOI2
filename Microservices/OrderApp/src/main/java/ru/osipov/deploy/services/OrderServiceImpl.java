@@ -2,6 +2,7 @@ package ru.osipov.deploy.services;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import ru.osipov.deploy.entities.Order;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+@Service
 public class OrderServiceImpl implements OrderService {
 
     private static final Logger logger = getLogger(OrderServiceImpl.class);

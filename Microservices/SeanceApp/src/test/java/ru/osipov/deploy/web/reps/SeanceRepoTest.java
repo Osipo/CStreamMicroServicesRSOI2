@@ -67,7 +67,6 @@ public class SeanceRepoTest {
 
     @Test
     void findById(){
-        //Optional<Seance> o1 = sRep.findById(new SeancePK(2l,));
         Optional<Seance> o2 = sRep.findByFidAndCid(10l,2l);
         //assert o1.isPresent();
         assert o2.isPresent();

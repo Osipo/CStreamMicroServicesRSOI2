@@ -31,13 +31,13 @@ import java.util.Arrays;
 import java.util.Map;
 
 @Service
-public class WebGenreService {
+public class WebOrderService {
     @Autowired
     @LoadBalanced
     protected RestTemplate restTemplate;
     protected String token;
 
-    @Value("${service.genre.url}")
+    @Value("${service.order.url}")
     protected String serviceUrl;
     private static final Logger logger = LoggerFactory.getLogger(WebFilmService.class);
     private static final Gson gson = new GsonBuilder().serializeNulls().create();
@@ -45,7 +45,7 @@ public class WebGenreService {
 
     //protected String genreToken;
 
-    public WebGenreService(){
+    public WebOrderService(){
         if(serviceUrl == null)
             serviceUrl = "http://localhost:3333";
         this.token = getToken();

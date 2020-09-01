@@ -13,9 +13,4 @@ public class DeployApp {
         SpringApplication.run(DeployApp.class,args);
     }
 
-    @Bean
-    public JwtTokenProvider jwtTokenProvider(){
-        return new JwtTokenProvider();
-    }
-
 }

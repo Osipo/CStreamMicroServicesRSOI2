@@ -5,17 +5,17 @@ import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixThreadPoolKey;
 import ru.osipov.deploy.errors.ApiException;
 import ru.osipov.deploy.models.GenreInfo;
-import ru.osipov.deploy.services.WebGenreService;
+import ru.osipov.deploy.services.WebOrderService;
 
 import java.net.ConnectException;
 import java.util.List;
 
 public class GenreGetAllCommand extends HystrixCommand<GenreInfo[]> {
 
-    private WebGenreService service;
+    private WebOrderService service;
     private boolean failSilently;
 
-    public GenreGetAllCommand(WebGenreService service, boolean failSilently) {
+    public GenreGetAllCommand(WebOrderService service, boolean failSilently) {
         super(Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey("GenreServiceGroup")).andThreadPoolKey(
                 HystrixThreadPoolKey.Factory.asKey("GenreServicePool")));
         this.service = service;

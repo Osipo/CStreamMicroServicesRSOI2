@@ -16,7 +16,7 @@ import java.util.Optional;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-@Service
+@Service("CUDRoomServiceImpl")
 public class CUDRoomServiceImpl extends RoomServiceImpl implements CUDRoomService {
 
     private static final Logger logger = getLogger(CUDRoomServiceImpl.class);

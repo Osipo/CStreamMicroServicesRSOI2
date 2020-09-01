@@ -19,7 +19,7 @@ public interface SeanceRepository extends JpaRepository<Seance, SeancePK> {
     @Query("select r from RoomsCinema c join Seance r where c.cid = ?1")
     List<Seance> findByCid(Long cid);
 
-    @Query("select r from RoomsCinema c join Seance r where c.cid = ?1 AND r.fid = ?2")
+    @Query("select r from RoomsCinema c join Seance r on r.rid = c where c.cid = ?1 AND r.fid = ?2")
     Optional<Seance> findByFidAndCid(Long fid, Long cid);
 
     List<Seance> findAllByDate(LocalDate begining);

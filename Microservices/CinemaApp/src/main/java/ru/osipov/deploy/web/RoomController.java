@@ -29,6 +29,7 @@ public class RoomController {
     private static final Logger logger = LoggerFactory.getLogger(RoomController.class);
 
 
+
     private final CUDRoomService roomService;
 
     private final CUDSeatService seatService;

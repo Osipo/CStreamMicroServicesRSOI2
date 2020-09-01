@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-@Component("jwtTokenProvider")
+@Component
 public class JwtTokenProvider implements JwtTokenSupplier {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);

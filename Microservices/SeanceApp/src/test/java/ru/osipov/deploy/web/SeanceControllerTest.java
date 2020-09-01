@@ -228,7 +228,7 @@ public class SeanceControllerTest {
     @Test
     void testUpdate() throws Exception {
         logger.info("testUpdate");
-        LocalTime lt = LocalTime.parse("15:00:00.12");
+        LocalTime lt = LocalTime.parse("15:00:02.13");//now() produce difference (break equals())
         CreateSeance req = new CreateSeance(2L,10L,1L,LocalDate.parse("2019-12-13"),lt);
         SeanceInfo r = new SeanceInfo(2L,2L,1L,10L,LocalDate.parse("2019-12-13"),lt);
         when(serv.updateSeance(2L,10L,req)).thenReturn(r);
