@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -15,41 +16,27 @@ import javax.validation.constraints.Size;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateCinema {
+public class CreateSeat {
 
     @NonNull
     @NotBlank
-    @Size(min = 3)
-    private String name;
+    @Size(min = 2)
+    private String state;
 
     @NonNull
     @NotBlank
-    @NotEmpty
-    @Size(min = 3)
-    private String country;
+    @Min(value = 1)
+    private Long num;
 
     @NonNull
     @NotBlank
-    @NotEmpty
-    @Size(min = 3)
-    private String city;
-
-
-    private String region;
-
-    @NonNull
-    @NotBlank
-    @NotEmpty
-    @Size(min = 3)
-    private String street;
+    private Long rid;
 
     @Override
     public String toString(){
         return com.google.common.base.MoreObjects.toStringHelper(this)
-                .add("name", name)
-                .add("country", country)
-                .add("city",city)
-                .add("region",region)
-                .add("street",street).toString();
+                .add("state", state)
+                .add("number", num)
+                .add("rid",rid).toString();
     }
 }

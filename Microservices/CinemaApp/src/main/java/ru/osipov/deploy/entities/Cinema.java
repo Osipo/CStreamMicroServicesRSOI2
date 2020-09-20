@@ -32,7 +32,7 @@ public class Cinema {
     @Column(name = "country", nullable = false)
     private String country;
 
-    @OneToMany(mappedBy = "cinema")
+    @OneToMany(mappedBy = "cinema",  cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Room> rooms;
 
     @Override
@@ -49,7 +49,7 @@ public class Cinema {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(cid, cname,city,street, region != null ? region : 0,country,rooms);
+        return Objects.hashCode(cid, cname,city,street, region != null ? region : 0,country);
     }
 
     @Override

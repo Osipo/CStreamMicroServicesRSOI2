@@ -40,6 +40,7 @@ public class CinemaRepoTest {
         Optional<Cinema> o = cRep.findByCname("CMax");
         assert o.isPresent();
         assert o.get().getCname().equals("CMax");
+        assert o.get().getRooms() != null;
     }
 
     @Test

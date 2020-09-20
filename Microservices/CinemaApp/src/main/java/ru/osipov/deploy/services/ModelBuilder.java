@@ -32,6 +32,10 @@ public class ModelBuilder {
     @Nonnull
     public static CinemaInfo buildCinemaInfo(@Nonnull Cinema ci) {
         logger.info("Cinema: '{}'",ci);
-        return new CinemaInfo(ci.getCid(),ci.getCname(), ci.getCountry(),ci.getCity(),ci.getRegion(),ci.getStreet(),ci.getRooms().stream().map(ModelBuilder::buildRoomInfo).collect(Collectors.toList()));
+        System.out.println("Error produced by call getRooms() ");
+        try{
+        Thread.sleep(10000);
+        }catch(InterruptedException e ){}
+        return new CinemaInfo(ci.getCid(),ci.getCname(), ci.getCountry(),ci.getCity(),ci.getRegion(),ci.getStreet(),ci.getRooms() == null ? null : ci.getRooms().stream().map(ModelBuilder::buildRoomInfo).collect(Collectors.toList()));
     }
 }

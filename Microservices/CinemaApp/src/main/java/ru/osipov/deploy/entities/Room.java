@@ -33,12 +33,12 @@ public class Room {
     @JoinColumn(name="cid",nullable = false)
     private Cinema cinema;
 
-    @OneToMany(mappedBy = "room")
+    @OneToMany(mappedBy = "room",  cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Seat> seats;
 
     @Override
     public int hashCode(){
-        return Objects.hashCode(rid,category,size,cinema,seats);
+        return Objects.hashCode(rid,category,size);
     }
 
     @Override

@@ -29,7 +29,7 @@ public class Seat {
 
     @Override
     public int hashCode(){
-        return Objects.hashCode(sid,num,state,room);
+        return Objects.hashCode(sid,num,state);
     }
 
     @Override

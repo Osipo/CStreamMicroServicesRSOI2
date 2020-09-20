@@ -1,9 +1,13 @@
 package ru.osipov.deploy.models;
 
 import com.google.common.base.Objects;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+
+import java.beans.ConstructorProperties;
 
 @ToString
 @Accessors(chain = true)
@@ -19,14 +23,8 @@ public class GenreInfo {
     @Getter
     private final String remarks;
 
-    public GenreInfo(){
-        this.id = -1L;
-        this.name = "Error";
-        this.remarks = null;
-    }
 
-
-
+    @ConstructorProperties({"id","n","r"})
     public GenreInfo(Long id, String n, String r){
         this.id = id;
         this.name = n;

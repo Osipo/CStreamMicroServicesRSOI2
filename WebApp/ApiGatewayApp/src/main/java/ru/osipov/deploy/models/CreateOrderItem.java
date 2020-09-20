@@ -6,50 +6,43 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
+import javax.annotation.Nonnull;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 @Data
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateCinema {
+public class CreateOrderItem {
 
     @NonNull
     @NotBlank
-    @Size(min = 3)
-    private String name;
+    @Min(value = 0)
+    private Double price;
 
     @NonNull
     @NotBlank
-    @NotEmpty
-    @Size(min = 3)
-    private String country;
+    @Min(value = 0)
+    private Double discount;
 
     @NonNull
     @NotBlank
-    @NotEmpty
-    @Size(min = 3)
-    private String city;
-
-
-    private String region;
+    @Min(value = 1)
+    private Long seatId;
 
     @NonNull
     @NotBlank
-    @NotEmpty
-    @Size(min = 3)
-    private String street;
+    @Min(value = 1)
+    private Long seanceId;
 
     @Override
     public String toString(){
         return com.google.common.base.MoreObjects.toStringHelper(this)
-                .add("name", name)
-                .add("country", country)
-                .add("city",city)
-                .add("region",region)
-                .add("street",street).toString();
+                .add("price", price)
+                .add("discount", discount)
+                .add("seanceId",seanceId)
+                .add("seatId",seatId).toString();
     }
 }

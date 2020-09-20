@@ -35,6 +35,7 @@ public class CinemaServiceImpl implements CinemaService {
     @Override
     @Transactional(readOnly = true)
     public List<CinemaInfo> getAllCinemas() {
+        
         logger.info("Get all cinemas");
         return rep.findAll().stream().map(ModelBuilder::buildCinemaInfo).collect(Collectors.toList());
     }

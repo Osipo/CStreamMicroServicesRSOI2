@@ -3,6 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Home from './Home';
+import GenList from './GenList';
 import FilmList from './FilmList';
 import FilmEdit from './FilmEdit';
 import GenreList from './GenreList';
@@ -26,7 +27,7 @@ class App extends Component {
                 <Route path='/' exact={true} component={Home}/>
                 <Route path='/views/films' exact={true} component={FilmList} />
                 <Route path='/views/genres' exact={true} component={GenreList} />
-                <Route path='/views/cinemas' exact={true} component={CinemaList}/>
+                <Route path='/views/cinemas' exact={true} render={(props) => (<GenList {...props} path={"/CinemaService/v1/api/cinemas"}/>)}/>
                 <Route path='/views/cinemas/:id' exact={true} component={CinemaEdit}/>
                 <Route path='/views/seances' exact={true} component={SeanceList}/>
                 <Route path='/views/genres/new' exact={true} component={GenreEdit}/>

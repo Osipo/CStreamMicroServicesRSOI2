@@ -60,6 +60,7 @@ public class WebConfig implements WebMvcConfigurer {
         return validator();
     }
 
+    /*
     @Bean
     @Description("Thymeleaf template resolver serving HTML 5")
     public ClassLoaderTemplateResolver templateResolver() {
@@ -104,6 +105,7 @@ public class WebConfig implements WebMvcConfigurer {
 //        registry.addViewController("/").setViewName("/index");
 //        registry.addViewController("/genre_result/genres").setViewName("/GResult");
     }
+    */
 
     @Bean
     public LocalValidatorFactoryBean validator() {

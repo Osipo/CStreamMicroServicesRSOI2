@@ -29,7 +29,7 @@ class FilmList extends Component {
   componentDidMount() {
     this.setState({isLoading: true});
 
-    fetch('/v1/api/films')
+    fetch('/FilmService/v1/api/films')
       .then(response => response.json())
       .then(data => this.setState({films: data, isLoading: false}));
   }

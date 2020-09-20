@@ -15,41 +15,26 @@ import javax.validation.constraints.Size;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateCinema {
-
+public class CreateRoom {
     @NonNull
     @NotBlank
-    @Size(min = 3)
-    private String name;
-
-    @NonNull
-    @NotBlank
-    @NotEmpty
-    @Size(min = 3)
-    private String country;
+    @Size(min = 6)
+    private String category;
 
     @NonNull
     @NotBlank
     @NotEmpty
-    @Size(min = 3)
-    private String city;
+    @Min(value = 0)
+    private Integer seats;
 
-
-    private String region;
-
-    @NonNull
-    @NotBlank
-    @NotEmpty
-    @Size(min = 3)
-    private String street;
+    @Min(value = 0)
+    private Integer roomNum;
 
     @Override
     public String toString(){
         return com.google.common.base.MoreObjects.toStringHelper(this)
-                .add("name", name)
-                .add("country", country)
-                .add("city",city)
-                .add("region",region)
-                .add("street",street).toString();
+                .add("category", category)
+                .add("number",roomNum)
+                .add("seats", seats).toString();
     }
 }

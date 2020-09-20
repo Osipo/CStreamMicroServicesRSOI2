@@ -3,11 +3,10 @@ import { Button, ButtonGroup, Container, Table } from 'reactstrap';
 import AppNavbar from './AppNavbar';
 import { Link } from 'react-router-dom';
 import $ from 'jquery';
-class CinemaList extends Component {
-
-  constructor(props) {
+class GenList extends Component {
+    constructor(props) {
     super(props);
-    this.state = {cinemas: [], isLoading: true,
+    this.state = {data: [], isLoading: true,
               currentPage: 1,
               pageSize: 1,
               upperPageBound: 3,
@@ -16,6 +15,7 @@ class CinemaList extends Component {
               isNextBtnActive: '',
               pageBound: 3
     };
+            this.sourcePath = props.path;
             this.handleClick = this.handleClick.bind(this);
             this.btnDecrementClick = this.btnDecrementClick.bind(this);
             this.btnIncrementClick = this.btnIncrementClick.bind(this);
@@ -23,16 +23,14 @@ class CinemaList extends Component {
             this.btnPrevClick = this.btnPrevClick.bind(this);
             this.componentDidMount = this.componentDidMount.bind(this);
             this.setPrevAndNextBtnClass = this.setPrevAndNextBtnClass.bind(this);
-	    this.showTimeout = this.showTimeout.bind(this);
-  }
-  
-  
-  componentDidMount() {
+            this.showTimeout = this.showTimeout.bind(this);
+   }
+   componentDidMount() {
         this.setState({isLoading: true});
 	setTimeout(this.showTimeout, 10*1000);
-        fetch('/CinemaService/v1/api/cinemas')
+        fetch(this.sourcePath)
           .then(response => response.json())
-          .then(data => this.setState({cinemas: data, isLoading: false}));
+          .then(data => this.setState({data: data, isLoading: false}));
   }
   
   showTimeout(){
@@ -53,7 +51,7 @@ class CinemaList extends Component {
             this.setPrevAndNextBtnClass(listid);
           }
           setPrevAndNextBtnClass(listid) {
-            let totalPage = Math.ceil(this.state.cinemas.length / this.state.pageSize);
+            let totalPage = Math.ceil(this.state.data.length / this.state.pageSize);
             this.setState({isNextBtnActive: 'disabled'});
             this.setState({isPrevBtnActive: 'disabled'});
             if(totalPage === listid && totalPage > 1){
@@ -102,20 +100,20 @@ class CinemaList extends Component {
   
   render() {
     
-    const { cinemas,isLoading, currentPage, pageSize,upperPageBound,lowerPageBound,isPrevBtnActive,isNextBtnActive } = this.state;
+    const { data,isLoading, currentPage, pageSize,upperPageBound,lowerPageBound,isPrevBtnActive,isNextBtnActive } = this.state;
             
-             if (isLoading) {
+            if (isLoading) {
                 return <p>Loading...</p>;
             }
             
-            if(cinemas.reason !== undefined){
+            if(data.reason !== undefined){
                 return(
                     <div>
                         <AppNavbar meid={3}/>
                         <Container fluid>
                             <div className="attention">
-                                <p>{cinemas.reason}</p>
-                                <p>{cinemas.code}</p>
+                                <p>{data.reason}</p>
+                                <p>{data.code}</p>
                             </div>
                         </Container>
                     </div>
@@ -125,7 +123,7 @@ class CinemaList extends Component {
             // Logic for displaying current todos
             const indexOfLastTodo = currentPage * pageSize;
             const indexOfFirstTodo = indexOfLastTodo - pageSize;
-            const currentTodos = cinemas.slice(indexOfFirstTodo, indexOfLastTodo);
+            const currentTodos = data.slice(indexOfFirstTodo, indexOfLastTodo);
 
             const renderCinemas = currentTodos.map((c, index) => {
               return <tr key={index}>
@@ -143,7 +141,7 @@ class CinemaList extends Component {
 
             // Logic for displaying page numbers
             const pageNumbers = [];
-            for (let i = 1; i <= Math.ceil(cinemas.length / pageSize); i++) {
+            for (let i = 1; i <= Math.ceil(data.length / pageSize); i++) {
               pageNumbers.push(i);
             }
 
@@ -230,4 +228,4 @@ class CinemaList extends Component {
   }
   
 }
-export default CinemaList;
+export default GenList;

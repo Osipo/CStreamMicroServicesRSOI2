@@ -2,8 +2,11 @@ package ru.osipov.deploy.models;
 
 
 import com.google.common.base.Objects;
-import lombok.*;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
+
+import java.util.List;
 
 @ToString
 @Accessors(chain = true)
@@ -19,20 +22,13 @@ public class FilmInfo {
     private final Short rating;
 
     @Getter
-    private final Long gid;
+    private final List<GenreInfo> genres;
 
-    public FilmInfo(){
-        this.id = -1L;
-        this.name = "Error";
-        this.rating = 0;
-        this.gid = -1L;
-    }
-
-    public FilmInfo(Long id, String name, Short rating, Long gid){
+    public FilmInfo(Long id, String name, Short rating, List<GenreInfo> genres){
         this.id = id;
         this.name = name;
         this.rating = rating;
-        this.gid = gid;
+        this.genres = genres;
     }
 
     @Override
@@ -42,11 +38,11 @@ public class FilmInfo {
         FilmInfo f = (FilmInfo) o;
         return Objects.equal(id,f.id) && Objects.equal(name, f.name) &&
                Objects.equal(rating, f.rating) &&
-               Objects.equal(gid,f.gid);
+               Objects.equal(genres,f.genres);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id,name, rating,gid);
+        return Objects.hashCode(id,name, rating,genres);
     }
 }
