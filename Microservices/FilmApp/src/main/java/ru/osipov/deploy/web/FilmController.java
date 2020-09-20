@@ -68,8 +68,8 @@ public class FilmController {
         return ResponseEntity.ok(f);
     }
 
-    //GET: /v1/films/genre/{genre_id}
-    //If no genre_id was specified -> empty list.
+    //GET: /v1/films/genre/{genre_name}
+    //If no genre was specified -> empty list.
     @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE,path = {"/genre/{gname}"})
     public List<FilmInfo> getByGid(@PathVariable(required = true, name = "gname") String gid){
         return fService.getFilmsByGName(gid);
@@ -117,7 +117,7 @@ public class FilmController {
                 logger.info("not found. 404");
                 return ResponseEntity.status(404).body("Film with name = "+name+" was not found.");
             }
-            films.add(fService.getByName(name));
+            films.add(f);
 
         }
         logger.info("Count: "+films.size());

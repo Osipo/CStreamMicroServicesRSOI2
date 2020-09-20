@@ -2,7 +2,7 @@ package ru.osipov.deploy.entities;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-
+import java.util.UUID;
 import javax.persistence.*;
 import com.google.common.base.Objects;
 
@@ -28,7 +28,13 @@ public class Room {
     @Column(name = "room_number", nullable = false)
     private Integer roomNum;
 
-
+    @Transient
+    private String hashId;
+    
+    public Room(){
+        this.hashId = UUID.randomUUID().toString();
+    }
+    
     @ManyToOne
     @JoinColumn(name="cid",nullable = false)
     private Cinema cinema;
@@ -38,7 +44,7 @@ public class Room {
 
     @Override
     public int hashCode(){
-        return Objects.hashCode(rid,category,size);
+        return Objects.hashCode(hashId);
     }
 
     @Override
@@ -46,10 +52,7 @@ public class Room {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Room r = (Room) o;
-        return Objects.equal(rid, r.rid) && Objects.equal(category,r.category) &&
-                Objects.equal(size,r.size) &&
-                Objects.equal(roomNum,r.roomNum) &&
-                Objects.equal(seats,r.seats) && Objects.equal(cinema, r.cinema);
+        return Objects.equal(r.hashId, hashId);
     }
 
     @Override

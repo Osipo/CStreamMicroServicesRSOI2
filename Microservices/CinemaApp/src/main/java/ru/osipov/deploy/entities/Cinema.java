@@ -3,7 +3,7 @@ package ru.osipov.deploy.entities;
 import com.google.common.base.Objects;
 import lombok.Data;
 import lombok.experimental.Accessors;
-
+import java.util.UUID;
 import javax.persistence.*;
 import java.util.Set;
 
@@ -35,21 +35,25 @@ public class Cinema {
     @OneToMany(mappedBy = "cinema",  cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Room> rooms;
 
+    @Transient
+    private String hashId;
+   
+    
+    public Cinema(){
+        this.hashId = UUID.randomUUID().toString();
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Cinema c = (Cinema) o;
-        return Objects.equal(cid, c.cid) && Objects.equal(cname, c.cname) &&
-                Objects.equal(city,c.city) && Objects.equal(street, c.street) &&
-                (region == null) ? c.region == null : Objects.equal(region, c.region) &&
-                Objects.equal(country, c.country) &&
-                Objects.equal(rooms,c.rooms);
+        return Objects.equal(hashId, c.hashId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(cid, cname,city,street, region != null ? region : 0,country);
+        return Objects.hashCode(hashId);
     }
 
     @Override

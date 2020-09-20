@@ -82,7 +82,7 @@ public class GenreController {
                 return ResponseEntity.status(404).body("Genre with name = "+name+" was not found.");
             }
 
-            genres.add(gService.getByName(name));
+            genres.add(g);
         }
         logger.info("Count: "+genres.size());
         return ResponseEntity.ok(genres);

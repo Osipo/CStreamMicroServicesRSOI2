@@ -95,7 +95,7 @@ public class RoomController {
 
     //POST: /v1/cinemas/{cinema_id}/rooms/delete/{room_id}
     //POST: /v1/cinemas/{cinema_id}/rooms/delete/
-    //PROTECTED [only for Admin and Cinema_Admin]
+    //PROTECTED [only for Cinema_Admin]
     @PostMapping(produces = APPLICATION_JSON_UTF8_VALUE, path={"/delete/{rid}","/delete/"})
     public ResponseEntity deleteRoom(@PathVariable(name = "cid", required = true) Long cid,@PathVariable(name = "rid")Long id, @RequestHeader HttpHeaders headers){
         //long cid = cid();
@@ -150,7 +150,7 @@ public class RoomController {
         }
     }
 
-    //POST: /v1/cinemas/{cid}/rooms/{rid}/update
+    //POST: /v1/cinemas/{cid}/rooms/{rid}/update/{sid}
     //PUBLIC [only for Admin and Cinema_Admin]
     @PatchMapping(consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE, path = "/{rid}/update/{sid}")
     public ResponseEntity updateSeat(@PathVariable(name = "cid", required = true) Long cid,
@@ -172,7 +172,7 @@ public class RoomController {
     }
 
     //POST: /v1/cinemas/{cid}/rooms/{rid}/delete/{sid}
-    //PROTECTED [only for Admin and Cinema_Admin]
+    //PROTECTED [only for Cinema_Admin]
     @PostMapping(consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE, path = "/{rid}/delete/{sid}")
     public ResponseEntity deleteSeat(@PathVariable(name = "cid", required = true) Long cid,
                                      @PathVariable(name = "rid", required = true)Long id,

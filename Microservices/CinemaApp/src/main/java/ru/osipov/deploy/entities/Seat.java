@@ -1,6 +1,7 @@
 package ru.osipov.deploy.entities;
 
 import lombok.Data;
+import java.util.UUID;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
@@ -23,13 +24,20 @@ public class Seat {
     @Column(name = "state",nullable = false)
     private String state;
 
+    @Transient
+    private String hashId;
+    
+    public Seat(){
+        this.hashId = UUID.randomUUID().toString();
+    }
+    
     @ManyToOne
     @JoinColumn(name="room_id",nullable = false)
     private Room room;
 
     @Override
     public int hashCode(){
-        return Objects.hashCode(sid,num,state);
+        return Objects.hashCode(hashId);
     }
 
     @Override
@@ -37,8 +45,7 @@ public class Seat {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Seat s = (Seat) o;
-        return Objects.equal(sid, s.sid) && Objects.equal(num,s.num) &&
-                Objects.equal(state,s.state) && Objects.equal(room, s.room);
+        return Objects.equal(s.hashId, hashId);
     }
 
     @Override

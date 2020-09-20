@@ -64,8 +64,8 @@ public class SeanceController {
         return result;
     }
 
-    @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE, path = {"/{id}","/"})
-    public List<SeanceInfo> getAllByCid(@PathVariable(required = false, name = "id") Long cid){
+    @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE, path = {"/{cid}","/"})
+    public List<SeanceInfo> getAllByCid(@PathVariable(required = false, name = "cid") Long cid){
         List<SeanceInfo> result;
         if(cid == null || cid == 0){
             logger.info("Cinema_id was not specified. Get all.");
@@ -121,10 +121,10 @@ public class SeanceController {
         return ResponseEntity.ok("All deleted.");
     }
 
-    //PATCH: /v1/seances/cid/fid
+    //PATCH: /v1/seances/rid/sid
     //PROTECTED.
-    @PatchMapping(consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE, path = {"/{cid}/{fid}"})
-    public ResponseEntity updateSeance(@PathVariable(required = true, name = "cid") Long cid, @PathVariable(required = true, name = "fid") Long fid, @RequestBody @Valid CreateSeance request
+    @PatchMapping(consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE, path = {"/{rid}/{sid}"})
+    public ResponseEntity updateSeance(@PathVariable(required = true, name = "rid") Long cid, @PathVariable(required = true, name = "sid") Long fid, @RequestBody @Valid CreateSeance request
     , @RequestHeader HttpHeaders headers){
         SeanceInfo s;
         try{
@@ -136,8 +136,10 @@ public class SeanceController {
         return ResponseEntity.ok(s);
     }
 
-    @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE, path = {"/{cid}/{fid}"})
-    public ResponseEntity getSeanceByID(@PathVariable(required = true, name = "cid") Long cid, @PathVariable(required = true, name = "fid") Long fid){
+    
+    //GET /v1/seances/rid/sid
+    @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE, path = {"/{rid}/{sid}"})
+    public ResponseEntity getSeanceByID(@PathVariable(required = true, name = "rid") Long cid, @PathVariable(required = true, name = "sid") Long fid){
         SeanceInfo s = seanceService.getSeanceByFilmAndCinema(fid,cid);
         if(s.getCid() == -1L)
             return ResponseEntity.status(404).body("There are no any seance with cinema "+cid+"and film "+fid);

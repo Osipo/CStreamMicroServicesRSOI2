@@ -137,7 +137,7 @@ public class OrderController {
     }
 
     //PATCH: /v1/orders/update
-    //protected: [only for Cinema_Admin and Admin]
+    //protected: [only for Cinema_Admin]
     @PatchMapping(path ="/update", consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity updateOrder(@RequestBody @Valid UpdateOrder o){
         logger.info("PATCH /v1/orders/update");
