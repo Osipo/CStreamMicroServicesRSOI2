@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.UUID;
 import java.time.LocalTime;
 import java.util.Set;
 
@@ -40,9 +41,18 @@ public class Order {
     @OneToMany(mappedBy = "order")
     private Set<OrderItem> items;
 
+    @Transient
+    private String hashId;
+    
+    public Order(){
+        this.hashId = UUID.randomUUID().toString();
+    }
+    
     @Override
     public int hashCode(){
-        return Objects.hashCode(oid,sum,createdAt,createdTime,uid,items);
+        if(oid == null || oid == 0L)
+            return Objects.hashCode(hashId);
+        return Objects.hashCode(oid);
     }
 
     @Override
@@ -50,11 +60,9 @@ public class Order {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Order oi = (Order) o;
-        return Objects.equal(oid, oi.oid) && Objects.equal(sum,oi.sum) &&
-                Objects.equal(uid,oi.uid) && Objects.equal(status, oi.status) &&
-                Objects.equal(createdAt,oi.createdAt) &&
-                Objects.equal(updatedAt,oi.updatedAt) &&
-                Objects.equal(createdTime,oi.createdTime) && Objects.equal(items, oi.items);
+        long id1 = oi.oid;
+        long id2 = oid;
+        return Objects.equal(hashId, oi.hashId);
     }
 
     @Override

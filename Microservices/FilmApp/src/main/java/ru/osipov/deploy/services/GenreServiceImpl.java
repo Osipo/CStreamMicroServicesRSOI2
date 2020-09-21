@@ -135,6 +135,12 @@ public class GenreServiceImpl implements GenreService {
         if(o.isPresent()){
             logger.info("Genre was found. Retrieve object for operation");
             Genre g = o.get();
+            Optional<Genre> o2 = gRepository.findByName(request.getGname());
+            if(o2.isPresent()){
+                logger.info("The newName of the new genre  must be unique");
+                logger.info("But this name '{}' is already being used by another genre",request.getGname());
+                throw new IllegalStateException("Genre with new name "+request.getGname()+" alredy exists");
+            }
             g.setName(request.getGname());
             g.setRemarks(request.getRemarks());
             logger.info("Data was read.");

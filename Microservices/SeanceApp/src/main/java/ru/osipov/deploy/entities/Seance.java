@@ -9,6 +9,7 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Set;
+import java.util.UUID;
 
 @Data
 @Accessors(chain = true)
@@ -41,11 +42,20 @@ public class Seance {
     @OneToMany(mappedBy = "sid")
     private Set<Ticket> tickets;
 
+    @Transient
+    private String hashId;
+    
+    public Seance(){
+        this.hashId = UUID.randomUUID().toString();
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Seance s = (Seance) o;
+        if((sid == null || sid == 0L) && (rid == null || rid == 0L))
+            return Objects.equal(hashId, s.hashId);
         return  Objects.equal(sid, s.sid) &&
                 Objects.equal(fid,s.fid) &&
                 Objects.equal(rid, s.rid) &&
@@ -55,7 +65,9 @@ public class Seance {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(sid,fid,date,time,rid);
+        if(sid == null || sid == 0L)
+            return Objects.hashCode(hashId);
+        return Objects.hashCode(sid,rid);
     }
 
     @Override

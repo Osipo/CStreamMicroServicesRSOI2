@@ -7,7 +7,7 @@ import lombok.experimental.Accessors;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.UUID;
 
 @Data
 @Accessors(chain = true)
@@ -31,6 +31,12 @@ public class Film {
             inverseJoinColumns = @JoinColumn(name = "gid"))
     private List<Genre> genres = new ArrayList<>();
 
+    @Transient
+    private String hashId;
+    
+    public Film(){
+        this.hashId = UUID.randomUUID().toString();
+    }
 
 
     public List<Genre> getGenres() {
@@ -46,13 +52,12 @@ public class Film {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Film f = (Film) o;
-        return Objects.equal(fid, f.fid) && Objects.equal(fname, f.fname) &&
-                Objects.equal(rating, f.rating) && Objects.equal(genres, f.genres);
+        return Objects.equal(hashId, f.hashId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(fid, fname, rating);
+        return Objects.hashCode(hashId);
     }
 
     @Override

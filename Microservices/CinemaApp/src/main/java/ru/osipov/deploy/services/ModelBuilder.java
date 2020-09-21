@@ -20,7 +20,7 @@ public class ModelBuilder {
     @Nonnull
     public static RoomInfo buildRoomInfo(@Nonnull Room ri) {
         logger.info("Room: '{}'",ri);
-        return new RoomInfo(ri.getRid(),ri.getCinema().getCid(), ri.getCategory(),ri.getSize(),ri.getRoomNum(),ri.getSeats().stream().map(ModelBuilder::buildSeatInfo).collect(Collectors.toList()));
+        return new RoomInfo(ri.getRid(),ri.getCinema().getCid(), ri.getCategory(),ri.getSize(),ri.getRoomNum());
     }
 
     @Nonnull
@@ -32,10 +32,6 @@ public class ModelBuilder {
     @Nonnull
     public static CinemaInfo buildCinemaInfo(@Nonnull Cinema ci) {
         logger.info("Cinema: '{}'",ci);
-        System.out.println("Error produced by call getRooms() ");
-        try{
-        Thread.sleep(10000);
-        }catch(InterruptedException e ){}
-        return new CinemaInfo(ci.getCid(),ci.getCname(), ci.getCountry(),ci.getCity(),ci.getRegion(),ci.getStreet(),ci.getRooms() == null ? null : ci.getRooms().stream().map(ModelBuilder::buildRoomInfo).collect(Collectors.toList()));
+        return new CinemaInfo(ci.getCid(),ci.getCname(), ci.getCountry(),ci.getCity(),ci.getRegion(),ci.getStreet());
     }
 }

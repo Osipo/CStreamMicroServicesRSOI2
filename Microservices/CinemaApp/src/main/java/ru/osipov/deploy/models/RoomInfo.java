@@ -27,17 +27,13 @@ public class RoomInfo {
     @Getter
     private final Integer roomNum;
 
-    @Getter
-    private final List<SeatInfo> seats;
 
-
-    public RoomInfo(Long rid, Long cid, String category, Integer size, Integer roomNum,List<SeatInfo> seats){
+    public RoomInfo(Long rid, Long cid, String category, Integer size, Integer roomNum){
         this.rid = rid;
         this.roomNum = roomNum;
         this.cid = cid;
         this.category = category;
         this.size = size;
-        this.seats = seats;
     }
 
     @Override
@@ -47,12 +43,11 @@ public class RoomInfo {
         RoomInfo ri = (RoomInfo) o;
         return  Objects.equal(rid,ri.rid) && Objects.equal(cid,ri.cid) && Objects.equal(category, ri.category) &&
                 Objects.equal(size,ri.size) &&
-                Objects.equal(roomNum,ri.roomNum) &&
-                 Objects.equal(seats, ri.seats);
+                Objects.equal(roomNum,ri.roomNum);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(rid,cid,category,size,roomNum,seats);
+        return Objects.hashCode(rid,cid,category,size,roomNum);
     }
 }

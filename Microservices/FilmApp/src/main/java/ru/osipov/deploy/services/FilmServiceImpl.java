@@ -179,6 +179,12 @@ public class FilmServiceImpl implements FilmService {
             }
             Film f = o.get();
             logger.info("Film was found.");
+            Optional<Film> o2 = rep.findByFname(request.getName());
+            if(o2.isPresent()){
+                logger.info("The newName of the new film  must be unique");
+                logger.info("But this name '{}' is already being used by another film",request.getName());
+                throw new IllegalStateException("Film with new name "+request.getName()+" alredy exists");
+            }
             f.setFname(request.getName());
             f.setRating(request.getRating());
             f.setGenres(gs);

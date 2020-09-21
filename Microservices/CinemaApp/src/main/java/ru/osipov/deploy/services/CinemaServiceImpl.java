@@ -61,7 +61,7 @@ public class CinemaServiceImpl implements CinemaService {
     @Transactional(readOnly = true)
     public CinemaInfo getByName(String ciName) {
         logger.info("Get one cinema by name = '{}'",ciName);
-        return rep.findByCname(ciName).map(ModelBuilder::buildCinemaInfo).orElse(new CinemaInfo(-2l,"","","","","",new ArrayList<>()));
+        return rep.findByCname(ciName).map(ModelBuilder::buildCinemaInfo).orElse(new CinemaInfo(-2l,"","","","",""));
     }
 
     @Nonnull

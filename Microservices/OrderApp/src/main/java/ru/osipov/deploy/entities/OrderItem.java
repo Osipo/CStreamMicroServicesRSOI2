@@ -3,7 +3,7 @@ package ru.osipov.deploy.entities;
 import com.google.common.base.Objects;
 import lombok.Data;
 import lombok.experimental.Accessors;
-
+import java.util.UUID;
 import javax.persistence.*;
 
 @Data
@@ -36,18 +36,22 @@ public class OrderItem {
 
     @Override
     public int hashCode(){
-        return Objects.hashCode(id,sid,seatId);
+        return Objects.hashCode(id == null || id == 0L ? hashId : id);
     }
 
+    @Transient
+    private String hashId;
+    
+    public OrderItem(){
+        this.hashId = UUID.randomUUID().toString();
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OrderItem oi = (OrderItem) o;
-        return Objects.equal(id, oi.id) && Objects.equal(price,oi.price) &&
-                Objects.equal(discount,oi.discount) &&
-                Objects.equal(sid,oi.sid) &&
-                Objects.equal(seatId,oi.seatId);
+        return Objects.equal(hashId, oi.hashId);
     }
 
     @Override
