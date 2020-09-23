@@ -25,11 +25,14 @@ class App extends Component {
         <Router>
             <Switch>
                 <Route path='/' exact={true} component={Home}/>
-                <Route path='/views/films' exact={true} component={FilmList} />
+                <Route path='/views/films' exact={true} render={(props) => (<GenList {...props} path={"/FilmService/v1/films/"} entity={"film"}/>)} />
+                
                 <Route path='/views/genres' exact={true} component={GenreList} />
-                <Route path='/views/cinemas' exact={true} render={(props) => (<GenList {...props} path={"/CinemaService/v1/api/cinemas"}/>)}/>
-                <Route path='/views/cinemas/:id' exact={true} component={CinemaEdit}/>
                 <Route path='/views/seances' exact={true} component={SeanceList}/>
+                <Route path='/views/cinemas' exact={true} render={(props) => (<GenList {...props} path={"/CinemaService/v1/cinemas/"} entity={"cinema"}/>)}/>
+                
+                <Route path='/views/cinemas/:id' exact={true} component={CinemaEdit}/>
+                
                 <Route path='/views/genres/new' exact={true} component={GenreEdit}/>
                 <Route path='/views/films/:id'  component={FilmEdit} />
                 <Route path='/views/cinemas/:id/seances' exact={true} component={SeanceCinemaList} />

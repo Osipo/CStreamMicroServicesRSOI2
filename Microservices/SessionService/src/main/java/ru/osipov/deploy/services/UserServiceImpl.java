@@ -73,12 +73,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserEntity create(UserEntity user) {
+    public UserEntity create(UserEntity user,String role) {
         logger.info("create() method called: ");
-
+        RoleName nrol = null;
+        try{
+            nrol = Enum.valueOf(RoleName.class, role);
+        }
+        catch(IllegalArgumentException | NullPointerException e){
+            nrol = RoleName.ROLE_USER;
+        }
+        
         Optional<Role> roleUser = roleRepository.findByName(RoleName.ROLE_USER);
+        Optional<Role> specRole = roleRepository.findByName(nrol);
         List<Role> userRoles = new ArrayList<>();
         roleUser.ifPresent(userRoles::add);
+        specRole.ifPresent(userRoles::add);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(userRoles);
         checkUserData(user);

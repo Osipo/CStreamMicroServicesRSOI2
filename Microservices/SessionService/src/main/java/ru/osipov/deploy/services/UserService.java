@@ -13,7 +13,7 @@ public interface UserService {
     UserModel findById(Long id);
     UserEntity findByUsername(String userName);
     UserEntity findByEmail(String email);
-    UserEntity create(UserEntity user);
+    UserEntity create(UserEntity user,String role);
     UserEntity update(Long id, UserEntity user);
     void delete(Long id);
 

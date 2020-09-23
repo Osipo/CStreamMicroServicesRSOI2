@@ -83,6 +83,7 @@ public class SessionController {
     }
 
     //GET TOKEN BY LOGIN/PASSWORD.
+    //Request from form
     @PostMapping(path = "/oauth2/token", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public Map<String, String> getTokenByLForm(@RequestBody @Valid SignInRequest data, HttpServletRequest request){
         HashMap<String, String> requestDto = new HashMap<>();
@@ -160,7 +161,7 @@ public class SessionController {
         r.setUsername(user.getUsername());
         r.setEmail(user.getEmail());
         r.setPassword(user.getPassword());
-        UserEntity result = userService.create(r);//set role ROLE_USER and encrypt Password. Then save it into db.
+        UserEntity result = userService.create(r,user.getRole());//set specified Role with USER_ROLE and encrypt Password. Then save it into db.
         HashMap<String, String> req = new HashMap<>();//after registration return access_token.
         req.put("username",user.getUsername());
         req.put("password",user.getPassword());

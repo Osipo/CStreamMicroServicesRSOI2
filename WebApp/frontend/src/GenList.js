@@ -5,8 +5,8 @@ import { Link } from 'react-router-dom';
 import $ from 'jquery';
 class GenList extends Component {
     constructor(props) {
-    super(props);
-    this.state = {data: [], isLoading: true,
+        super(props);
+        this.state = {data: [], isLoading: true,
               currentPage: 1,
               pageSize: 1,
               upperPageBound: 3,
@@ -14,20 +14,21 @@ class GenList extends Component {
               isPrevBtnActive: 'disabled',
               isNextBtnActive: '',
               pageBound: 3
-    };
-            this.sourcePath = props.path;
-            this.handleClick = this.handleClick.bind(this);
-            this.btnDecrementClick = this.btnDecrementClick.bind(this);
-            this.btnIncrementClick = this.btnIncrementClick.bind(this);
-            this.btnNextClick = this.btnNextClick.bind(this);
-            this.btnPrevClick = this.btnPrevClick.bind(this);
-            this.componentDidMount = this.componentDidMount.bind(this);
-            this.setPrevAndNextBtnClass = this.setPrevAndNextBtnClass.bind(this);
-            this.showTimeout = this.showTimeout.bind(this);
+        };
+        this.sourcePath = props.path;//url of fetching data
+        this.entity = props.entity;//type of data.
+        this.handleClick = this.handleClick.bind(this);
+        this.btnDecrementClick = this.btnDecrementClick.bind(this);
+        this.btnIncrementClick = this.btnIncrementClick.bind(this);
+        this.btnNextClick = this.btnNextClick.bind(this);
+        this.btnPrevClick = this.btnPrevClick.bind(this);
+        this.componentDidMount = this.componentDidMount.bind(this);
+        this.setPrevAndNextBtnClass = this.setPrevAndNextBtnClass.bind(this);
+        this.showTimeout = this.showTimeout.bind(this);
    }
    componentDidMount() {
         this.setState({isLoading: true});
-	setTimeout(this.showTimeout, 10*1000);
+	setTimeout(this.showTimeout, 10*1000);//timeout for FETCHING: 10 seconds.
         fetch(this.sourcePath)
           .then(response => response.json())
           .then(data => this.setState({data: data, isLoading: false}));
@@ -125,7 +126,11 @@ class GenList extends Component {
             const indexOfFirstTodo = indexOfLastTodo - pageSize;
             const currentTodos = data.slice(indexOfFirstTodo, indexOfLastTodo);
 
-            const renderCinemas = currentTodos.map((c, index) => {
+            //PARSE DATA WITH SPECIFIED TYPE.
+            let renderCinemas = null;
+            let renderFilms = null;
+            if(this.entity === "cinema"){
+              renderCinemas = currentTodos.map((c, index) => {
               return <tr key={index}>
                 <td style={{whiteSpace: 'nowrap'}}>{c.name}</td>
                 <td>{c.country}</td>
@@ -137,8 +142,27 @@ class GenList extends Component {
                   </ButtonGroup>
                 </td>
               </tr>;
-            });
-
+              });
+            }
+            else if(this.entity === "film"){
+                renderFilms = currentTodos.map((f, index) => {
+                    let genres = f.genres.map((g, index) => {
+                        return <div key={g.id}>{g.name}</div>
+                    });
+                    return <tr key={index}>
+                    <td style={{whiteSpace: 'nowrap'}}>{f.name}</td>
+                    <td>{f.rating}</td>
+                    <td>{genres}</td>
+                    <td>
+                      <ButtonGroup>
+                        <Button size="sm" color="primary" tag={Link} to={"/views/films/"+f.id}>Edit</Button>
+                      </ButtonGroup>
+                    </td>
+                  </tr>;
+              });
+           }
+            
+            
             // Logic for displaying page numbers
             const pageNumbers = [];
             for (let i = 1; i <= Math.ceil(data.length / pageSize); i++) {
@@ -180,20 +204,7 @@ class GenList extends Component {
                 renderNextBtn = <li className={isNextBtnActive}><a href='#' id="btnNext" onClick={this.btnNextClick}> Next </a></li>
             }
 
-    /*const cList = cinemas.map(c => {
-           return(<tr key={c.id}>
-                <td style={{whiteSpace: 'nowrap'}}>{c.name}</td>
-                <td>{c.country}</td>
-                <td>{c.city}  {c.region} {c.street}</td>
-                <td>
-                  <ButtonGroup>
-                    <Button size="sm" color="success" tag={Link} to={"/views/cinemas/"+c.id}>Edit</Button>
-                    <Button size="sm" color="primary" tag={Link} to={"/views/cinemas/"+c.id+"/seances"}>Seances</Button> 
-                  </ButtonGroup>
-                </td>
-                            
-           </tr>);});*/
-
+    //RETURN SECTION.  SHOWS LIST WITH SPECIFIED TYPE.
     return (
       <div>
         <AppNavbar meid={3}/>
@@ -201,7 +212,9 @@ class GenList extends Component {
           <div className="float-right">
             <Button color="danger" tag={Link} to="/">Back</Button>
           </div>
-          <h3>Cinemas</h3>
+          
+          <h3>{this.entity}</h3>
+          if(entity === "cinema"){
           <Table className="mt-4">
             <thead>
             <tr>
@@ -215,6 +228,22 @@ class GenList extends Component {
             {renderCinemas}
             </tbody>
           </Table>
+          } else if(entity === "film"){
+              <Table className="mt-4">
+            <thead>
+            <tr>
+              <th width="20%">Name</th>
+              <th width="10%">Rating</th>
+              <th width="30%">Genres</th>
+            </tr>
+            </thead>
+            <tbody>
+            {renderFilms}
+            </tbody>
+          </Table>
+          }
+          
+          
           <ul id="page-numbers" className="pagination">
                   {renderPrevBtn}
                   {pageDecrementBtn}

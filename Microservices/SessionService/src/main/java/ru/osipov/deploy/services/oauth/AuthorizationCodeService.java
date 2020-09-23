@@ -40,6 +40,7 @@ public class AuthorizationCodeService {
         if (!authorizationCode.getCode().equals(code))
             return false;
 
+        /*
         if (authorizationCode.getUpdatedAt() != null) {
             LocalDate date = authorizationCode.getUpdatedAt();
             if (date.isBefore(LocalDate.now())) {
@@ -52,7 +53,7 @@ public class AuthorizationCodeService {
                 deleteById(code);
                 return false;
             }
-        }
+        }*/
         return true;
     }
 
