@@ -6,3 +6,5 @@ include 'SeanceApp'
 include 'CinemaApp'
 include 'QueueApp'
 include 'SessionService'
+include 'StatisticsApp'
+

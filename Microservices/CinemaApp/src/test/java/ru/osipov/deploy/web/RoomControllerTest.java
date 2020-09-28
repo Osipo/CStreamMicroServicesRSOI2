@@ -88,7 +88,7 @@ public class RoomControllerTest {
     }
 
     @Test
-    public void testById(){
+    public void testById() throws Exception {
         logger.info("testGetAll");
         RoomInfo res = new RoomInfo(3l,1l,"Standard",100,1);
         when(serv.getRoomById(3l)).thenReturn(res);

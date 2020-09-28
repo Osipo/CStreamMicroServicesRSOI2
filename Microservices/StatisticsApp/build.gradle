@@ -1,0 +1,95 @@
+buildscript{
+    repositories{
+        mavenCentral()
+        maven{
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "org.springframework.boot:org.springframework.boot.gradle.plugin:${springBootVersion}"
+    }
+}
+
+plugins {
+    id 'java'
+    id 'application'
+    id "org.springframework.boot" version "2.1.7.RELEASE"
+    id "io.spring.dependency-management" version "1.0.8.RELEASE"
+}
+apply from: 'libraries.gradle'
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+mainClassName = 'ru.osipov.deploy.App'
+group 'ru.osipov.deploy'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.12
+targetCompatibility = 1.12
+
+repositories {
+    mavenCentral()
+}
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+task stage(dependsOn: ['build', 'clean'])
+build.mustRunAfter clean
+
+task copyToLib(type: Copy) {
+    into "$buildDir/libs"
+    from(configurations.compile)
+}
+
+stage.dependsOn(copyToLib)
+
+dependencies {
+
+    // Use MySQL Connector-J
+    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.15'
+
+    //compile 'mysql:mysql-connector-java'
+    compile group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
+
+    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
+    implementation 'com.google.guava:guava:27.0.1-jre'
+    implementation 'org.springframework.boot:spring-boot-dependencies:2.0.5.RELEASE'
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "com.google.code.gson:gson"
+    implementation "com.google.guava:guava:${guavaVersion}"
+    implementation "org.apache.commons:commons-lang3:${commonsLangVersion}"
+
+    implementation "com.h2database:h2"
+
+    compileOnly "com.google.code.findbugs:jsr305:${findBugsVersion}"
+    implementation "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "org.junit.jupiter:junit-jupiter-api"
+    testImplementation "org.junit.jupiter:junit-jupiter-engine"
+
+    //Registration Service
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter', version: '2.1.3.RELEASE'
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-eureka-server', version: '2.1.3.RELEASE'
+    runtime group: 'org.springframework.cloud', name: 'spring-cloud-dependencies', version: 'Finchley.RELEASE', ext: 'pom'
+
+
+    //Security
+    implementation 'org.springframework.boot:spring-boot-starter-security:2.1.3.RELEASE'
+    implementation 'io.jsonwebtoken:jjwt-api:0.10.5'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.10.5'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.10.5'
+}
+test{
+    useJUnitPlatform()
+}
+springBoot{
+    buildInfo()
+}
