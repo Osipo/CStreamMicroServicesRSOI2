@@ -129,6 +129,7 @@ class GenList extends Component {
             //PARSE DATA WITH SPECIFIED TYPE.
             let renderCinemas = null;
             let renderFilms = null;
+            let renderSeances = null;
             if(this.entity === "cinema"){
               renderCinemas = currentTodos.map((c, index) => {
               return <tr key={index}>
@@ -138,6 +139,7 @@ class GenList extends Component {
                 <td>
                   <ButtonGroup>
                     <Button size="sm" color="success" tag={Link} to={"/views/cinemas/"+c.id}>Edit</Button>
+                    <Button size="sm" color="primary" tag={Link} to={"/views/cinemas/"+c.id+"/films"}>Films</Button> 
                     <Button size="sm" color="primary" tag={Link} to={"/views/cinemas/"+c.id+"/seances"}>Seances</Button> 
                   </ButtonGroup>
                 </td>
@@ -160,6 +162,11 @@ class GenList extends Component {
                     </td>
                   </tr>;
               });
+           }
+           else if(this.entity === "seance"){
+               renderSeances = currentTodos.map((f, index) => {
+                   
+               });
            }
             
             

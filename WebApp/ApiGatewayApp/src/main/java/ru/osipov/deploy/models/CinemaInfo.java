@@ -26,17 +26,14 @@ public class CinemaInfo {
     @Getter
     private final String street;
 
-    @Getter
-    private final List<RoomInfo> rooms;
-
-    public CinemaInfo(Long id, String name, String country, String city, String region, String street, List<RoomInfo> rooms){
+   
+    public CinemaInfo(Long id, String name, String country, String city, String region, String street){
         this.id = id;
         this.name = name;
         this.country = country;
         this.city = city;
         this.region = region;
         this.street = street;
-        this.rooms = rooms;
     }
 
 
@@ -50,12 +47,11 @@ public class CinemaInfo {
         return  Objects.equal(id,ci.id) && Objects.equal(name, ci.name) &&
                 Objects.equal(city,ci.city) && Objects.equal(street, ci.street) &&
                 (region == null) ? ci.region == null : Objects.equal(region, ci.region) &&
-                Objects.equal(country, ci.country)
-                && Objects.equal(rooms,ci.rooms);
+                Objects.equal(country, ci.country);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id,name,city,street, region != null ? region : 0,country,rooms);
+        return Objects.hashCode(id,name,city,street, region != null ? region : 0,country);
     }
 }

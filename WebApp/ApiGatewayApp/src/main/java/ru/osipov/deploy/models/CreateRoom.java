@@ -16,6 +16,11 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateRoom {
+    
+    @NonNull
+    @NotBlank
+    private Long cid;
+    
     @NonNull
     @NotBlank
     @Size(min = 6)
@@ -33,6 +38,7 @@ public class CreateRoom {
     @Override
     public String toString(){
         return com.google.common.base.MoreObjects.toStringHelper(this)
+                .add("cinemaId",cid)
                 .add("category", category)
                 .add("number",roomNum)
                 .add("seats", seats).toString();

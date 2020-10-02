@@ -28,7 +28,7 @@ class App extends Component {
                 <Route path='/views/films' exact={true} render={(props) => (<GenList {...props} path={"/FilmService/v1/films/"} entity={"film"}/>)} />
                 
                 <Route path='/views/genres' exact={true} component={GenreList} />
-                <Route path='/views/seances' exact={true} component={SeanceList}/>
+                <Route path='/views/seances' exact={true} render={(props) => (<GenList {...props} path={"/CinemaService/v1/seances/"} entity={"seance"}/>)}/>
                 <Route path='/views/cinemas' exact={true} render={(props) => (<GenList {...props} path={"/CinemaService/v1/cinemas/"} entity={"cinema"}/>)}/>
                 
                 <Route path='/views/cinemas/:id' exact={true} component={CinemaEdit}/>
